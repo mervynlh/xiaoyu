@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxdetailOptRecordMapper">
+
+        <resultMap id="TrxdetailOptRecordResult" type="TrxdetailOptRecord">
+            <result property="id" column="id"/>
+            <result property="trxorderId" column="trxorder_id"/>
+            <result property="trxorderDetailId" column="trxorder_detail_id"/>
+            <result property="type" column="type"/>
+            <result property="optuser" column="optuser"/>
+            <result property="optusername" column="optusername"/>
+            <result property="desc" column="description"/>
+            <result property="createTime" column="create_time"/>
+            <result property="userType" column="user_type"/>
+            <result property="applicant" column="applicant"/>
+        </resultMap>
+
+		<resultMap type="TrxdetailOptRecordDTO" id="TrxdetailOptRecordDTOResult" extends="TrxdetailOptRecordResult">
+			<result property="sourcePrice" column="source_price"/>
+			<result property="currentPrice" column="current_price"/>
+			<result property="courseName" column="course_name"/>
+			<result property="requestId" column="request_id"/>
+		</resultMap>
+
+        <sql id="edu_trxdetail_opt_record_columns">
+            edu_trxdetail_opt_record.id,
+            edu_trxdetail_opt_record.trxorder_id,
+            edu_trxdetail_opt_record.trxorder_detail_id,
+            edu_trxdetail_opt_record.type,
+            edu_trxdetail_opt_record.optuser,
+            edu_trxdetail_opt_record.optusername,
+            edu_trxdetail_opt_record.description,
+            edu_trxdetail_opt_record.create_time,
+            edu_trxdetail_opt_record.user_type,
+            edu_trxdetail_opt_record.applicant
+        </sql>
+
+        <sql id="edu_trxdetail_opt_record_properties">
+            #{id},
+            #{trxorderId},
+            #{trxorderDetailId},
+            #{type},
+            #{optuser},
+            #{optusername},
+            #{desc},
+            #{createTime},
+            #{userType},
+            #{applicant}
+        </sql>
+
+        <insert id="createTrxdetailOptRecord" parameterType="TrxdetailOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_trxdetail_opt_record (<include refid="edu_trxdetail_opt_record_columns"/>) VALUES (<include refid="edu_trxdetail_opt_record_properties"/>)
+        </insert>
+
+        <delete id="deleteTrxdetailOptRecordById" parameterType="Long">
+            delete from edu_trxdetail_opt_record
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateTrxdetailOptRecord" parameterType="TrxdetailOptRecordDTO">
+            update edu_trxdetail_opt_record SET
+            	id = #{id},
+            	trxorder_id = #{trxorderId},
+            	trxorder_detail_id = #{trxorderDetailId},
+            	type = #{type},
+            	optuser = #{optuser},
+            	optusername = #{optusername},
+            	description = #{desc},
+            	create_time = #{createTime}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getTrxdetailOptRecordById" resultMap="TrxdetailOptRecordDTOResult" parameterType="Long">
+            select
+            <include refid="edu_trxdetail_opt_record_columns"/>,
+            edu_trxorder_detail.source_price,
+            edu_trxorder_detail.current_price,
+            edu_trxorder_detail.course_name,
+            edu_trxorder_detail.request_id
+            from edu_trxdetail_opt_record 
+            left join edu_trxorder_detail on edu_trxdetail_opt_record.trxorder_detail_id = edu_trxorder_detail.id
+            where edu_trxdetail_opt_record.id = #{value}
+        </select>
+		
+        <select id="getTrxdetailOptRecordList" resultMap="TrxdetailOptRecordDTOResult" parameterType="java.util.HashMap">
+            select
+            <include refid="edu_trxdetail_opt_record_columns"/>,
+            edu_trxorder_detail.source_price,
+            edu_trxorder_detail.current_price,
+            edu_trxorder_detail.course_name,
+            edu_trxorder_detail.request_id
+            from edu_trxdetail_opt_record
+            left join edu_trxorder_detail on edu_trxdetail_opt_record.trxorder_detail_id = edu_trxorder_detail.id
+            <where>
+            	<if test="e.type==null or e.type==''">
+            		and edu_trxdetail_opt_record.type in('COURSEAUDIT','COURSESUCCESS','COURSECANCEL')
+            	</if>
+            	<if test="e.type!=null and e.type!=''">
+            		and edu_trxdetail_opt_record.type = #{e.type}
+            	</if>
+            	<if test="e.userType!=null">
+	            	and edu_trxdetail_opt_record.user_type = #{e.userType}
+	            </if>
+	            <if test="e.applicant!=null and e.applicant!=''">
+	            	and edu_trxdetail_opt_record.applicant = #{e.applicant}
+	            </if>
+	            <if test="e.requestId!=null and e.requestId!=0">
+	            	and edu_trxorder_detail.request_id = #{e.requestId}
+	            </if>
+            </where>
+            order by edu_trxdetail_opt_record.create_time desc
+            <include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getTrxdetailOptRecordListCount" resultType="int" parameterType="java.util.HashMap">
+            select
+            count(1)
+            from edu_trxdetail_opt_record
+            left join edu_trxorder_detail on edu_trxdetail_opt_record.trxorder_detail_id = edu_trxorder_detail.id
+           <where>
+           		<if test="e.type==null or e.type==''">
+            		and edu_trxdetail_opt_record.type in('COURSEAUDIT','COURSESUCCESS','COURSECANCEL')
+            	</if>
+            	<if test="e.type!=null and e.type!=''">
+            		and edu_trxdetail_opt_record.type = #{e.type}
+            	</if>
+            	<if test="e.userType!=null">
+	            	and edu_trxdetail_opt_record.user_type = #{e.userType}
+	            </if>
+	            <if test="e.applicant!=null and e.applicant!=''">
+	            	and edu_trxdetail_opt_record.applicant = #{e.applicant}
+	            </if>
+	             <if test="e.requestId!=null and e.requestId!=0">
+	            	and edu_trxorder_detail.request_id = #{e.requestId}
+	            </if>
+            </where>
+            order by edu_trxdetail_opt_record.create_time desc
+        </select>
+</mapper>

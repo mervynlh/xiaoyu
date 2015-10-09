@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<decorators defaultdir="/WEB-INF/layouts/">
+
+	<excludes>
+		   <!-- 不走布局的页面 静态资源 文本编辑器 api -->
+           <pattern>/static/*</pattern>
+           <pattern>/kindeditor/*</pattern>
+           <pattern>/api/*</pattern>
+           <!-- ajax返回html -->
+           <pattern>/*/ajax/*</pattern>
+           <!-- 剔除后台iframe布局的路径 -->
+           <pattern>/admin</pattern>
+           <pattern>/admin/</pattern>
+           <pattern>/admin/sys/login</pattern>
+           <pattern>/admin/sys/topframe</pattern>
+           <pattern>/admin/sys/leftframe</pattern>
+           <pattern>/admin/sys/main</pattern>
+           <pattern>/admin/sys/rightframe</pattern>
+           <pattern>/admin/sys/bottomFrame</pattern>
+           <pattern>/admin/func/showchild</pattern>
+           
+           <!--
+           <pattern>/admin/**/*</pattern>
+           <pattern>/user/*</pattern>
+           <pattern>/group/*</pattern>
+           <pattern>/role/*</pattern>
+           <pattern>/func/*</pattern>
+           <pattern>/sys/*</pattern>
+           <pattern>/adminCus/*</pattern>-->
+           <pattern>/front/playkpoint*</pattern>
+    
+      	   
+           <!--  -->
+    </excludes>
+    
+    <!-- edu前端布局 -->
+    <decorator name="edudefault" page="edu/default.jsp">
+       <pattern>/front/*/*</pattern>
+       <pattern>/index</pattern>
+       <pattern>/front/*</pattern>
+       <pattern>/shopcart*</pattern>
+       <pattern>/user/getpwdcode</pattern>
+       <pattern>/member/*</pattern>
+       <pattern>/help</pattern>
+       <pattern>/library/*</pattern>
+       <pattern>/book/*</pattern>
+       <pattern>/order/*</pattern>
+        <pattern>/cashorder/*</pattern>
+    </decorator> 
+    <!-- 忘记修改密码 -->
+     <decorator name="lfrontedudefault" page="edu/login_default.jsp">
+      <pattern>/register</pattern>
+      <pattern>/login</pattern>
+      <pattern>/forget_passwd</pattern>
+      <pattern>/jump_user</pattern>
+    </decorator> 
+    
+    <!-- edu学习中心布局 -->
+    <decorator name="eduucdefault" page="edu/uc/default_uc.jsp">
+       <pattern>/uc/*</pattern>
+       <pattern>/uletter</pattern>
+    </decorator> 
+    
+    
+   <!-- 个人中心布局SNS 暂时跟网校的功能分开 -->   
+   <decorator name="snsdefault" page="sns/default.jsp">
+		<!-- SNS相关 -->
+        <pattern>/u/*</pattern>
+        <pattern>/p/*</pattern>
+        <pattern>/search</pattern>
+        <pattern>/weibo*</pattern>
+        <pattern>/weibo/*</pattern>
+        <pattern>/weibo/**/*</pattern>
+        <pattern>/blog</pattern>
+        <pattern>/blog/*</pattern>
+        <pattern>/blog/**/*</pattern>
+        <pattern>/friend</pattern>
+        <pattern>/friend/*</pattern>
+        <pattern>/friend/**/*</pattern>
+        <pattern>/sug</pattern>
+        <pattern>/sug/*</pattern>
+        <pattern>/sug/**/*</pattern>
+        <pattern>/dis</pattern>
+        <pattern>/dis/*</pattern>
+        <pattern>/dis/**/*</pattern>
+        <pattern>/letter</pattern>
+        <pattern>/letter/*</pattern>
+        <pattern>/letter/**/*</pattern>
+    </decorator>
+     
+     <!-- 考试前端布局 -->
+    <decorator name="examdefault" page="exam/default.jsp">
+              <pattern>/quest/*</pattern>
+              <pattern>/paper/*</pattern>
+              <pattern>/subj/*</pattern>
+    </decorator>
+
+    <!-- 后台管理布局 -->
+    <decorator name="admindefault" page="admin/default.jsp">
+        <pattern>/admin/*</pattern>
+		<pattern>/admin/**/*</pattern>
+		
+    </decorator>
+       
+</decorators>

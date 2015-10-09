@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteTeacherDetailMapper">
+
+	<resultMap id="WebsiteTeacherDetailResult" type="WebsiteTeacherDetail">
+		<result property="id" column="id" />
+		<result property="recommendId" column="recommendId" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="orderNum" column="ordernum" />
+	</resultMap>
+	<resultMap id="WebsiteTeacherDetailDTOResult" type="WebsiteTeacherDetailDTO" extends="WebsiteTeacherDetailResult">
+		<result property="teacherStatus" column="teacherStatus" />
+		<result property="recommendName" column="recommendName" />
+		<result property="teacherName" column="teacherName" />
+	</resultMap>
+	<sql id="edu_website_teacher_detail_columns">
+		edu_website_teacher_detail.id,
+		edu_website_teacher_detail.recommendId,
+		edu_website_teacher_detail.teacher_id,
+		edu_website_teacher_detail.orderNum
+	</sql>
+
+	<sql id="edu_website_teacher_detail_properties">
+		#{id},
+		#{recommendId},
+		#{teacherId},
+		#{orderNum}
+	</sql>
+	<!-- 添加推荐教师 -->
+	<insert id="createWebsiteTeacherDetail" parameterType="java.util.List">
+		insert INTO edu_website_teacher_detail (
+		<include refid="edu_website_teacher_detail_columns" />
+		) VALUES 
+		<foreach collection="list" item="item" index="index" separator="," > 
+			(#{item.id},#{item.recommendId},#{item.teacherId},#{item.orderNum}) 
+		</foreach>
+	</insert>
+	<!-- 删除推荐教师 -->
+	<delete id="delWebsiteTeacherDetailById" parameterType="Long">
+		delete from edu_website_teacher_detail where id = #{value}
+	</delete>
+	<delete id="deleteWebsiteTeacherDetail" parameterType="WebsiteTeacherDetail">
+		delete from edu_website_teacher_detail where 
+		teacher_id = #{TeacherId}
+	</delete>
+	<!-- 更新推荐教师 -->
+	<update id="updateWebsiteTeacherDetail" parameterType="WebsiteTeacherDetail">
+		update edu_website_teacher_detail SET
+		orderNum = #{orderNum}
+		where
+		id = #{id}
+	</update>
+	<!-- id查询推荐教师 -->
+	<select id="getWebsiteTeacherDetailDTOById" resultMap="WebsiteTeacherDetailDTOResult" parameterType="Long">
+		select
+		<include refid="edu_website_teacher_detail_columns" />,
+		user_expand.realname as TeacherName,
+		edu_teacher.STATUS as teacherStatus,
+		edu_website_teacher.NAME as recommendName
+		from
+		edu_website_teacher_detail
+		left join edu_teacher on edu_website_teacher_detail.teacher_id=edu_teacher.ID
+		left join edu_website_teacher on edu_website_teacher_detail.recommendId=edu_website_teacher.id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		where
+		edu_website_teacher_detail.id = #{value}
+	</select>
+	<!-- 推荐分类查询推荐教师集合 -->
+	<select id="getWebsiteTeacherDetails" resultMap="WebsiteTeacherDetailResult" parameterType="Long">
+		select
+		<include refid="edu_website_teacher_detail_columns" />
+		from edu_website_teacher_detail
+		where
+		recommendId = #{value}
+	</select>
+	<!-- 推荐分类删除推荐教师 -->
+	<delete id="delWebsiteTeacherDetails" parameterType="Long">
+		delete from edu_website_teacher_detail where recommendId = #{value}
+	</delete>
+	<!-- 推荐课程列表 -->
+	<select id="queryWebsiteTeacherDetailList" parameterType="WebsiteTeacherDetailDTO" resultMap="WebsiteTeacherDetailDTOResult">
+		select
+		<include refid="edu_website_teacher_detail_columns" />,
+		user_expand.realname as TeacherName,
+		edu_teacher.STATUS as teacherStatus,
+		edu_website_teacher.NAME as recommendName
+		from
+		edu_website_teacher_detail
+		left join edu_teacher on edu_website_teacher_detail.teacher_id=edu_teacher.ID
+		left join edu_website_teacher on edu_website_teacher_detail.recommendId=edu_website_teacher.id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		<where>
+			<if test="e.teacherName!=null and e.teacherName!='' ">
+				and user_expand.realname like CONCAT('%',#{e.teacherName},'%')
+			</if>
+			<if test="e.recommendId!=null and e.recommendId>0 ">
+				and edu_website_teacher_detail.recommendId = #{e.recommendId}
+			</if>
+			<if test="e.teacherStatus!=null and e.teacherStatus>0 ">
+				and edu_teacher.status = #{e.teacherStatus}
+			</if>
+			<if test="e.cityId>0">
+				and edu_teacher.city_id = #{e.cityId}
+			</if>
+		</where>
+		order by edu_website_teacher_detail.orderNum DESC,edu_website_teacher_detail.id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryWebsiteTeacherDetailListCount" parameterType="WebsiteTeacherDetailDTO" resultType="int">
+		select count(1)
+		from
+		edu_website_teacher_detail
+		left join edu_teacher on edu_website_teacher_detail.teacher_id=edu_teacher.ID
+		left join edu_website_teacher on edu_website_teacher_detail.recommendId=edu_website_teacher.id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		<where>
+			<if test="e.teacherName!=null and e.teacherName!='' ">
+				and user_expand.realname like CONCAT('%',#{e.teacherName},'%')
+			</if>
+			<if test="e.recommendId!=null and e.recommendId>0 ">
+				and edu_website_teacher_detail.recommendId = #{e.recommendId}
+			</if>
+			<if test="e.teacherStatus!=null and e.teacherStatus>0 ">
+				and edu_teacher.status = #{e.teacherStatus}
+			</if>
+			<if test="e.cityId>0">
+				and edu_teacher.city_id = #{e.cityId}
+			</if>
+		</where>
+	</select>
+</mapper>

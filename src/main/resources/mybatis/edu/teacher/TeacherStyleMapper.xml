@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherStyleMapper">
+		
+	 <resultMap type="TeacherStyle" id="TeacherStyleResult">
+	 		<result property="id" column="id"/>
+	 		<result property="name" column="name"/>
+	 		<result property="teacherId" column="teacher_id"/>
+	 		<result property="type" column="type"/>
+	 		<result property="imageUrl" column="image_url"/>
+	 		<result property="videoUrl" column="video_url"/>
+	 		<result property="createTime" column="create_time"/>
+	 		<result property="status" column="status"/>
+	 </resultMap>
+	 
+	 <sql id="edu_teacher_style_columns">
+	 	edu_teacher_style.id,
+	 	edu_teacher_style.name,
+	 	edu_teacher_style.teacher_id,
+	 	edu_teacher_style.type,
+	 	edu_teacher_style.image_url,
+	 	edu_teacher_style.video_url,
+	 	edu_teacher_style.create_time,
+	 	edu_teacher_style.status
+	 </sql>
+
+	<sql id="edu_teacher_style_properties">
+		#{id},
+		#{name},
+		#{teacherId},
+		#{type},
+		#{imageUrl},
+		#{videoUrl},
+		#{createTime},
+		#{status}
+	</sql>
+	 
+	<insert id="addTeacherStyleBatch" parameterType="list">
+		insert into edu_teacher_style (
+		<include refid="edu_teacher_style_columns" />
+		) values
+		<foreach item="item" index="index" collection="list" separator=",">
+			( #{item.id},#{item.name},#{item.teacherId},#{item.type},#{item.imageUrl},#{item.videoUrl},#{item.createTime},#{item.status})
+		</foreach>
+	</insert>
+
+	<insert id="addTeacherStyle" parameterType="TeacherStyle" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert into edu_teacher_style (
+		<include refid="edu_teacher_style_columns" />
+		) values (
+		<include refid="edu_teacher_style_properties"/>
+		)
+	</insert>
+
+	<select id="queryTeacherStyleByCondition" parameterType="TeacherStyle" resultMap="TeacherStyleResult">
+		select <include refid="edu_teacher_style_columns"/> from edu_teacher_style 
+		<where>
+			<if test="type!=null and type!=''">
+			and type=#{type}
+			</if>
+			<if test="status>0">
+			and status=#{status}
+			</if>
+			<if test="teacherId>0">
+			and teacher_id=#{teacherId}
+			</if>
+		</where>
+		order by create_time desc
+		<if test="num>0">
+		limit #{num}
+		</if>
+	</select>
+	
+	<select id="queryStyleById" parameterType="Long" resultMap="TeacherStyleResult">
+		select <include refid="edu_teacher_style_columns"/> from edu_teacher_style 
+		where id=#{value}
+	</select>
+	
+	<delete id="delTeacherStyle" parameterType="String">
+		delete from edu_teacher_style where id in (${value})
+	</delete>
+</mapper>

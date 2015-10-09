@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CashOrderMapper">
+
+        <resultMap id="CashOrderResult" type="CashOrder">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="createTime" column="create_time"/>
+            <result property="payTime" column="pay_time"/>
+            <result property="orderAmount" column="order_amount"/>
+            <result property="amount" column="amount"/>
+            <result property="requestId" column="request_id"/>
+            <result property="trxStatus" column="trx_status"/>
+            <result property="payType" column="pay_type"/>
+            <result property="reqChannel" column="req_channel"/>
+            <result property="description" column="description"/>
+            <result property="version" column="version"/>
+            <result property="reqIp" column="req_ip"/>
+        </resultMap>
+        
+		<resultMap id="CashOrderDTOResult" type="CashOrderDTO" extends="CashOrderResult">
+            <result property="email" column="email"/>
+        </resultMap>
+        
+        <sql id="edu_cash_order_columns">
+            edu_cash_order.id,
+            edu_cash_order.user_id,
+            edu_cash_order.create_time,
+            edu_cash_order.pay_time,
+            edu_cash_order.order_amount,
+            edu_cash_order.amount,
+            edu_cash_order.request_id,
+            edu_cash_order.trx_status,
+            edu_cash_order.pay_type,
+            edu_cash_order.req_channel,
+            edu_cash_order.description,
+            edu_cash_order.version,
+            edu_cash_order.req_ip
+        </sql>
+
+        <sql id="edu_cash_order_properties">
+            #{id},
+            #{userId},
+            #{createTime},
+            #{payTime},
+            #{orderAmount},
+            #{amount},
+            #{requestId},
+            #{trxStatus},
+            #{payType},
+            #{reqChannel},
+            #{description},
+            #{version},
+            #{reqIp}
+        </sql>
+        
+		<!-- 添加订单 -->
+        <insert id="createCashOrder" parameterType="CashOrder" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_cash_order (<include refid="edu_cash_order_columns"/>) VALUES (<include refid="edu_cash_order_properties"/>)
+        </insert>
+
+		<!-- 删除订单 -->
+        <delete id="delCashOrderById" parameterType="Long">
+            delete from edu_cash_order where id = #{value}
+        </delete>
+
+		<!-- 更新订单 -->
+        <update id="updateCashOrder" parameterType="CashOrder">
+            update edu_cash_order SET
+                user_id = #{userId},
+                create_time = #{createTime},
+                pay_time = #{payTime},
+                order_amount = #{orderAmount},
+                amount = #{amount},
+                request_id = #{requestId},
+                trx_status = #{trxStatus},
+                pay_type = #{payType},
+                req_channel = #{reqChannel},
+                description = #{description},
+                version = #{version},
+                req_ip = #{reqIp}
+            where
+                id = #{id}
+        </update>
+
+		<!-- id查询订单 -->
+        <select id="getCashOrderById" resultMap="CashOrderResult" parameterType="Long">
+            select
+            <include refid="edu_cash_order_columns"/>
+            from edu_cash_order
+            where id = #{value}
+        </select>
+        
+        <!-- id查询订单DTO -->
+        <select id="getCashOrderDTOById" resultMap="CashOrderDTOResult" parameterType="Long">
+             select
+            <include refid="edu_cash_order_columns"/>,
+            user_user.email
+            from edu_cash_order
+			left join user_user on user_user.id=edu_cash_order.user_id
+			where edu_cash_order.id = #{value}
+        </select>
+        
+        <!-- 订单号查询 订单-->
+		<select id="getCashOrderByRequestId" resultMap="CashOrderResult" parameterType="String">
+            select
+            <include refid="edu_cash_order_columns"/>
+            from edu_cash_order
+            where request_id = #{value}
+        </select>
+        
+        
+        <!-- 会员订单列表 -->
+        <select id="getCashOrderPage" resultMap="CashOrderDTOResult" parameterType="CashOrderDTO">
+            select
+            <include refid="edu_cash_order_columns"/>,
+            user_user.email
+            from edu_cash_order
+			left join user_user on user_user.id=edu_cash_order.user_id
+			<where>
+				<if test="e.userId!=null and e.userId!='' ">
+					and edu_cash_order.user_id=#{e.userId}
+				</if>
+				<if test="e.email!=null and e.email!='' ">
+					and user_user.email=#{e.email}
+				</if>
+				<if test="e.requestId!=null and e.requestId!='' ">
+					and edu_cash_order.request_id=#{e.requestId}
+				</if>
+				<if test="e.trxStatus!=null and e.trxStatus!='' ">
+					and edu_cash_order.trx_status=#{e.trxStatus}
+				</if>
+				<if test="e.startTime!=null and e.startTime!='' ">
+					and <![CDATA[edu_cash_order.create_time>=]]>#{e.startTime}
+				</if>
+				<if test="e.endTime!=null and e.endTime!='' ">
+					and <![CDATA[edu_cash_order.create_time<=]]>#{e.endTime}
+				</if>
+				<if test="e.startPayTime!=null and e.startPayTime!='' ">
+					and <![CDATA[edu_cash_order.pay_time>=]]>#{e.startPayTime}
+				</if>
+				<if test="e.endPayTime!=null and e.endPayTime!='' ">
+					and <![CDATA[edu_cash_order.pay_time<=]]>#{e.endPayTime}
+				</if>
+			</where>
+			order BY edu_cash_order.create_time DESC
+			<include refid="publicMapper.pageEnd"/>
+        </select>
+        <select id="getCashOrderPageCount" resultType="int"  parameterType="CashOrderDTO">
+            select
+            count(1)
+           from edu_cash_order
+			left join user_user on user_user.id=edu_cash_order.user_id
+			<where>
+				<if test="e.userId!=null and e.userId!='' ">
+					and edu_cash_order.user_id=#{e.userId}
+				</if>
+				<if test="e.email!=null and e.email!='' ">
+					and user_user.email=#{e.email}
+				</if>
+				<if test="e.requestId!=null and e.requestId!='' ">
+					and edu_cash_order.request_id=#{e.requestId}
+				</if>
+				<if test="e.trxStatus!=null and e.trxStatus!='' ">
+					and edu_cash_order.trx_status=#{e.trxStatus}
+				</if>
+				<if test="e.startTime!=null and e.startTime!='' ">
+					and <![CDATA[edu_cash_order.create_time>=]]>#{e.startTime}
+				</if>
+				<if test="e.endTime!=null and e.endTime!='' ">
+					and <![CDATA[edu_cash_order.create_time<=]]>#{e.endTime}
+				</if>
+				<if test="e.startPayTime!=null and e.startPayTime!='' ">
+					and <![CDATA[edu_cash_order.pay_time>=]]>#{e.startPayTime}
+				</if>
+				<if test="e.endPayTime!=null and e.endPayTime!='' ">
+					and <![CDATA[edu_cash_order.pay_time<=]]>#{e.endPayTime}
+				</if>
+			</where>
+        </select>
+        
+        
+        <!-- 更新订单状态为成功，网银回调 -->
+		<update id="updateCashOrderStatusSuccess" parameterType="CashOrder">
+			update
+			edu_cash_order
+			set
+			pay_time = #{payTime},
+			trx_status = #{trxStatus},
+			pay_type = #{payType},
+			version =version+1
+			where request_id = #{requestId}
+		</update>
+</mapper>

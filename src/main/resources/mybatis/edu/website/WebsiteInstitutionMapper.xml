@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteInstitutionMapper">
+	<resultMap id="WebsiteInstitutionResult" type="WebsiteInstitution">
+		<result property="id" column="id" />
+		<result property="institutionId" column="institution_id" />
+		<result property="sort" column="sort" />
+	</resultMap>
+	<resultMap type="WebsiteInstitutionDTO" id="WebsiteInstitutionDTOResult" extends="WebsiteInstitutionResult">
+		<result property="name" column="name" />
+		<result property="applicant" column="applicant" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="instPictureUrl" column="inst_pic_url" />
+	</resultMap>
+	<sql id="edu_website_Institution_columns">
+		edu_website_institution.id,
+		edu_website_institution.institution_id,
+		edu_website_institution.sort
+	</sql>
+	<sql id="edu_website_Institution_properties">
+		#{id},
+		#{institutionId},
+		#{sort}
+	</sql>
+	<!-- 添加推荐机构 -->
+	<insert id="addWebsiteInstitution" parameterType="Map">
+		insert into edu_website_institution(institution_id) values 
+		<foreach item="item" index="index" collection="array" separator=",">
+				(#{item})
+		</foreach>
+	</insert>
+	<!-- 删除推荐机构 -->
+	<delete id="deleteWebsiteInstitution" parameterType="Map">
+		delete from edu_website_institution where edu_website_institution.id in
+		<foreach collection="array" item="item" open="(" close=")" separator=",">
+		 	#{item}
+	 	</foreach>
+	</delete>
+	<!-- 修改机构排序 -->
+	<update id="updateWebsiteInstitution" parameterType="WebsiteInstitution">
+		update edu_website_institution set edu_website_institution.sort = #{sort} where edu_website_institution.id = #{id}
+	</update>
+	
+	<!-- 根据推荐id查询机构详情 -->
+	<select id="getWebsiteInstitutionById" parameterType="Long" resultMap="WebsiteInstitutionDTOResult">
+		select <include refid="edu_website_Institution_columns"/>,
+		edu_institution.name
+		from edu_website_institution
+		left join edu_institution on edu_website_institution.institution_id = edu_institution.id
+		where edu_website_institution.id = #{value}
+	</select>
+	<!-- 查询机构列表-前台 -->
+	<select id="getWebsiteInstitutionList" resultMap="WebsiteInstitutionDTOResult">
+		select <include refid="edu_website_Institution_columns"/>,
+		edu_institution.name,
+		edu_institution.inst_pic_url
+		from edu_website_institution
+		left join edu_institution on edu_website_institution.institution_id = edu_institution.id
+		order by edu_website_institution.sort desc
+	</select>
+	<!-- 查询机构列表-后台 -->
+	<select id="queryWebsiteInstitutionList" parameterType="Map" resultMap="WebsiteInstitutionDTOResult">
+		select <include refid="edu_website_Institution_columns"/>,
+		edu_institution.name,
+		edu_institution.applicant,
+		edu_institution.mobile,
+		edu_institution.email
+		from edu_website_institution
+		left join edu_institution on edu_website_institution.institution_id = edu_institution.id
+		<where>
+			<if test="e.name!=null and e.name!=''">
+				and edu_institution.name = #{e.name}
+			</if>
+			<if test="e.applicant!=null and e.applicant!=''">
+				and edu_institution.applicant = #{e.applicant}
+			</if>
+			<if test="e.mobile!=null and e.mobile!=''">
+				and edu_institution.mobile = #{e.mobile}
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and edu_institution.email = #{e.email}
+			</if>
+		</where>
+		order by edu_website_institution.sort desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryWebsiteInstitutionListCount" parameterType="Map" resultType="int">
+		select count(1)
+		from edu_website_institution
+		left join edu_institution on edu_website_institution.institution_id = edu_institution.id
+		<where>
+			<if test="e.name!=null and e.name!=''">
+				and edu_institution.name = #{e.name}
+			</if>
+			<if test="e.applicant!=null and e.applicant!=''">
+				and edu_institution.applicant = #{e.applicant}
+			</if>
+			<if test="e.mobile!=null and e.mobile!=''">
+				and edu_institution.mobile = #{e.mobile}
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and edu_institution.email = #{e.email}
+			</if>
+		</where>
+		order by edu_website_institution.sort desc
+	</select>
+</mapper>

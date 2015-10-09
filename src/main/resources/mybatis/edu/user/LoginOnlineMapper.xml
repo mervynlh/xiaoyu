@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LoginOnlineMapper">
+
+        <resultMap id="LoginOnlineResult" type="LoginOnline">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="loginsid" column="loginsid"/>
+            <result property="type" column="type"/>
+            <result property="createTime" column="create_time"/>
+        </resultMap>
+
+        <sql id="user_login_online_columns">
+            user_login_online.id,
+            user_login_online.user_id,
+            user_login_online.loginsid,
+            user_login_online.type,
+            user_login_online.create_time
+        </sql>
+
+        <sql id="user_login_online_properties">
+            #{id},
+            #{userId},
+            #{loginsid},
+            #{type},
+            #{createTime}
+        </sql>
+
+        <insert id="createLoginOnline" parameterType="LoginOnline" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO user_login_online (<include refid="user_login_online_columns"/>) VALUES (<include refid="user_login_online_properties"/>)
+        </insert>
+
+        <delete id="deleteLoginOnlineOutDate" parameterType="Long">
+            delete from user_login_online
+            where
+            <![CDATA[ create_time <=]]>  #{createTime}
+        </delete>
+
+        <delete id="deleteLoginOnlineById" parameterType="Long">
+            delete from user_login_online
+            where
+                user_id = #{value}
+        </delete>
+
+        <update id="updateLoginOnline" parameterType="LoginOnline">
+            update user_login_online SET
+                loginsid = #{loginsid},
+                create_time = #{createTime}
+            where
+                user_id = #{userId} and type = #{type}
+        </update>
+
+        <select id="getLoginOnlineById" resultMap="LoginOnlineResult" parameterType="Long">
+            select
+            <include refid="user_login_online_columns"/>
+            from user_login_online
+            where
+                id = #{value}
+        </select>
+		
+        <select id="getLoginOnlineList" resultMap="LoginOnlineResult" parameterType="HashMap">
+            select
+            <include refid="user_login_online_columns"/>
+            from user_login_online
+            <where>
+                <if test="userId!=null and userId!=0">
+                    and user_id = #{userId}
+                </if>
+                <if test="type!=null and type!=''">
+                    and type = #{type}
+                </if>
+                <if test="loginsid!=null and loginsid!=''">
+                    and loginsid = #{loginsid}
+                </if>
+            </where>
+            <include refid="publicMapper.pageEnd" />
+        </select>
+
+    <select id="getLoginOnlineListCount" resultMap="LoginOnlineResult" parameterType="HashMap">
+        select
+       count(1)
+        from user_login_online
+        <where>
+            <if test="e.userId!=null and e.userId!=0">
+                and user_id = #{e.userId}
+            </if>
+            <if test="e.type!=null and e.type!=''">
+                and type = #{e.type}
+            </if>
+            <if test="e.loginsid!=null and e.loginsid!=''">
+                and loginsid = #{e.loginsid}
+            </if>
+        </where>
+
+    </select>
+
+    <select id="getLoginOnlineCnt" resultType="int">
+      select  count(1) from user_login_online
+    </select>
+        
+</mapper>

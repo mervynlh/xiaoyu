@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseSubjectMapper">
+
+        <resultMap id="CourseSubjectResult" type="CourseSubject">
+            <result property="id" column="id"/>
+            <result property="courseId" column="course_id"/>
+            <result property="subjectId" column="subject_id"/>
+        </resultMap>
+
+        <sql id="edu_course_subject_columns">
+            edu_course_subject.id,
+            edu_course_subject.course_id,
+            edu_course_subject.subject_id
+        </sql>
+
+        <sql id="edu_course_subject_properties">
+            #{id},
+            #{courseId},
+            #{subjectId}
+        </sql>
+
+        <insert id="createCourseSubject" parameterType="CourseSubject" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_course_subject (<include refid="edu_course_subject_columns"/>) VALUES (<include refid="edu_course_subject_properties"/>)
+        </insert>
+
+        <delete id="deleteCourseSubjectById" parameterType="Long">
+            delete from edu_course_subject
+            where
+                id = #{value}
+        </delete>
+ 		<delete id="deleteCourseSubject" parameterType="CourseSubject">
+            delete from edu_course_subject
+            where
+                 course_id = #{courseId}
+        </delete>
+
+        <update id="updateCourseSubject" parameterType="CourseSubject">
+            update edu_course_subject SET
+                id = #{id},
+                course_id = #{courseId},
+                subject_id = #{subjectId}
+            where
+                id = #{id}
+
+
+
+        </update>
+
+        <select id="getCourseSubjectById" resultMap="CourseSubjectResult" parameterType="Long">
+            select
+            <include refid="edu_course_subject_columns"/>
+            from edu_course_subject
+            where
+                id = #{value}
+        </select>
+		
+        <select id="getCourseSubjectList" resultMap="CourseSubjectResult" parameterType="CourseSubject">
+            select
+            <include refid="edu_course_subject_columns"/>
+            from edu_course_subject
+            where 1=1
+            <if test="courseId!=0">
+					AND edu_course_subject.course_id=#{courseId}
+				</if>
+        </select>
+        
+</mapper>

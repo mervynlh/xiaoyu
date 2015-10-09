@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MsgSenderMapper">
+
+	<resultMap id="MsgSenderResult" type="MsgSender">
+		<result property="id" column="id" />
+		<result property="cusId" column="cus_id" />
+		<result property="addTime" column="add_TIME" />
+		<result property="updateTime" column="update_time" />
+		<result property="content" column="content" />
+		<result property="type" column="type" />
+		<result property="status" column="status" />
+		<result property="receivingCusId" column="receiving_cusId" />
+		<result property="showname" column="showname" />
+		
+	</resultMap>
+
+	<sql id="edu_msg_sender_columns">
+		edu_msg_sender.id,
+		edu_msg_sender.cus_id,
+		edu_msg_sender.add_Time,
+		edu_msg_sender.update_time,
+		edu_msg_sender.content,
+		edu_msg_sender.type,
+		edu_msg_sender.status,
+		edu_msg_sender.receiving_cusId,
+		edu_msg_sender.showname
+	</sql>
+
+	<sql id="edu_msg_sender_properties">
+		#{id},
+		#{cusId},
+		#{addTime},
+		#{updateTime},
+		#{content},
+		#{type},
+		#{status},
+		#{receivingCusId},
+		#{showname}
+	</sql>
+	<!-- 添加站内信发件箱 -->
+	<insert id="addMsgSender" parameterType="java.util.HashMap"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		INSERT INTO edu_msg_sender (
+		<include refid="edu_msg_sender_columns" />
+		) VALUES (
+		<include refid="edu_msg_sender_properties" />
+		)
+	</insert>
+	<!-- 查询站内信发件箱  分页-->
+	<select id="queryMsgSenderByOutbox" parameterType="java.util.HashMap"
+		resultMap="MsgSenderResult">
+		select 
+		<include refid="edu_msg_sender_columns" />
+		from edu_msg_sender
+		<where>
+			edu_msg_sender.type = 2
+			and edu_msg_sender.cus_id = #{e.cusId}
+		</where>
+		order by edu_msg_sender.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<!-- 查询站内信发件箱  分页的count 方法 -->
+	<select id="queryMsgSenderByOutboxCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select 
+		count(1)
+		from edu_msg_sender
+		<where>
+			edu_msg_sender.type = 2
+			and edu_msg_sender.cus_id = #{e.cusId}
+		</where>
+	</select>
+	<!-- 删除发件箱 -->
+	<delete id="delLetterOutbox" parameterType="java.util.HashMap">
+		DELETE FROM edu_msg_sender WHERE type= 2 and id = #{id} and
+		 cus_id = #{cusId}
+	</delete>
+
+	<delete id="delMsgSenderPast" parameterType="java.util.HashMap">
+			DELETE FROM
+		edu_msg_sender WHERE 
+		<![CDATA[edu_msg_sender.add_time<#{date}]]>
+	</delete>
+
+	<delete id="delAllOutbox" parameterType="java.util.HashMap">
+			DELETE FROM
+		edu_msg_sender WHERE 
+		type = 2 
+		and cus_id = #{cusId}
+	</delete>
+	
+	<delete id="delMsgSenderByids" parameterType="String">
+		DELETE FROM
+		edu_msg_sender WHERE 
+		id in (${value})
+	</delete>
+</mapper>

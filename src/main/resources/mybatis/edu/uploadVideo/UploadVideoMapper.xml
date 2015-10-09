@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UploadVideoMapper">
+        <resultMap id="UploadVideoResult" type="UploadVideo">
+            <result property="id" column="id"/>
+            <result property="title" column="title"/>
+            <result property="videoUrl" column="video_url"/>
+            <result property="classifyOne" column="classifyOne"/>
+            <result property="classifyTwo" column="classifyTwo"/>
+            <result property="info" column="info"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="status" column="status"/>
+            <result property="size" column="size"/>
+            <result property="type" column="type"/>
+            <result property="userId" column="user_id"/>
+            <result property="userEmail" column="userEmail"/>
+        </resultMap>
+        <resultMap id="UploadVideoDTOResult" type="UploadVideoDTO" extends="UploadVideoResult">
+            <result property="classifyOneName" column="classifyOneName"/>
+            <result property="classifyTwoName" column="classifyTwoName"/>
+        </resultMap>
+        <sql id="edu_video_upload_columns">
+            edu_video_upload.id,
+            edu_video_upload.title,
+            edu_video_upload.video_url,
+            edu_video_upload.classifyOne,
+            edu_video_upload.classifyTwo,
+            edu_video_upload.info,
+            edu_video_upload.create_time,
+            edu_video_upload.update_time,
+            edu_video_upload.status,
+            edu_video_upload.size,
+            edu_video_upload.type,
+            edu_video_upload.user_id
+        </sql>
+
+        <sql id="edu_video_upload_properties">
+            #{id},
+            #{title},
+            #{videoUrl},
+            #{classifyOne},
+            #{classifyTwo},
+            #{info},
+            #{createTime},
+            #{updateTime},
+            #{status},
+            #{size},
+            #{type},
+            #{userId}
+        </sql>
+        <!-- 添加视频 -->
+        <insert id="createUploadVideo" parameterType="UploadVideo" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+            INSERT INTO edu_video_upload (<include refid="UploadVideoMapper.edu_video_upload_columns"/>) VALUES (<include refid="UploadVideoMapper.edu_video_upload_properties"/>)
+        </insert>
+
+		<!-- 更新视频 -->
+        <update id="updateUploadVideoById" parameterType="UploadVideo">
+            UPDATE edu_video_upload SET
+	            title=#{title},
+	            classifyOne=#{classifyOne},
+	            classifyTwo=#{classifyTwo},
+	            info=#{info}
+				where id =#{id}
+        </update>
+        
+		<!-- 删除视频 -->
+        <update id="delUploadVideo" parameterType="String">
+            UPDATE edu_video_upload SET
+	            status=1
+	            WHERE
+				id in (${value})
+        </update>
+		<!-- id查询视频 -->
+		<select id="getUploadVideoById" resultMap="UploadVideoResult" parameterType="Long">
+            SELECT
+            <include refid="UploadVideoMapper.edu_video_upload_columns"/>
+            FROM edu_video_upload
+            WHERE ID = #{value}
+        </select>
+		<!-- 视频分页 -->
+        <select id="getUploadVideoPage" resultMap="UploadVideoResult" parameterType="java.util.Map">
+            SELECT
+            <include refid="UploadVideoMapper.edu_video_upload_columns"/>,
+            user_user.email as userEmail
+           <!--  classsifyOne.name as classifyOneName,
+            classsifyTwo.name as classifyTwoName -->
+            FROM edu_video_upload
+            <!-- left join edu_video_classify as classsifyOne on classsifyOne.id=edu_video_upload.classifyOne
+            left join edu_video_classify as classsifyTwo on classsifyTwo.id=edu_video_upload.classifyTwo -->
+            left join user_user on edu_video_upload.user_id = user_user.id
+            WHERE
+            edu_video_upload.status=0
+            <if test="e.startTime!=null and e.startTime!=''">
+            	and <![CDATA[edu_video_upload.create_time >=concat( #{e.startTime},'00:00:00') ]]>
+        	</if>
+        	<if test="e.endTime!=null and e.endTime!=''">
+            	and <![CDATA[edu_video_upload.create_time <=concat( #{e.endTime},'23:59:59') ]]>
+        	</if>
+			<if test="e.classifyOne!=null and e.classifyOne>0">
+            	and edu_video_upload.classifyOne = #{e.classifyOne}
+        	</if>
+			<if test="e.classifyTwo!=null and e.classifyTwo>0">
+            	and edu_video_upload.classifyTwo = #{e.classifyTwo}
+        	</if>
+			<if test="e.title!=null and e.title!=''">
+            	and edu_video_upload.title like CONCAT('%',#{e.title},'%')
+        	</if>
+        	<if test="e.userId != null and e.userId != '' and e.userId != 0">
+            	and edu_video_upload.user_id = #{e.userId}
+        	</if>
+        	<if test="e.type != null and e.type != ''">
+            	and edu_video_upload.type = #{e.type}
+        	</if>
+			ORDER BY edu_video_upload.create_time DESC
+			<include refid="publicMapper.pageEnd"/>	
+        </select>
+        <select id="getUploadVideoPageCount" resultType="int" parameterType="java.util.Map">
+            SELECT
+            count(1)
+            FROM edu_video_upload
+            <!-- left join edu_video_classify as classsifyOne on classsifyOne.id=edu_video_upload.classifyOne
+            left join edu_video_classify as classsifyTwo on classsifyTwo.id=edu_video_upload.classifyTwo -->
+            left join user_user on edu_video_upload.user_id = user_user.id
+            WHERE
+            edu_video_upload.status=0
+            <if test="e.startTime!=null and e.startTime!=''">
+            	and <![CDATA[edu_video_upload.create_time >=concat( #{e.startTime},'00:00:00') ]]>
+        	</if>
+        	<if test="e.endTime!=null and e.endTime!=''">
+            	and <![CDATA[edu_video_upload.create_time <=concat( #{e.endTime},'23:59:59') ]]>
+        	</if>
+			<if test="e.classifyOne!=null and e.classifyOne>0">
+            	and edu_video_upload.classifyOne = #{e.classifyOne}
+        	</if>
+			<if test="e.classifyTwo!=null and e.classifyTwo>0">
+            	and edu_video_upload.classifyTwo = #{e.classifyTwo}
+        	</if>
+			<if test="e.title!=null and e.title!=''">
+            	and edu_video_upload.title like CONCAT('%',#{e.title},'%')
+        	</if>
+        	<if test="e.userId != null and e.userId != '' and e.userId != 0">
+            	and edu_video_upload.user_id = #{e.userId}
+        	</if>
+        	<if test="e.type != null and e.type != ''">
+            	and edu_video_upload.type = #{e.type}
+        	</if>
+        </select>
+       
+</mapper>

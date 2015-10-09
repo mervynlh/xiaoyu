@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AssessMapper">
+
+    <resultMap id = "AssessResult" type = "Assess">
+       <result property="id" column="id" />
+       <result property="userId" column="user_id"/>
+       <result property="orderId" column="order_id"/>
+       <result property="teacherId" column="teacher_id"/>
+       <result property="createTime" column="create_time"/>
+       <result property="content" column="content"/>
+       <result property="imgs" column="imgs"/>
+       <result property="status" column="status"/>	
+       <result property="type" column="type"/>
+       <result property="description" column="description"/>
+       <result property="attribute" column="attribute"/>
+       <result property="speed" column="speed"/>	
+       <result property="courseModel" column="course_model"/>
+       <result property="subjectMajorName" column="subject_major_name"/>	
+       <result property="star" column="star"/>	
+    </resultMap>
+    <resultMap id = "AssessDtoResult" type = "AssessDto" extends="AssessResult">
+    	<result property="nickname" column="nickname"/>
+    	<result property="email" column="email"/>
+    	<result property="avatar" column="avatar"/>
+    	<result property="teacherName" column="teacherName"/>
+    	<result property="studentName" column="studentName"/>
+    	<result property="courseName" column="course_name"/>
+    </resultMap>
+    
+    <sql id="edu_assess_columns">
+    edu_assess.id,
+    edu_assess.user_id,
+    edu_assess.order_id,
+    edu_assess.teacher_id,
+    edu_assess.create_time,
+    edu_assess.content,
+    edu_assess.imgs,
+    edu_assess.status,
+    edu_assess.type,
+    edu_assess.description,
+    edu_assess.attribute,
+    edu_assess.speed,
+    edu_assess.course_model,
+    edu_assess.subject_major_name,
+    edu_assess.star
+    </sql>
+    
+    <sql id="edu_assess_properties">
+    #{id},
+    #{userId},
+    #{orderId},
+    #{teacherId},
+    #{createTime},
+    #{content},
+    #{imgs},
+    #{status},
+    #{type},
+    #{description},
+    #{attribute},
+    #{speed},
+    #{courseModel},
+    #{subjectMajorName},
+    round((#{description}+#{attribute}+#{speed})/3)
+    </sql>
+
+<!--     插入学生评论记录 代审核 有功能未加入 -->
+    <insert id="addAssess" parameterType="Assess"
+    keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+      insert into edu_assess (
+      <include refid="edu_assess_columns"/>
+      ) values(
+      <include refid="edu_assess_properties" />
+      )
+    </insert>    
+<!-- 查询学生对教师的总评价列表 Dao和Service层还没有实现-->
+    <select id="getAssessList" resultMap="AssessResult" parameterType="Assess">
+    select 
+    <include refid="edu_assess_columns" />
+    from edu_assess
+    <include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="getAssessListCount" resultMap="AssessResult" parameterType="Long">
+    select
+    count(1)
+    from
+    edu_assess
+    </select>
+    
+    <!-- 获取好评中评差评的数量 -->
+    <select id="getCountByType" parameterType="Map" resultType="AssessType">
+		SELECT type ,count(*) count FROM edu_assess 
+		where edu_assess.status = #{status} 
+		<if test="userId!=null and userId!=0">
+			and edu_assess.user_id = #{userId}
+		</if>
+		<if test="teacherId!=null and teacherId!=0">
+			and edu_assess.teacher_id = #{teacherId}
+		</if>
+		group by type
+    </select>
+    
+   <!-- 根据用户Id教师id类型id状态id查询评论表 -->
+    <select id="getAssessListByTypeStatus" parameterType="java.util.HashMap" resultMap="AssessDtoResult">
+    	select <include refid="edu_assess_columns" />,
+    	tea.realname as teacherName,
+    	stu.realname as studentName,
+    	edu_trxorder.course_model,
+    	edu_trxorder.course_name
+    	from edu_assess
+    	left join edu_teacher on edu_assess.teacher_id = edu_teacher.id
+    	left join user_expand tea on edu_teacher.user_id = tea.user_id
+    	left join user_expand stu on edu_assess.user_id = stu.user_id
+    	left join edu_trxorder on edu_assess.order_id = edu_trxorder.id
+    	where edu_assess.status = #{e.status}
+    	<if test="e.userId!=null and e.userId!=0">
+    		and edu_assess.user_id = #{e.userId}
+    	</if>
+    	<if test="e.teacherId!=null and e.teacherId!=0">
+    		and edu_assess.teacher_id = #{e.teacherId} 
+    	</if>
+    	<if test="e.type!=null and e.type!=0">
+    		and edu_assess.type = #{e.type}
+    	</if>
+    	<include refid="publicMapper.pageEnd" />
+    </select>
+    <select id="getAssessListByTypeStatusCount" parameterType="java.util.HashMap" resultType="int">
+    	select count(1)
+    	from edu_assess
+    	where edu_assess.status = #{e.status}
+    	<if test="e.userId!=null and e.userId!=0">
+    		and edu_assess.user_id = #{e.userId}
+    	</if>
+    	<if test="e.teacherId!=null and e.teacherId!=0">
+    		and edu_assess.teacher_id = #{e.teacherId} 
+    	</if>
+    	<if test="e.type!=null and e.type!=0">
+    		and edu_assess.type = #{e.type}
+    	</if>
+    </select>
+    
+    <!-- 根据订单id获取学生对老师的评价 -->
+	<select id="getAssessByOrderId" parameterType="Long" resultMap="AssessResult">
+		select 
+			<include refid="edu_assess_columns" />
+		from
+			edu_assess
+		where
+			edu_assess.order_id = #{value}
+	</select>
+    
+<!-- 根据评论类型查看学生评论记录 未完成 需要根据教师id查询教师所教科目以及连接学生(用户)表 查询学生的姓名-->
+<!--   查询评论类型数量 即好评有多少 中评有多少 差评有多少 -->    
+    <select id="getAssessListByType" resultMap="AssessResult" parameterType="int">
+	select
+	<include refid="edu_assess_columns" />
+	from edu_assess
+	where edu_assess.type = #{type}
+	order by edu_assess.id desc
+    <include refid="publicMapper.pageEnd"/>	
+    </select>
+    
+    <select id="getAssessListByTypeCount" resultType="int" parameterType="java.util.Map">
+    select
+    count(1)
+    from edu_assess
+    where edu_assess.type = #{type}
+    </select>
+    
+<!-- 通过id删除评论 -->
+    <delete id="deleteAssessById" parameterType="Long" >
+    delete from 
+    edu_assess
+    where
+    id = #{value}
+    </delete>
+    
+    <!-- 根据条件查询教师的评价 （前台）  -->
+    <select id="queryAssessListByCondition"  resultMap="AssessDtoResult" parameterType="java.util.Map">
+    select
+    <include refid="edu_assess_columns" />,
+    user_user.nickname,
+    user_user.email,
+    user_expand.avatar
+    from edu_assess
+    left join user_user on user_user.id=edu_assess.user_id
+    left join user_expand on user_expand.user_id=edu_assess.user_id
+    where 1=1 and status=0
+    <if test="e.teacherId>0">
+    	and  edu_assess.teacher_id = #{e.teacherId}
+    </if>
+    order by edu_assess.create_time desc
+    <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="queryAssessListByConditionCount" resultType="int" parameterType="java.util.Map">
+    select
+    count(1)
+    from edu_assess
+    left join user_user on user_user.id=edu_assess.user_id
+    left join user_expand on user_expand.user_id=edu_assess.user_id
+    where 1=1 and status=0
+    <if test="e.teacherId>0">
+    	and  edu_assess.teacher_id = #{e.teacherId}
+    </if>
+    </select>
+</mapper>

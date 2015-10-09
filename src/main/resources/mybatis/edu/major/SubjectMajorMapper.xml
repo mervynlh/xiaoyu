@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SubjectMajorMapper">
+		<resultMap type="SubjectMajor" id="SubjectMajorResultMap">
+			<result property="id" column="id"/>
+			<result property="subjectid" column="subject_id"/>
+			<result property="majorid" column="major_id"/>
+			<result property="subjectName" column="subjectName"/>
+			<result property="majorName" column="majorName"/>
+		</resultMap>
+		
+		<sql id="edu_subject_major_columns">
+		edu_subject_major.id,
+		edu_subject_major.subject_id,
+		edu_subject_major.major_id	
+		</sql>
+		
+		<sql id="edu_subject_major_properties">
+		 #{id},
+		 #{subjectid},
+		 #{majorid}
+	    </sql>
+		
+		<select id="querySubjectMajorByPage" resultMap="SubjectMajorResultMap" parameterType="Map">
+		SELECT
+		*,
+		edu_major.name as majorName,
+		sys_subject.SUBJECT_NAME as subjectName
+		FROM  edu_subject_major
+		LEFT JOIN edu_major ON edu_subject_major.major_id=edu_major.id
+		LEFT JOIN sys_subject ON edu_subject_major.subject_id=sys_subject.SUBJECT_ID
+		<where>
+		<if test="e.majorid!=null and e.majorid>0">
+		and edu_subject_major.major_id=#{e.majorid}
+		</if>
+		<if test="e.subjectid!=null and e.subjectid>0">
+		and edu_subject_major.subject_id=#{e.subjectid}
+		</if>
+		</where>
+		<include refid="publicMapper.pageEnd"/>		
+		</select>
+
+		<select id="querySubjectMajorByPageCount" resultType="int" parameterType="Map">
+			SELECT
+			count(1)
+			FROM  edu_subject_major
+			LEFT JOIN edu_major ON edu_subject_major.major_id=edu_major.id
+			LEFT JOIN sys_subject ON edu_subject_major.subject_id=sys_subject.SUBJECT_ID
+			<where>
+			<if test="e.majorid!=null and e.majorid>0">
+			and edu_subject_major.major_id=#{e.majorid}
+			</if>
+			<if test="e.subjectid!=null and e.subjectid>0">
+			and edu_subject_major.subject_id=#{e.subjectid}
+			</if>
+			</where>
+		</select>
+		
+		<delete id="deleteSubjectMajorBatch" parameterType="String">
+			delete
+			from
+			edu_subject_major
+			where edu_subject_major.id in (${value})
+		</delete>
+		
+		<insert id="addSubjectMajorBatch" parameterType="list" useGeneratedKeys="true" keyColumn="id">
+			insert INTO edu_subject_major (
+			<include refid="edu_subject_major_columns" />
+			) VALUES
+			<foreach item="item" index="index" collection="list"
+				separator=",">
+				( #{item.id},
+				#{item.subjectid},
+				#{item.majorid}
+				)
+			</foreach>
+		</insert>
+		
+		<select id="querySubjectMajorById" parameterType="long" resultMap="SubjectMajorResultMap">
+			select <include refid="edu_subject_major_columns"/>, edu_major.name as majorName,sys_subject.SUBJECT_NAME as subjectName
+			from  edu_subject_major
+			left join edu_major on edu_subject_major.major_id=edu_major.id
+			left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id
+			where edu_subject_major.id=#{value}
+		</select>
+		<select id="querySubjectMajorByIds" parameterType="java.util.List" resultMap="SubjectMajorResultMap">
+			select <include refid="edu_subject_major_columns"/>, edu_major.name as majorName,sys_subject.SUBJECT_NAME as subjectName
+			from  edu_subject_major
+			left join edu_major on edu_subject_major.major_id=edu_major.id
+			left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id
+			left join  edu_course_subject on edu_course_subject.subject_id=edu_subject_major.id
+			where course_id in
+			<foreach collection="list" item="item" separator="," open="("
+				close=")">
+				#{item}
+			</foreach>
+			 order by field(course_id,
+			 <foreach collection="list" item="item" separator=",">
+			 #{item}
+			 </foreach>
+			 );
+		</select>
+		
+		<select id="querySubejctMajorById" resultMap="SubjectMajorResultMap" parameterType="Long">
+				SELECT
+				<include refid="edu_subject_major_columns"/>,
+				edu_major.name as majorName,
+				sys_subject.SUBJECT_NAME as subjectName
+				FROM  edu_subject_major
+				LEFT JOIN edu_major ON edu_subject_major.major_id=edu_major.id
+				LEFT JOIN sys_subject ON edu_subject_major.subject_id=sys_subject.SUBJECT_ID
+				where
+				edu_subject_major.subject_id=#{value}
+		</select>
+	
+		
+		<select id="querySubjectMajorList" parameterType="SubjectMajor" resultMap="SubjectMajorResultMap">
+		select <include refid="edu_subject_major_columns"/>,
+		edu_major.name as majorName,
+		sys_subject.subject_name as subjectName
+		from  edu_subject_major
+		left join edu_major on edu_subject_major.major_id=edu_major.id
+		left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id
+		where 1=1
+		<if test="majorid!=null and majorid>0">
+		and edu_subject_major.major_id=#{majorid}
+		</if>
+		<if test="subjectid!=null and subjectid>0">
+		and edu_subject_major.subject_id=#{subjectid}
+		or sys_subject.parent_id=#{subjectid}
+		</if>
+		group by edu_major.id
+		</select>
+		
+		<!-- 根据父专业查询子专业下及科目 -->
+		<select id="querySonMajorByParent" parameterType="java.util.Map" resultMap="SubjectMajorResultMap">
+<!-- 			select <include refid="edu_subject_major_columns"/>,edu_major.name as majorName,sys_subject.subject_name as subjectName -->
+<!-- 			from edu_subject_major  -->
+<!-- 			left join edu_major on edu_subject_major.major_id=edu_major.id -->
+<!-- 			left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id -->
+<!-- 			where edu_subject_major.subject_id=#{value} or sys_subject.parent_id=#{value} -->
+			select <include refid="edu_subject_major_columns"/>,edu_major.name as majorName,sys_subject.subject_name as subjectName
+			from edu_subject_major 
+			left join edu_major on edu_subject_major.major_id=edu_major.id
+			left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id
+    		left join edu_teacher_subject on edu_teacher_subject.subject_id=edu_subject_major.subject_id
+    		left join edu_teacher_major on edu_teacher_major.major_id=edu_subject_major.major_id
+			where edu_subject_major.subject_id=#{subjectId} or sys_subject.parent_id=#{subjectId}
+     		and edu_teacher_subject.teacher_id=#{teacherId}
+     		and edu_teacher_major.teacher_id=#{teacherId}
+		</select>
+</mapper>

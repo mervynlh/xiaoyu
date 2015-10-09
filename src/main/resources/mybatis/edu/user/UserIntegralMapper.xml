@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserIntegralMapper">
+
+        <resultMap id="UserIntegralResult" type="UserIntegral">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="currentScore" column="current_score"/>
+            <result property="totalScore" column="total_score"/>
+        </resultMap>
+		
+		<resultMap type="UserIntegral" id="UserIntegralInfoResult" extends="UserIntegralResult">
+			<result property="realname" column="realname"/>
+		</resultMap>
+        <sql id="edu_user_integral_columns">
+            edu_user_integral.id,
+            edu_user_integral.user_id,
+            edu_user_integral.current_score,
+            edu_user_integral.total_score
+        </sql>
+
+        <sql id="edu_user_integral_properties">
+            #{id},
+            #{userId},
+            #{currentScore},
+            #{totalScore}
+        </sql>
+
+        <insert id="createUserIntegral" parameterType="UserIntegral" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_integral (<include refid="edu_user_integral_columns"/>) VALUES (<include refid="edu_user_integral_properties"/>)
+        </insert>
+
+        <delete id="deleteUserIntegralById" parameterType="Long">
+            delete from edu_user_integral
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateUserIntegral" parameterType="UserIntegral">
+            update edu_user_integral SET
+                user_id = #{userId},
+                current_score = #{currentScore},
+                total_score = #{totalScore}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getUserIntegralById" resultMap="UserIntegralResult" parameterType="Long">
+            select
+            <include refid="edu_user_integral_columns"/>
+            from edu_user_integral
+            where
+            id = #{value}
+        </select>
+		
+        <select id="getUserIntegralList" resultMap="UserIntegralResult" parameterType="UserIntegral">
+            select
+            <include refid="edu_user_integral_columns"/>
+            from edu_user_integral
+        </select>
+        <!-- 查询用户积分列表分页 -->
+        <select id="getUserIntegralListPage" parameterType="Map" resultMap="UserIntegralInfoResult">
+	        select <include refid="edu_user_integral_columns"/>,
+	        user_expand.realname,
+	        user_user.mobile
+	        from edu_user_integral
+	        left join user_user on edu_user_integral.user_id=user_user.id
+	        left join user_expand on edu_user_integral.user_id=user_expand.user_id
+	        <where>
+	        <if test="e.realname !=null and e.realname !=''">
+	       	user_expand.realname like concat('%',#{e.realname},'%')
+	        </if>
+	        <if test="e.mobile!=null and e.mobile!=''">
+	        	and user_user.mobile like concat('%',#{e.mobile},'%')
+	        </if>
+	        </where>
+            order by edu_user_integral.total_score desc
+	        <include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getUserIntegralListPageCount" parameterType="Map" resultType="int">
+        	select count(1) 
+			from edu_user_integral
+	        left join user_user on edu_user_integral.user_id=user_user.id
+	        left join user_expand on edu_user_integral.user_id=user_expand.user_id
+        	<where>
+        	<if test="e.realname !=null and e.realname !=''">
+	       	user_expand.realname like concat('%',#{e.realname},'%')
+	        </if>
+	        <if test="e.mobile!=null and e.mobile!=''">
+	        	and user_user.mobile like concat('%',#{e.mobile},'%')
+	        </if>
+	        </where>
+
+        </select>
+        <!-- 根据用户Id获得积分 -->
+        <select id="getUserIntegralByUserId" parameterType="Long" resultMap="UserIntegralResult">
+	        select <include refid="edu_user_integral_columns"/>
+	        from edu_user_integral
+	        where edu_user_integral.user_id=#{userId}
+        </select>
+</mapper>

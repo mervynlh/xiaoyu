@@ -1,0 +1,15 @@
+{
+  "name": "sns-static",
+  "version": "1.0.0",
+  "description": "sns-static",
+  "src": "src/main/webapp/static",
+  "target": "target/sns-web/static",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-jshint": "~0.6.3",
+    "grunt-contrib-nodeunit": "~0.2.2",
+    "grunt-contrib-uglify": "~0.2.2",
+    "grunt-contrib-htmlmin": "~0.1.3",  
+    "grunt-contrib-cssmin": "~0.6.1"
+  }
+}

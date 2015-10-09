@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserRoleMapper" >
+	
+	<resultMap id="UserRoleResult"
+		type="UserRole">
+		<result property="roleId" column="role_id" />
+		<result property="userId" column="user_id" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+
+	<sql id="sys_user_role_columns">
+		sys_user_role.role_id,
+		sys_user_role.user_id,
+		sys_user_role.create_time
+	</sql>
+
+	<sql id="sys_user_role_properties">
+		#{roleId}, #{userId}, #{createTime}
+	</sql>
+
+	<insert id="createUserRole" parameterType="UserRole">
+		INSERT INTO sys_user_role (
+		<include
+			refid="sys_user_role_columns" />
+		) VALUES (
+		<include
+			refid="sys_user_role_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserRoleByUserId" parameterType="java.util.Map">
+		delete from sys_user_role WHERE role_id =
+		#{roleId} AND user_id = #{userId}
+	</delete>
+
+	<delete id="deleteUserRoleByRole" parameterType="long">
+		delete from sys_user_role WHERE role_id = #{value}
+	</delete>
+	
+	<delete id="deleteUserRoleByuserIdRoleId" parameterType="map">
+		delete from sys_user_role WHERE user_id = #{userId} and  role_id = #{roleId}
+	</delete>
+
+	<update id="updateUserRole" parameterType="UserRole">
+		update sys_user_role SET role_id = #{roleId},
+		user_id = #{userId} WHERE
+		role_id = #{roleId} AND user_id = #{userId} 
+
+	</update>
+
+	<select id="getUserRoleById"	resultMap="UserRoleResult"		parameterType="java.util.Map">
+		select
+		<include
+			refid="sys_user_role_columns" />
+		from sys_user_role WHERE role_id = #{roleId}
+		AND user_id = #{userId} 
+
+
+	</select>
+
+	<select id="getUserRoleByUserIdRoleId"	resultMap="UserRoleResult"	parameterType="java.util.Map">
+		select
+		<include
+			refid="sys_user_role_columns" />
+		from sys_user_role WHERE role_id = #{roleId}
+		AND user_id = #{userId}
+
+	</select>
+
+	<select id="getUserRoleList" resultMap="UserRoleResult" parameterType="UserRole">
+		select
+		<include
+			refid="sys_user_role_columns" />
+		from sys_user_role
+	</select>
+
+	<select id="getUGSRByUserId" resultMap="UserRoleResult" parameterType="long">
+		select
+		<include
+			refid="sys_user_role_columns" />
+		from sys_user_role WHERE user_id = #{userId}
+	</select>
+	
+</mapper>

@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseAssessMapper">
+
+	<resultMap id="CourseAssessResult" type="CourseAssess">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="courseId" column="course_id" />
+		<result property="kpointId" column="kpoint_id" />
+		<result property="content" column="content" />
+		<result property="createTime" column="create_time" />
+	</resultMap>
+	<resultMap id="QueryCourseAssessResult" type="QueryCourseAssess" extends="CourseAssessResult">
+          <result property="email" column="email"/>
+          <result property="emailIsavalible" column="email_isavalible"/>
+          <result property="mobile" column="mobile"/>
+          <result property="mobileIsavalible" column="mobile_isavalible"/>
+          <result property="password" column="password"/>
+          <result property="isavalible" column="isavalible"/>
+          <result property="customerkey" column="customerkey"/>
+          <result property="createdate" column="createdate"/>
+          <result property="userip" column="userip"/>
+          <result property="avatar" column="avatar"/>
+          <result property="nickname" column="nickname"/>
+	</resultMap>
+	
+	<resultMap type="QueryCourseAssess" id="QueryAdminCourseAssess" extends="CourseAssessResult">
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="courseName" column="courseName" />
+		<result property="pointName" column="pointName" />
+	</resultMap>
+	<sql id="edu_course_assess_columns">
+		edu_course_assess.id,
+		edu_course_assess.user_id,
+		edu_course_assess.course_id,
+		edu_course_assess.kpoint_id,
+		edu_course_assess.content,
+		edu_course_assess.create_time,
+		edu_course_assess.status
+	</sql>
+
+	<sql id="edu_course_assess_properties">
+		#{id},
+		#{userId},
+		#{courseId},
+		#{kpointId},
+		#{content},
+		#{createTime},
+		#{status}
+	</sql>
+
+	<insert id="createCourseAssess" parameterType="CourseAssess"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_course_assess (
+		<include refid="edu_course_assess_columns" />
+		) VALUES (
+		<include refid="edu_course_assess_properties" />
+		)
+	</insert>
+
+	<delete id="deleteCourseAssessById" parameterType="Long">
+		delete from
+		edu_course_assess
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateCourseAssess" parameterType="CourseAssess">
+		update
+		edu_course_assess SET
+		edu_course_assess.status=#{status}
+		where
+		edu_course_assess.id = #{id}
+	</update>
+
+	<select id="getCourseAssessById" resultMap="QueryAdminCourseAssess" parameterType="Long">
+		select
+		<include refid="edu_course_assess_columns" />,
+		user_user.nickname,
+		user_user.email,
+		edu_course.name courseName,
+		edu_course_kpoint.name pointName
+		from edu_course_assess
+		left join user_user on edu_course_assess.user_id =user_user.id
+		left join edu_course on edu_course_assess.course_id=edu_course.id
+		left join edu_course_kpoint on edu_course_assess.kpoint_id=edu_course_kpoint.id
+		where
+		edu_course_assess.id = #{id}
+	</select>
+
+	<select id="getCourseAssessList" resultMap="CourseAssessResult"
+		parameterType="CourseAssess">
+		select
+		<include refid="edu_course_assess_columns" />
+		from edu_course_assess
+	</select>
+	
+	<select id="getCourseAssessListPage" resultMap="QueryCourseAssessResult" parameterType="Map">
+		select
+		<include refid="edu_course_assess_columns" />,
+		 user_user.nickname,
+        user_user.email,
+        user_user.email_isavalible,
+        user_user.mobile,
+        user_user.mobile_isavalible,
+        user_user.password,
+        user_user.isavalible,
+        user_user.customerkey,
+        user_user.createdate,
+        user_user.userip,
+        user_expand.avatar
+		from edu_course_assess
+		left join user_user
+		on edu_course_assess.user_id =
+		user_user.id
+		left join user_expand
+		on edu_course_assess.user_id = user_expand.user_id
+		<where>
+		edu_course_assess.status=0
+			<if test="e.courseId!=null and e.courseId!=0">
+				and edu_course_assess.course_id = #{e.courseId}
+			</if>
+			<if test="e.kpointId!=null">
+				and edu_course_assess.kpoint_id = #{e.kpointId}
+			</if>
+			<if test="e.kpointId==null">
+				and edu_course_assess.kpoint_id != 0
+			</if>
+		</where>
+		order by edu_course_assess.id desc
+		<include refid="publicMapper.pageEnd"/>
+	</select>
+	<select id="getCourseAssessListPageCount" resultType="int"
+		parameterType="Map">
+		select
+		count(1)
+		from edu_course_assess
+		<where>
+		edu_course_assess.status=0
+			<if test="e.courseId!=null">
+				and edu_course_assess.course_id = #{e.courseId}
+			</if>
+			<if test="e.kpointId!=null">
+				and edu_course_assess.kpoint_id = #{e.kpointId}
+			</if>
+			<if test="e.kpointId==null">
+				and edu_course_assess.kpoint_id != 0
+			</if>
+		</where>
+	</select>
+	<!-- 查询课程评论列表后台 -->
+	<select id="getAdminCourseAssessList" parameterType="java.util.HashMap" resultMap="QueryAdminCourseAssess">
+	    select
+		<include refid="edu_course_assess_columns" />,
+		user_user.nickname,
+		user_user.email,
+		edu_course.name courseName,
+		edu_course_kpoint.name pointName
+		from edu_course_assess
+		left join user_user on edu_course_assess.user_id =user_user.id
+		left join edu_course on edu_course_assess.course_id=edu_course.id
+		left join edu_course_kpoint on edu_course_assess.kpoint_id=edu_course_kpoint.id
+		<where>
+		<if test="e.nickname!=null and e.nickname!=''">
+		user_user.nickname like CONCAT('%',#{e.nickname},'%')
+		</if>
+		<if test="e.email!=null and e.email!=''">
+		and user_user.email like CONCAT('%',#{e.email},'%')
+		</if>
+		<if test="e.courseName!=null and e.courseName!=''">
+		and edu_course.name like CONCAT('%',#{e.courseName},'%')
+		</if>
+		<if test="e.pointName!=null and e.pointName!=''">
+		and edu_course_kpoint.name like CONCAT('%',#{e.pointName},'%')
+		</if>
+		<if test="e.startDate !='' and e.startDate !=null and e.endDate !=null and e.endDate !='' ">
+		and edu_course_assess.create_time BETWEEN #{e.startDate} and #{e.endDate}
+		</if>
+		</where> 
+		order by edu_course_assess.id desc
+		<include refid="publicMapper.pageEnd"/>
+	</select>
+	
+	<select id="getAdminCourseAssessListCount" parameterType="java.util.HashMap" resultType="int">
+	select count(1) from edu_course_assess
+	left join user_user on edu_course_assess.user_id =user_user.id
+	left join edu_course on edu_course_assess.course_id=edu_course.id
+	left join edu_course_kpoint on edu_course_assess.kpoint_id=edu_course_kpoint.id
+	<where>
+		<if test="e.nickname!=null and e.nickname!=''">
+		user_user.nickname like CONCAT('%',#{e.nickname},'%')
+		</if>
+		<if test="e.email!=null and e.email!=''">
+		and user_user.email like CONCAT('%',#{e.email},'%')
+		</if>
+		<if test="e.courseName!=null and e.courseName!=''">
+		and edu_course.name like CONCAT('%',#{e.courseName},'%')
+		</if>
+		<if test="e.pointName!=null and e.pointName!=''">
+		and edu_course_kpoint.name like CONCAT('%',#{e.pointName},'%')
+		</if>
+		<if test="e.startDate !='' and e.startDate !=null and e.endDate !=null and e.endDate !='' ">
+		and edu_course_assess.create_time BETWEEN #{e.startDate} and #{e.endDate}
+		</if>
+		</where> 
+	</select>
+	
+	<delete id="delCourseAssessBatch">
+		delete from edu_course_assess
+		where edu_course_assess.id in
+		<foreach collection="array" item="item" separator="," open="(" close=")"> 
+		#{item}
+		</foreach>
+	</delete>
+</mapper>

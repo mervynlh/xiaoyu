@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeixinMenuMapper">
+
+	<resultMap type="WeixinMenu" id="WeixinMenuResult">
+		<result property="id" column="id"/>
+		<result property="parentId" column="parentId"/>
+		<result property="menuName" column="menu_name"/>
+		<result property="keywordUrl" column="keyword_url"/>
+		<result property="soft" column="soft"/>
+		<result property="status" column="status"/>
+	</resultMap>
+	
+	
+	<sql id="edu_weixin_menu_columns">
+		edu_weixin_menu.id,
+		edu_weixin_menu.parentId,
+		edu_weixin_menu.menu_Name,
+		edu_weixin_menu.keyword_url,
+		edu_weixin_menu.soft,
+		edu_weixin_menu.status
+	</sql>
+	
+	<sql id="edu_weixin_menu_properties">
+		#{id},
+		#{parentId},
+		#{menuName},
+		#{keywordUrl},
+		#{soft},
+		#{status}
+	</sql>
+      <!-- 获取一级菜单 -->
+      <select id="getWeixinFirstMenu" resultMap="WeixinMenuResult">
+      	select <include refid="WeixinMenuMapper.edu_weixin_menu_columns"/> 
+      	from edu_weixin_menu where edu_weixin_menu.parentId=0 order by soft ASC
+      </select>
+      <!-- 根据一级菜单id获取二级菜单 -->
+      <select id="getWeixinSecondMenuByParentId" parameterType="Long" resultMap="WeixinMenuResult">
+      	select * from edu_weixin_menu where edu_weixin_menu.parentId=#{value} order by soft ASC
+      </select>
+      <!-- 获取启用一级菜单 -->
+      <select id="getWeixinFirstEnableMenu" resultMap="WeixinMenuResult">
+      	select * from edu_weixin_menu where edu_weixin_menu.parentId=0 and edu_weixin_menu.status=1 order by soft ASC
+      </select>
+      <!-- 根据一级菜单id获取启用二级菜单 -->
+      <select id="getWeixinSecondEnableMenuByParentId" parameterType="Long" resultMap="WeixinMenuResult">
+      	select * from edu_weixin_menu where edu_weixin_menu.parentId=#{value} and edu_weixin_menu.status=1 order by soft ASC
+      </select>
+      <!-- 根据ID删除菜单及子菜单 -->
+      <delete id="delWeixinMenuById" parameterType="Long">
+      	delete from edu_weixin_menu where edu_weixin_menu.id=#{value} or edu_weixin_menu.parentId=#{value}
+      </delete>
+     
+      <!-- 新建菜单 -->
+      <insert id="addWeixinMenu" parameterType="WeixinMenu" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+      	insert into edu_weixin_menu(<include refid="edu_weixin_menu_columns"/>) values(<include refid="edu_weixin_menu_properties"/>)
+      </insert>
+      <!-- 更新菜单 -->
+      <update id="updateWeixinMenu" parameterType="WeixinMenu">
+      	UPDATE edu_weixin_menu
+		SET
+		edu_weixin_menu.parentId=#{parentId},
+		edu_weixin_menu.menu_name=#{menuName},
+		edu_weixin_menu.keyword_url=#{keywordUrl},
+		edu_weixin_menu.soft=#{soft},
+		edu_weixin_menu.status=#{status}
+		where edu_weixin_menu.id=#{id}
+      </update>
+</mapper>

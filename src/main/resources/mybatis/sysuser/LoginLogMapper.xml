@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="LoginLogMapper">
+
+	<sql id="sys_login_log_columns">
+		sys_login_log.id,
+		sys_login_log.logintime,
+		sys_login_log.IP,
+		sys_login_log.userid,
+		sys_login_log.address,
+		sys_login_log.osname,
+		sys_login_log.user_agent,
+		sys_user.user_name,
+		sys_user.login_name
+	</sql>
+
+	<resultMap type="LoginLog" id="LoginLogResult">
+		<result property="id" column="id" />
+		<result property="loginTime" column="logintime" />
+		<result property="ip" column="ip" />
+		<result property="userId" column="userid" />
+		<result property="userName" column="user_name" />
+		<result property="loginName" column="login_name" />
+		<result property="address" column="address" />
+		<result property="osname" column="osname" />
+		<result property="userAgent" column="user_agent" />
+	</resultMap>
+
+	<!-- 添加登录日志 -->
+	<insert id="addLoginLog" parameterType="LoginLog">
+		insert into sys_login_log
+		(
+		sys_login_log.logintime,
+		sys_login_log.ip,
+		sys_login_log.userid,
+		sys_login_log.osname,
+		sys_login_log.user_agent
+		)
+		values
+		(#{loginTime}, #{ip}, #{userId},#{osname},#{userAgent})
+	</insert>
+
+	<!-- 查看所有登录日志记录 -->
+	<select id="getAll" resultMap="LoginLogResult" parameterType="QueryLoginLogCondition">
+		select
+		<include refid="sys_login_log_columns" />
+		FROM
+		sys_login_log,
+		sys_user
+		WHERE sys_login_log.userid = sys_user.user_id
+		ORDER BY sys_login_log.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getAllCount" resultType="int" parameterType="QueryLoginLogCondition">
+		select
+		COUNT(1)
+		FROM
+		sys_login_log
+	</select>
+
+	<select id="getAllUserLog"  resultType="AdminLoginLog">
+		select
+		`sys_login_log`.id as id, 
+		`sys_login_log`.loginTime as loginTime,
+		`sys_login_log`.ip as loginIp,
+		`sys_login_log`.userId as userId,
+		`sys_login_log`.address as address,
+		`sys_login_log`.osname as osname,
+		`sys_login_log`.user_agent as userAgent
+		FROM
+		sys_login_log
+		where address is null limit 0,10000
+	</select>
+	
+	
+	<update id="updateSysUserLog" parameterType="UserLoginLog">
+		update sys_login_log 
+		set
+		sys_login_log.address
+		=#{address} where id = #{id}
+	</update>
+	
+	
+	<!-- 根据用户登录ID查看所有登录日志记录 -->
+	<select id="getByUserId" resultMap="LoginLogResult"
+		parameterType="QueryLoginLogCondition">
+		select
+		<include refid="sys_login_log_columns" />
+		FROM
+		sys_login_log,
+		sys_user
+		WHERE sys_user.user_id = #{e.userId}
+		AND sys_login_log.userid = #{e.userId}
+		ORDER BY sys_login_log.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getByUserIdCount" resultType="int"
+		parameterType="QueryLoginLogCondition">
+		select
+		COUNT(1)
+		FROM
+		sys_login_log
+		WHERE
+		sys_login_log.userid = #{e.userId}
+	</select>
+
+	<!-- 根据用户名搜索查看登录日志 -->
+	<select id="search" resultMap="LoginLogResult" parameterType="QueryLoginLogCondition">
+		select
+		<include refid="sys_login_log_columns" />
+		FROM
+		sys_login_log,
+		sys_user
+		WHERE sys_login_log.userid = sys_user.user_id
+		AND (sys_user.user_name LIKE CONCAT('%',#{userName},'%' )
+		OR sys_user.login_name LIKE CONCAT('%',#{userName},'%' ) )
+		ORDER BY sys_login_log.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="searchCount" resultType="int" parameterType="QueryLoginLogCondition">
+		select
+		count(1)
+		FROM
+		sys_login_log,
+		sys_user
+		WHERE sys_login_log.userid = sys_user.user_id
+		AND (sys_user.user_name LIKE CONCAT('%',#{userName},'%' )
+		OR sys_user.login_name LIKE CONCAT('%',#{userName},'%' ) )
+	</select>
+	<!--end -->
+</mapper>

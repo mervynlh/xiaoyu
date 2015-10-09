@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserIntegralGiftMapper">
+
+        <resultMap id="UserIntegralGiftResult" type="UserIntegralGift">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="score" column="score"/>
+            <result property="logo" column="logo"/>
+            <result property="content" column="content"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="courseId" column="course_id"/>
+            <result property="status" column="status"/>
+        </resultMap>
+		
+		<resultMap type="UserIntegralGift" id="UserIntegralAndCourseGiftResult" extends="UserIntegralGiftResult">
+			<result property="courseName" column="courseName"/>
+			<result property="courseTitle" column="courseTitle"/>
+			<result property="courseLogo" column="courseLogo"/>
+		</resultMap>
+        <sql id="edu_user_integral_gift_columns">
+            edu_user_integral_gift.id,
+            edu_user_integral_gift.name,
+            edu_user_integral_gift.score,
+            edu_user_integral_gift.logo,
+            edu_user_integral_gift.content,
+            edu_user_integral_gift.create_time,
+            edu_user_integral_gift.update_time,
+            edu_user_integral_gift.course_id,
+            edu_user_integral_gift.status
+        </sql>
+
+        <sql id="edu_user_integral_gift_properties">
+            #{id},
+            #{name},
+            #{score},
+            #{logo},
+            #{content},
+            #{createTime},
+            #{updateTime},
+            #{courseId},
+            #{status}
+        </sql>
+		<!-- 创建礼品 -->
+        <insert id="createUserIntegralGift" parameterType="UserIntegralGift" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_integral_gift (<include refid="edu_user_integral_gift_columns"/>) VALUES (<include refid="edu_user_integral_gift_properties"/>)
+        </insert>
+		<!-- 软删除  status1.正常 2.删除-->
+        <update id="deleteUserIntegralGiftById" parameterType="Long">
+        	update edu_user_integral_gift
+        	set edu_user_integral_gift.status=2
+            where
+            edu_user_integral_gift.id = #{id}
+        </update>
+		<!-- 修改礼品 -->
+        <update id="updateUserIntegralGift" parameterType="UserIntegralGift">
+            update edu_user_integral_gift SET
+                name = #{name},
+                score = #{score},
+                logo = #{logo},
+                content = #{content},
+                update_time = #{updateTime},
+                course_id = #{courseId}
+            where
+                id = #{id}
+        </update>
+		<!-- 获得礼品详情 -->
+        <select id="getUserIntegralGiftById" resultMap="UserIntegralGiftResult" parameterType="Long">
+            select
+            <include refid="edu_user_integral_gift_columns"/>
+            from edu_user_integral_gift
+            where
+                id = #{value}
+        </select>
+		
+		<!-- 获得礼品详情 -->
+        <select id="getUserIntegralAndCourseGiftById" resultMap="UserIntegralAndCourseGiftResult" parameterType="Long">
+            select
+            <include refid="edu_user_integral_gift_columns"/>,
+	        edu_course.name courseName,
+	        edu_course.title courseTitle,
+	        edu_course.logo  courseLogo
+            from edu_user_integral_gift
+            left join edu_course on edu_user_integral_gift.course_id =edu_course.id 
+            where edu_user_integral_gift.id = #{value}
+        </select>
+		
+        <select id="getUserIntegralGiftList" resultMap="UserIntegralGiftResult" parameterType="UserIntegralGift">
+            select
+            <include refid="edu_user_integral_gift_columns"/>
+            from edu_user_integral_gift
+        </select>
+        <!-- 查询礼品列表  -->
+        <select id="getUserIntegralGiftListPage" parameterType="Map" resultMap="UserIntegralAndCourseGiftResult">
+	        select <include refid="edu_user_integral_gift_columns"/>,
+	        edu_course.name courseName,
+	        edu_course.title courseTitle,
+	        edu_course.logo  courseLogo
+	        from edu_user_integral_gift
+	        left join edu_course on edu_user_integral_gift.course_id =edu_course.id 
+	        <where>
+	        edu_user_integral_gift.status=1
+	        <if test="e.name!=null and e.name!=''">
+	        and edu_user_integral_gift.name like CONCAT('%',#{e.name},'%')
+	        </if>
+	        </where>
+	        order by edu_user_integral_gift.id desc
+	        <include refid="publicMapper.pageEnd" />
+        </select>
+         <select id="getUserIntegralGiftListPageCount" parameterType="Map" resultType="int">
+	        select count(1)
+	        from edu_user_integral_gift
+	        <where>
+	         edu_user_integral_gift.status=1
+	        <if test="e.name!=null and e.name!=''">
+	        and edu_user_integral_gift.name like CONCAT('%',#{e.name},'%')
+	        </if>
+	        </where>
+        </select>
+        <!-- 查询我的礼品  -->
+        <select id="getIntegralGiftListByUserId" parameterType="Map" resultMap="UserIntegralAndCourseGiftResult">
+	        select <include refid="edu_user_integral_gift_columns"/>,
+	        edu_course.name courseName,
+	        edu_course.title courseTitle,
+	        edu_course.logo  courseLogo
+	        from edu_user_integral_record
+	        left join edu_user_integral_gift on edu_user_integral_record.other =edu_user_integral_gift.id
+	        left join edu_course on edu_user_integral_gift.course_id =edu_course.id
+	        left join edu_user_integral_template on edu_user_integral_record.integral_type=edu_user_integral_template.id
+	        where edu_user_integral_record.user_id=#{e} and edu_user_integral_gift.status=1  and edu_user_integral_template.keyword='gift'
+        	order by edu_user_integral_record.id desc
+        	<include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getIntegralGiftListByUserIdCount" parameterType="Map" resultType="int">
+        	select count(1) from edu_user_integral_record
+        	left join edu_user_integral_gift on edu_user_integral_record.other =edu_user_integral_gift.id
+	        left join edu_course on edu_user_integral_gift.course_id =edu_course.id 
+	        left join edu_user_integral_template on edu_user_integral_record.integral_type=edu_user_integral_template.id
+          	where edu_user_integral_record.user_id=#{e} and edu_user_integral_gift.status=1 and edu_user_integral_template.keyword='gift'
+        </select>
+</mapper>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteMemcacheMapper">
+	<resultMap type="WebsiteMemcache" id="WebsiteMemcacheResult">
+	<result property="id" column="id"/>
+	<result property="memKey" column="mem_key"/>
+	<result property="memDesc" column="mem_desc"/>
+	</resultMap>
+	<sql id="edu_website_memcache_columns">
+	edu_website_memcache.id,
+	edu_website_memcache.mem_key,
+	edu_website_memcache.mem_desc 
+	</sql>
+	<sql id="edu_website_memcache_properties">
+	#{id},
+	#{memKey},
+	#{memDesc}
+	</sql>
+	<!-- 添加memcache key -->
+	<insert id="addWebsiteMemcache" parameterType="WebsiteMemcache" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into edu_website_memcache (
+		<include refid="edu_website_memcache_columns"/>)values(
+		<include refid="edu_website_memcache_properties"/>
+		)
+	</insert>
+	<!-- 查询list -->
+	<select id="queryWebsiteMemcacheList" parameterType="java.util.HashMap" resultMap="WebsiteMemcacheResult">
+		select <include refid="edu_website_memcache_columns"/>
+		from edu_website_memcache
+		<where>
+		<if test="e.memKey!=null and e.memKey!=''">
+		edu_website_memcache.mem_key like CONCAT ('%',#{e.memKey},'%')
+		</if>
+		</where>
+		order by edu_website_memcache.id desc
+		<include refid="publicMapper.pageEnd"/>  
+		</select>
+		<select id="queryWebsiteMemcacheListCount" parameterType="java.util.HashMap" resultType="int">
+		select count(1)
+		from edu_website_memcache
+		<where>
+		<if test="e.memKey!=null and e.memKey!=''">
+		edu_website_memcache.mem_key like CONCAT ('%',#{e.memKey},'%')
+		</if>
+		</where>
+	</select>
+	<!-- 查詢key是否存在 -->
+	<select id="queryWebsiteMemcacheIsExsit" parameterType="java.lang.String" resultType="int">
+		select count(1) from edu_website_memcache
+		where edu_website_memcache.mem_key=#{memKey}
+	</select>
+	<!-- 查询单个详情 -->
+	<select id="getWebsiteMemcacheById" parameterType="java.lang.Long" resultMap="WebsiteMemcacheResult">
+		select <include refid="edu_website_memcache_columns"/>
+		from edu_website_memcache
+		where edu_website_memcache.id=#{id}
+	</select>
+	<!-- 刪除memcache -->
+	<delete id="deleteWebsiteMemcacheById" parameterType="java.lang.Long">
+		delete from edu_website_memcache
+		where edu_website_memcache.id=#{id}
+	</delete>
+</mapper>

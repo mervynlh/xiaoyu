@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserExpandMapper">
+
+	<resultMap id="UserExpandResult" type="UserExpand">
+		<result property="id" column="id" />
+		<result property="cusId" column="user_id" />
+		<result property="realname" column="realname" />
+		<result property="userInfo" column="user_info" />
+		<result property="gender" column="gender" />
+		<result property="avatar" column="avatar" />
+		<result property="bannerUrl" column="banner_url" />
+		<result property="msgNum" column="msg_num" />
+		<result property="lastSystemTime" column="last_system_time" />
+        <result property="registerFrom" column="register_from" />
+        <result property="hideStatus" column="hide_status" />
+        <result property="extendCord" column="extend_cord"/>
+        <result property="birthday" column="birthday"/>
+	</resultMap>
+
+	<sql id="user_expand_columns">
+		user_expand.id,
+		user_expand.user_id,
+		user_expand.realname,
+		user_expand.user_info,
+		user_expand.gender,
+		user_expand.avatar,
+		user_expand.banner_url,
+		user_expand.msg_num,
+		user_expand.last_system_time,
+		user_expand.register_from,
+		user_expand.hide_status,
+		user_expand.extend_cord,
+		user_expand.birthday
+	</sql>
+
+	<sql id="user_expand_properties">
+		#{id},
+		#{cusId},
+		#{realname},
+		#{userInfo},
+		#{gender},
+		#{avatar},
+		#{bannerUrl},
+		#{msgNum},
+		#{lastSystemTime},
+		#{registerFrom},
+		#{hideStatus},
+		#{extendCord},
+		#{birthday}
+	</sql>
+
+	<insert id="createUserExpand" parameterType="UserExpand" keyColumn="id" keyProperty="id">
+		insert INTO user_expand (
+		<include refid="user_expand_columns" />
+		) VALUES (
+		<include refid="user_expand_properties" />
+		)
+	</insert>
+
+	<update id="updateUserExpand" parameterType="UserExpand">
+		update user_expand SET
+		realname = #{realname},
+		user_info = #{userInfo},
+		gender = #{gender},
+		avatar = #{avatar},
+		register_from = #{registerFrom},
+		<if test="birthday != null and birthday != ''">
+			birthday = #{birthday},
+			age = #{age},
+		</if>
+		hide_status = #{hideStatus}
+		where
+		user_id = #{cusId}
+	</update>
+
+	<update id="updateUserSign" parameterType="UserExpand">
+		update user_expand SET
+		cont_signin = #{contSignin},
+		last_sign_time = #{lastSignTime},
+		sign_date = #{signDate}
+		where
+		user_id = #{cusId}
+	</update>
+
+	<update id="updateAvatarById" parameterType="UserExpand">
+		update user_expand SET
+		avatar = #{avatar}
+		where
+		user_id = #{cusId}
+	</update>
+	
+	
+
+	<select id="getUserExpandByUserId" resultMap="UserExpandResult" parameterType="java.util.HashMap">
+		select
+		<include refid="user_expand_columns" />
+		from user_expand
+		where
+		user_id = #{id}
+
+	</select>
+
+	<select id="getUserExpandList" resultMap="UserExpandResult" parameterType="UserExpand">
+		select
+		<include refid="user_expand_columns" />
+		from user_expand
+	</select>
+	
+	
+	<!-- 获取用户的扩展综合信息 -->
+	<sql id="user_and_expand">
+			user_user.id,
+			user_user.nickname,
+			user_user.email,
+			user_user.email_isavalible,
+			user_user.mobile,
+			user_user.mobile_isavalible,
+			user_user.password,
+			user_user.isavalible,
+			user_user.customerkey,
+			user_user.createdate,
+			user_user.userip,
+			user_user.user_type,
+			
+			user_expand.user_id,
+			user_expand.realname,
+			user_expand.user_info,
+			user_expand.gender,
+			user_expand.avatar,
+			user_expand.banner_url,
+			user_expand.msg_num,
+			user_expand.last_system_time,
+			user_expand.register_from,
+			user_expand.hide_status,
+			user_expand.extend_cord,
+			user_expand.birthday,
+			user_expand.cont_signin,
+			user_expand.last_sign_time,
+			user_expand.sign_date
+	</sql>
+	
+	<resultMap type="UserExpandDto" id="UserExpandDtoMap" >
+		<result property="id" column="id" />
+		<result property="nickname" column="nickname" />
+		<result property="email" column="email" />
+		<result property="mobile" column="mobile" />
+		
+		<result property="cusId" column="user_id" />
+		<result property="realname" column="realname" />
+		<result property="userInfo" column="user_info" />
+		<result property="gender" column="gender" />
+		<result property="avatar" column="avatar" />
+		<result property="bannerUrl" column="banner_url" />
+		<result property="msgNum" column="msg_num" />
+		<result property="lastSystemTime" column="last_system_time" />
+		<result property="registerFrom" column="register_from" />
+		<result property="courseid"  column="course_id" />
+		<result property="hideStatus"  column="hide_status" />
+		<result property="extendCord" column="extend_cord" />
+		<result property="birthday" column="birthday"/>
+		<result property="userType" column="user_type"/>
+
+		<result property="integift" column="current_score"/>
+		
+		<result property="contSignin" column="cont_signin"/>
+		<result property="lastSignTime" column="last_sign_time"/>
+		<result property="signDate" column="sign_date"/>
+	</resultMap>
+
+	
+
+	<!-- 查询单个用户信息 -->
+	<select id="queryUserById" parameterType="long" resultMap="UserExpandDtoMap">
+		select
+			<include refid="user_and_expand"/>,
+			edu_user_integral.current_score
+		from user_user 
+		left join user_expand on user_user.id =user_expand.user_id
+		left join edu_user_integral ON user_user.id = edu_user_integral.user_id
+		where user_user.id =#{cusId}
+	</select>
+
+	<!-- 根据多个用户id获取用户信息 -->
+	<select id="queryCustomerInCusIds" parameterType="java.util.HashMap" resultMap="UserExpandDtoMap">
+		select
+			<include refid="user_and_expand"/>
+		from user_user 
+		left join user_expand on  user_user.id =user_expand.user_id
+		where user_user.id in
+		<foreach collection="list" index="index" item="item" open="(" separator="," close=")">  
+        	#{item}  
+   		</foreach>  
+	</select>
+	
+	
+	<!-- 查询用户列表 -->
+	<select id="queryAllCustomerPage" parameterType="java.util.HashMap" resultMap="UserExpandDtoMap">
+		select
+			<include refid="user_and_expand"/>
+		from user_user 
+		left join user_expand on  user_user.id =user_expand.user_id
+		<where>
+		 <if test="e.cusId != null and e.cusId>0">  
+	        and user_user.id =#{e.cusId}
+	    </if> 
+	    <if test="e.email != null and e.email !='' ">  
+	        and user_user.email =#{e.email}
+	    </if>
+	    </where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryAllCustomerPageCount" parameterType="java.util.HashMap" resultType="int">
+		select count(1)
+		from user_user
+		<where>
+		  <if test="e.cusId != null and e.cusId>0">  
+	        and user_user.id =#{e.cusId}
+	    </if> 
+		<if test="e.email != null and e.email !='' ">  
+	        and user_user.email =#{e.email}
+	    </if>
+	    </where>
+	</select>
+
+	<!-- 通过nickname 查询用户 -->
+	<select id="queryCustomerByShowName" parameterType="java.util.HashMap" resultMap="UserExpandDtoMap">
+		select
+        <include refid="user_and_expand"/>
+		from user_expand LEFT JOIN user_user on user_expand.user_id = user_user.id
+		where
+		user_user.nickname like
+		CONCAT('%',#{showName},'%')
+		limit #{size}
+	</select>
+	
+	<!-- 通过showname 查询用户 -->
+	<select id="queryCustomerByShowNameEquals" parameterType="java.util.HashMap" resultMap="UserExpandDtoMap">
+		select
+		<include refid="user_expand_columns" />
+		from user_expand LEFT JOIN user_user on user_expand.user_id = user_user.id
+		where
+		user_user.nickname = #{showName}
+	</select>
+
+	
+	<!-- 更新最后提醒消息的时间 -->
+	<update id="updateCusForLST" parameterType="java.util.HashMap">
+		update user_expand set last_system_time=#{date} where
+		user_id=#{cusId}
+	</update>
+	
+	<!-- 更新提醒的消息数量 +1-->
+	<update id="updateUnReadMsgNumAddOne" parameterType="java.util.HashMap">
+		update user_expand set 
+		<if test="falg=='msgNum'">
+		msg_num=msg_num+1
+		</if>
+		where
+		user_id=#{cusId}
+	</update>
+	<!-- 不区分消息类型 -->
+	<update id="updateUnReadMsgNumReset" parameterType="java.util.HashMap">
+		update user_expand set 
+		msg_num=0
+		where
+		user_id=#{cusId}
+	</update>
+	<!-- 更新用户个人中心封面 -->
+	<update id="updateUserExpandBannerUrl" parameterType="Map">
+		update user_expand
+		set user_expand.banner_url=#{bannerUrl}
+		where user_expand.user_id=#{userId}
+	</update>
+	 <!-- 更新用户的数据数量 -->
+      <update id="updateUserExpandCount" parameterType="map" >
+      	update user_expand 
+      	<if test="type=='msgNum'">set msg_num =msg_num ${operation} #{count}</if>
+      	where user_id=#{userId}
+      </update>
+      
+      <!-- 更新用户签到天数 -->
+      <update id="updateUserExpandSignDate" parameterType="Map">
+      	update user_expand
+      	set
+      		user_expand.sign_date = #{signDate}
+      	where 
+      		user_expand.user_id = #{userId}
+      </update>
+      <!-- 根据课程id查询用户信息 -->
+     <select id="queryUserExpandListByCourseId" parameterType="long" resultMap="UserExpandDtoMap">
+		select
+		distinct
+			<include refid="user_and_expand"/>
+		from user_user 
+		left join user_expand on  user_user.id =user_expand.user_id
+		left join edu_trxorder_detail on edu_trxorder_detail.user_id=user_user.id
+	    where  course_id=#{value}
+	    order by edu_trxorder_detail.id desc
+        limit 10
+	</select> 
+</mapper>

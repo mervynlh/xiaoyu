@@ -1,0 +1,12 @@
+#foreach( $teacher in $teacherList)
+<li style="margin-right: 7px;">
+    <a href="/front/teacher/$teacher.id" title="">
+        #if($teacher.picPath && $teacher.picPath!="")
+            <img src="$staticImageServer$teacher.picPath" height="50" width="66" alt="">
+            #else
+            <img src="static/edu/images/default/default_head.jpg" height="50" width="66" alt="">
+        #end
+        <p class="hLh20">$teacher.name</p>
+    </a>
+</li>
+#end

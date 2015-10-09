@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeixinBindMapper">
+	
+	<resultMap type="WeixinBind" id="WeixinBindResult">
+		<result property="id" column="id"/>
+		<result property="openId" column="open_id"/>
+		<result property="userId" column="user_id"/>
+		<result property="createTime" column="create_time"/>
+	</resultMap>
+	
+	<sql id="edu_weixin_user_columns">
+		edu_weixin_user.id,
+		edu_weixin_user.open_id,
+		edu_weixin_user.user_id,
+		edu_weixin_user.create_time
+	</sql>
+	<sql id="edu_weixin_user_properties">
+		#{id},
+		#{openId},
+		#{userId},
+		#{createTime}
+	</sql>
+	<!-- 查询微信用户绑定信息 -->
+    <select id="queryWeixinBind" parameterType="WeixinBind" resultMap="WeixinBindResult">
+    	select <include refid="WeixinBindMapper.edu_weixin_user_columns"/> 
+    	from edu_weixin_user 
+    	where 
+    	open_id=#{openId} 
+   		<if test="userId!=null and userId!=''">
+   			and user_id=#{userId}
+   		</if>
+    </select>
+    <!-- 添加微信用户绑定信息 -->
+    <insert id="createWeixinBind" parameterType="WeixinBind">
+    	insert into edu_weixin_user(<include refid="WeixinBindMapper.edu_weixin_user_columns"/> ) 
+    	values(<include refid="WeixinBindMapper.edu_weixin_user_properties"/> );
+    </insert>
+    <!-- 解除绑定 -->
+    <delete id="deleteWeixinBind" parameterType="WeixinBind">
+    	delete from edu_weixin_user where open_id=#{openId}
+    </delete>
+</mapper>

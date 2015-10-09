@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeixinSetMapper">
+	
+	<resultMap type="WeixinSetReply" id="WeixinSetReplyResult">
+		<result property="id" column="id"/>
+		<result property="type" column="type"/>
+		<result property="replyId" column="reply_id"/>
+	</resultMap>
+	
+	<sql id="edu_weixin_set_reply_columns">
+		edu_weixin_set_reply.id,
+		edu_weixin_set_reply.type,
+		edu_weixin_set_reply.reply_id
+	</sql>
+	<sql id="edu_weixin_set_reply_properties">
+		#{id},
+		#{type},
+		#{replyId}
+	</sql>
+		
+    <!-- 添加常规回复 -->
+    <insert id="addWeixinSetReply" parameterType="WeixinSetReply">
+    	insert into edu_weixin_set_reply(<include refid="edu_weixin_set_reply_columns"/>) values(<include refid="edu_weixin_set_reply_properties"/>)
+    </insert>
+    <!-- 修改常规回复 -->
+    <update id="updateWeixinSetReply" parameterType="WeixinSetReply">
+    	update edu_weixin_set_reply set 
+    	edu_weixin_set_reply.reply_id=#{replyId} 
+    	where 
+    	edu_weixin_set_reply.id=#{id}
+    </update>
+    <!-- 根据类型查询常规回复 -->
+    <select id="getWeixinSetReply" parameterType="String" resultMap="WeixinSetReplyResult">
+    	select <include refid="edu_weixin_set_reply_columns"/> from edu_weixin_set_reply where edu_weixin_set_reply.type=#{value}
+    </select>
+    <!-- 根据回复素材ID删除常规回复（回复素材被删除时，同时删除引用者中的回复） -->
+    <delete id="delWeixinSetReply" parameterType="Long">
+    	delete from edu_weixin_set_reply where edu_weixin_set_reply.reply_id=#{value}
+    </delete>
+</mapper>

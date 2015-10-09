@@ -1,0 +1,300 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CouponCodeMapper">
+	  <resultMap id="CouponCodeResult" type="CouponCode">
+          <result property="id" column="id"/>
+          <result property="couponId" column="coupon_id"/>
+          <result property="status" column="status"/>
+          <result property="trxorderId" column="trxorder_id"/>
+          <result property="requestId" column="request_id"/>
+          <result property="userId" column="user_id"/>
+          <result property="couponCode" column="coupon_code"/>
+          <result property="createTime" column="create_time"/>
+          <result property="useTime" column="use_time"/>
+          <result property="payTime" column="pay_time"/>
+      </resultMap>
+	  <resultMap type="CouponCodeDTO" id="CouponCodeDTOResult" extends="CouponCodeResult">
+	  	 	<result property="title" column="title"/>
+            <result property="startTime" column="start_time"/>
+            <result property="endTime" column="end_time"/>
+            <result property="limitAmount" column="limitamount"/>
+            <result property="type" column="type"/>
+            <result property="optuserName" column="optusername"/>
+            <result property="amount" column="amount"/>
+	  </resultMap>
+	  <resultMap type="CouponCodeDTO" id="NewCouponCodeDTOResult" extends="CouponCodeDTOResult">
+            <result property="amount" column="amount"/>
+	  </resultMap>
+
+      <sql id="edu_coupon_code_columns">
+          edu_coupon_code.id,
+          edu_coupon_code.coupon_id,
+          edu_coupon_code.status,
+          edu_coupon_code.trxorder_id,
+          edu_coupon_code.request_id,
+          edu_coupon_code.user_id,
+          edu_coupon_code.coupon_code,
+          edu_coupon_code.create_time,
+          edu_coupon_code.use_time,
+          edu_coupon_code.pay_time
+      </sql>
+	  <sql id="string_edu_coupon_code_columns">
+          edu_coupon_code.coupon_id,
+          edu_coupon_code.status,
+          edu_coupon_code.trxorder_id,
+          edu_coupon_code.request_id,
+          edu_coupon_code.user_id,
+          edu_coupon_code.coupon_code,
+          edu_coupon_code.create_time
+      </sql>
+      <sql id="edu_coupon_code_properties">
+          #{id},
+          #{couponId},
+          #{status},
+          #{trxorderId},
+          #{requestId},
+          #{userId},
+          #{couponCode},
+          #{createTime},
+          #{useTime},
+          #{payTime}
+      </sql>
+	  <!-- 生成优惠券编码 -->
+      <insert id="createCouponCode" parameterType="String">
+          insert INTO edu_coupon_code (<include refid="string_edu_coupon_code_columns"/>) VALUES ${value}
+      </insert>
+		
+	<insert id="addCouponCode" parameterType="CouponCode">
+		insert into edu_coupon_code (<include refid="edu_coupon_code_columns"/>)values (<include refid="edu_coupon_code_properties" />)
+	</insert>
+      
+      <!-- 使用优惠券 -->
+      <update id="useCouponCode" parameterType="Long">
+      	update edu_coupon_code SET
+              status = 2
+        where
+              id in (${value}) and status=1
+      </update>
+      <!-- 作废优惠券 -->
+      <update id="wasteCouponCode" parameterType="String">
+          update edu_coupon_code SET
+              status = 4
+          where
+              id in (${value}) and status=1
+      </update>
+      <!--支付成功后更新优惠编码信息 -->
+      <update id="updateCouponCode" parameterType="CouponCode">
+          update edu_coupon_code SET
+              status = #{status},
+              trxorder_id = #{trxorderId},
+              request_id =#{requestId},
+              user_id = #{userId},
+              use_time = #{useTime},
+              pay_time = #{payTime}
+          where
+              id = #{id}
+      </update>
+     
+      <!-- 作废优惠券下的未使用优惠编码 -->
+      <update id="wasteCodeByCouponId" parameterType="Long">
+         update edu_coupon_code SET
+              status = 4
+          where
+              coupon_id = #{id} and status=1
+      </update>
+      <!-- 过期的优惠编码修改状态 -->
+      <update id="overdueCodeByTime">
+      	  update edu_coupon_code SET
+          status = 3
+          where id in(SELECT e.id from(select edu_coupon_code.id from edu_coupon_code
+		  LEFT JOIN edu_coupon on edu_coupon.id=edu_coupon_code.coupon_id
+		  WHERE edu_coupon_code.status=1 and <![CDATA[edu_coupon.end_time<NOW()]]>) e)
+      </update>
+      <!-- id查询优惠券编码 -->
+      <select id="getCouponCodeById" resultMap="CouponCodeResult" parameterType="Long">
+          select
+          <include refid="edu_coupon_code_columns"/>
+          from edu_coupon_code
+          where id = #{value}
+      </select>
+	  <!-- 根据用户id和优惠券id获取优惠券记录 -->
+	  <select id="getCouponCodeByCouponIdAndUserId" parameterType="Map" resultMap="CouponCodeResult">
+	  	select <include refid="edu_coupon_code_columns"/> from edu_coupon_code where coupon_id = #{couponId} and user_id = #{userId}
+	  </select>
+      <select id="getCouponCodeListByCouponId" resultMap="CouponCodeResult" parameterType="Long">
+          select
+          <include refid="edu_coupon_code_columns"/>
+          from edu_coupon_code where coupon_id=#{value}
+      </select>
+      
+      <select id="getStringCodeListByCouponId" resultType="String" parameterType="Long">
+          select
+          edu_coupon_code.coupon_code
+          from edu_coupon_code
+          where edu_coupon_code.coupon_id=#{value}
+      </select>
+       <!-- 优惠卷编码DTO -->
+        <select id="getCouponCodeDTO" resultMap="NewCouponCodeDTOResult" parameterType="long">
+            select
+            <include refid="edu_coupon_code_columns"/>,
+            edu_coupon.title,
+            edu_coupon.start_time,
+            edu_coupon.end_time,
+            edu_coupon.limitamount,
+            edu_coupon.amount,
+            edu_coupon.type,
+            edu_coupon.optusername
+            from edu_coupon_code
+            left join edu_coupon on edu_coupon_code.coupon_id=edu_coupon.id
+            where edu_coupon_code.id=#{value}
+        </select>
+        <!-- 优惠卷编码DTOBycode -->
+        <select id="getCouponCodeDTOByCode" resultMap="NewCouponCodeDTOResult" parameterType="String">
+            select
+            <include refid="edu_coupon_code_columns"/>,
+            edu_coupon.title,
+            edu_coupon.start_time,
+            edu_coupon.end_time,
+            edu_coupon.limitamount,
+            edu_coupon.type,
+            edu_coupon.amount,
+            edu_coupon.optusername
+            from edu_coupon_code
+            left join edu_coupon on edu_coupon_code.coupon_id=edu_coupon.id
+            where edu_coupon_code.coupon_code=#{value}
+        </select>
+      <!-- 优惠卷编码分页列表 -->
+        <select id="getCouponCodePage" resultMap="CouponCodeDTOResult" parameterType="Map">
+            select
+            <include refid="edu_coupon_code_columns"/>,
+            edu_coupon.title,
+            edu_coupon.start_time,
+            edu_coupon.end_time,
+            edu_coupon.limitamount,
+            edu_coupon.type,
+            edu_coupon.optusername
+            from edu_coupon_code
+            left join edu_coupon on edu_coupon_code.coupon_id=edu_coupon.id
+            <where>
+            	<if test="e.status!=null and e.status>0 ">
+            		and edu_coupon_code.status=#{e.status}
+            	</if>
+           		<if test="e.type!=null and e.type>0 ">
+           			and edu_coupon.type=#{e.type}
+           		</if>
+           		<if test="e.couponCode!=null and e.couponCode!='' ">
+           			and edu_coupon_code.coupon_code = #{e.couponCode}
+           		</if>
+           		<if test="e.requestId!=null and e.requestId!='' ">
+           			and edu_coupon_code.request_id =#{e.requestId}
+           		</if>
+           		<if test="e.couponId!=null and e.couponId>0 ">
+           			and edu_coupon_code.coupon_id=#{e.couponId}
+           		</if>
+            </where>
+            ORDER BY edu_coupon_code.create_time DESC 
+			<include refid="publicMapper.pageEnd"/> 
+        </select>
+        <select id="getCouponCodePageCount" resultType="int" parameterType="Map">
+           select
+            count(1)
+            from edu_coupon_code
+            left join edu_coupon on edu_coupon_code.coupon_id=edu_coupon.id
+           <where>
+            	<if test="e.status!=null and e.status>0 ">
+            		and edu_coupon_code.status=#{e.status}
+            	</if>
+           		<if test="e.type!=null and e.type>0 ">
+           			and edu_coupon.type=#{e.type}
+           		</if>
+           		<if test="e.couponCode!=null and e.couponCode!='' ">
+           			and edu_coupon_code.coupon_code = #{e.couponCode}
+           		</if>
+           		<if test="e.requestId!=null and e.requestId!='' ">
+           			and edu_coupon_code.request_id =#{e.requestId}
+           		</if>
+           		<if test="e.couponId!=null and e.couponId>0 ">
+           			and edu_coupon_code.coupon_id=#{e.couponId}
+           		</if>
+            </where>
+        </select>
+        <resultMap type="CouponCodeDTO" id="CouponCodeListResult">
+        	<result property="id" column="id"/>
+        	<result property="teacherId" column="teacher_id" />
+        	<result property="amount" column="amount"/>
+        	<result property="limitAmount" column="limitamount"/>
+        	<result property="optuserName" column="realname"/>
+        	<result property="startTime" column="start_time"/>
+        	<result property="endTime" column="end_time"/>
+        	<result property="couponCode" column="coupon_code"/>
+        	<result property="type" column="type"/>
+        </resultMap>
+        <!-- 我的优惠券 -->
+        <select id="getMyCouponList" parameterType="java.util.HashMap" resultMap="CouponCodeListResult">
+        	select 
+				edu_coupon_code.id,
+				edu_coupon.teacher_id,
+				edu_coupon_code.status,
+				edu_coupon.amount,
+    			edu_coupon.limitamount,
+    			user_expand.realname,
+   				edu_coupon.start_time,
+    			edu_coupon.end_time,
+    			edu_coupon_code.coupon_code,
+    			edu_coupon.type
+			from
+				edu_coupon_code
+			left join edu_coupon on edu_coupon_code.coupon_id = edu_coupon.id
+			left join edu_teacher on edu_coupon.teacher_id = edu_teacher.id
+			left join user_expand on user_expand.user_id = edu_teacher.user_id
+			where 
+				edu_coupon_code.user_id = #{e.userId} and edu_coupon_code.status = #{e.status}
+				<if test="e.type!=0">
+					and edu_coupon.type = #{e.type}
+				</if>
+			order by edu_coupon.end_time
+			<include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getMyCouponListCount" resultType="int" parameterType="Map">
+        	select
+        		count(1) 
+        	from
+				edu_coupon_code
+			left join edu_coupon on edu_coupon_code.coupon_id = edu_coupon.id
+			left join edu_teacher on edu_coupon.teacher_id = edu_teacher.id
+			left join user_expand on user_expand.user_id = edu_teacher.user_id
+			where 
+				edu_coupon_code.user_id = #{e.userId} and edu_coupon_code.status = #{e.status}
+				<if test="e.type!=0">
+					and edu_coupon.type = #{e.type}
+				</if>
+				order by edu_coupon.end_time
+        </select>
+        <resultMap type="CouponCodeStatus" id="CouponCodeStatusResult">
+        	<result property="status" column="status"/>
+        	<result property="count" column="count(*)"/>
+        </resultMap>
+        <!-- 优惠券状态 -->
+        <select id="getCouponCodeStatus" parameterType="Long" resultMap="CouponCodeStatusResult">
+        	select status,count(*) from edu_coupon_code where edu_coupon_code.user_id = #{value} group by status;
+        </select>
+        <select id="getCouponCodeListByUserForOrder" parameterType="map" resultMap="NewCouponCodeDTOResult">
+        	select 
+        	<include refid="edu_coupon_code_columns"/>,
+            edu_coupon.title,
+            edu_coupon.start_time,
+            edu_coupon.end_time,
+            edu_coupon.limitamount,
+            edu_coupon.amount,
+            edu_coupon.type,
+            edu_coupon.optusername
+            from edu_coupon_code
+            left join edu_coupon on edu_coupon.id = edu_coupon_code.coupon_id
+        	where 
+        	edu_coupon_code.user_id = #{userId}
+        	and edu_coupon.teacher_id=#{teaId}
+        	and <![CDATA[ edu_coupon.limitamount<=]]>#{money}
+        	and edu_coupon_code.status=1
+        </select>
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VedioLiveMapper">
+
+	<resultMap id="VedioLiveResult" type="VedioLive">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="code" column="code" />
+		<result property="teacher" column="teacher" />
+		<result property="liveTime" column="live_time" />
+		<result property="joinNum" column="join_num" />
+		<result property="content" column="content" />
+		<result property="endTime" column="end_time" />
+		<result property="addTime" column="add_time" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+	<sql id="edu_vedio_live_columns">
+		edu_vedio_live.id,
+		edu_vedio_live.title,
+		edu_vedio_live.code,
+		edu_vedio_live.teacher,
+		edu_vedio_live.live_time,
+		edu_vedio_live.join_num,
+		edu_vedio_live.content,
+		edu_vedio_live.end_time,
+		edu_vedio_live.add_time,
+		edu_vedio_live.update_time
+	</sql>
+
+	<sql id="edu_vedio_live_properties">
+		#{id},
+		#{title},
+		#{code},
+		#{teacher},
+		#{liveTime},
+		#{joinNum},
+		#{content},
+		#{endTime},
+		#{addTime},
+		#{updateTime}
+	</sql>
+
+	<insert id="createVedioLive" parameterType="VedioLive" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_vedio_live (
+		<include refid="edu_vedio_live_columns" />
+		) VALUES (
+		<include refid="edu_vedio_live_properties" />
+		)
+	</insert>
+
+	<delete id="deleteVedioLiveById" parameterType="Long">
+		delete from edu_vedio_live
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateVedioLive" parameterType="VedioLive">
+		update edu_vedio_live SET
+		title = #{title},
+		code = #{code},
+		teacher = #{teacher},
+		live_time = #{liveTime},
+		join_num = #{joinNum},
+		content = #{content},
+		end_time = #{endTime},
+		update_time = #{updateTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getVedioLiveById" resultMap="VedioLiveResult" parameterType="Long">
+		select
+		<include refid="edu_vedio_live_columns" />
+		from edu_vedio_live
+		where
+		id = #{value}
+	</select>
+
+	<select id="getVedioLiveList" resultMap="VedioLiveResult" parameterType="VedioLive">
+		select
+		<include refid="edu_vedio_live_columns" />
+		from edu_vedio_live
+	</select>
+	<select id="getVedioLiveListPage" resultMap="VedioLiveResult" parameterType="VedioLive">
+		select
+		<include refid="edu_vedio_live_columns" />
+		from edu_vedio_live
+		<where>
+		<if test="e.id!=null and e.id!=''">
+			and edu_vedio_live.id = ${e.id} 
+		</if>
+		<if test="e.title!=null and e.title!=''">
+			<![CDATA[ and edu_vedio_live.title LIKE CONCAT('%',#{e.title},'%')  ]]>
+		</if>
+		<if test="e.dateFalg=='soon'">
+			<![CDATA[ and edu_vedio_live.live_time > now()]]>
+		</if>
+		<if test="e.dateFalg=='history'">
+			<![CDATA[and  edu_vedio_live.live_time< now() ]]>
+		</if>
+		</where>
+		<include refid="publicMapper.pageEnd"/>
+	</select>
+	<select id="getVedioLiveListPageCount" resultType="int" parameterType="VedioLive">
+		select
+		Count(1)
+		from edu_vedio_live
+		<where>
+		<if test="e.id!=null and e.id!=''">
+			and edu_vedio_live.id = ${e.id} 
+		</if>
+		<if test="e.title!=null and e.title!=''">
+			<![CDATA[ and edu_vedio_live.title LIKE CONCAT('%',#{e.title},'%')  ]]>
+		</if>
+		<if test="e.dateFalg=='soon'">
+			<![CDATA[ and edu_vedio_live.live_time > now()]]>
+		</if>
+		<if test="e.dateFalg=='history'">
+			<![CDATA[and  edu_vedio_live.live_time< now() ]]>
+		</if>
+		</where>
+		
+	</select>
+
+</mapper>

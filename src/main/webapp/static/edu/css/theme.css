@@ -1,0 +1,127 @@
+/*  
+Version:1.1
+Author:chenxin
+Update @ 2015-08-10
+*/
+.c-master {color: #40bb8a;}
+.c-master-2{color: #00ad69;}
+.c-genyel{color: #e8feda;}
+.c-org{color: #ff3300;}
+.c-org-1{color: #ff8e4c;}
+.c-blue{color: #74d1ff;}
+.c-red{color: #ff6b6b;}
+.c-red-1{color: #f31818;}
+.c-zi{color: #775c94;}
+.c-huan{color: #ff8041;}
+.c-333 {color: #333;}
+.c-666 {color: #666;}
+.c-999 {color: #999;}
+.c-ccc {color: #ccc;}
+.c-fff {color: #fff;}
+/*---========topBar header nav style========---*/
+.c-star-wrap-2 li a,.integral-icon,.right-go,.left-go,.u-s-r-tit a,.u-up-down,.icon-2-18,.dtClose,.Correct,.Wrong,.rl-r-Close,.icon-login-mm,.icon-login-mz,.teatime-tit-xg a,.icon-zs,.icon-aq,.icon-bm,.icon-zy,.icon-sfrz,.icon-xlrz,.icon-jsrz,.icon-zyzz,.icon-hjsrz,.icon-hp,.icon-zp,.icon-cp,.icon-ws,.icon-xw,.icon-sw,.tea-tab-tit a,.icon-d-g,.icon-d,.icon-c,.teach-fc em,.icon-pho-3,.icon-jian,.icon-jia,.icon-jl,.icon-fx,.icon-sc,.icon-jc,.icon-phon-1,.icon-sk-1,.icon-sk-2,.icon-sk-3,.icon-sk-4,.icon-sk-5,.icon-bj,.icon-nv,.icon-nan,.job-select.selected .j-s-defalt em,.j-s-defalt em,.a-img-one,.a-img,.icon-dian,.icon-phone,.icon-right,.icon-dh-top,.icon-dh-bottom,.icon-Money,.icon-more,.pagination li a,.n-menu-ico,.icon-te-1,.icon-te-2,.icon-te-3,.down-ico{background: url(../img/icon-1.png) no-repeat;}
+.down-ico{display: inline-block;background-position:-3px 0px;}	
+.icon-te-1{background-position:-1px -28px;}
+.icon-te-2{background-position:-1px -80px;}
+.icon-te-3{background-position:-1px -132px;}
+.n-menu-ico{background-position:-1px -178px;}
+.pagination li a{background-position:-102px -1px;}
+.pagination .current a{background-position:-68px -1px;}
+.icon-more{background-position:-133px 0px;}
+.icon-Money{background-position:-71px -31px;top:2px;left:-10px;}
+.icon-dh-top{background-position:-67px -57px;}
+.icon-dh-bottom{background-position:-67px -109px;}
+.icon-right{background-position:-68px -178px;}
+.icon-phone{background-position:-346px -2px;}
+.a-img {background-position: -188px -1px;}
+.j-s-defalt em {background-position: -213px 1px;}
+.job-select.selected .j-s-defalt em {background-position: -310px -30px;}
+.icon-nv{background-position: -234px 0px;}
+.icon-nan{background-position: -270px 2px;}
+.icon-bj{background-position: -303px -1px;}
+.icon-sk-1{background-position: -117px -28px;}
+.icon-sk-2{background-position: -154px -27px;}
+.icon-sk-3{background-position: -193px -27px;}
+.icon-sk-4{background-position: -231px -27px;}
+.icon-sk-5{background-position: -269px -26px;}
+.icon-phon-1{background-position: -353px -48px;}
+.icon-fx{background-position: -123px -109px;}
+.icon-sc{background-position: -202px -109px;}
+.icon-sc-dj{background-position: -248px -109px;}
+.icon-jc{background-position: -304px -109px;}
+.icon-jl{background-position: -197px -69px;}
+.icon-pho-3{background-position: -313px -69px;}
+.dtClose{background-position: -82px -491px;}
+.icon-2-18{background-position: -366px -503px;}
+.u-up-down {background-position: -293px -504px;}
+.right-go{background-position: -175px -481px;}
+.left-go{background-position: -175px -502px;}
+.integral-icon{background-position: -214px -500px;}
+.u-menu-list .curr .u-up-down {background-position: -334px -503px;}
+.icon-jian{background-position: -77px -342px;display: inline-block;width: 20px;height: 20px;vertical-align: middle;}
+.icon-jia{background-position: -124px -343px;display: inline-block;width: 20px;height: 20px;vertical-align: middle;}
+.teach-fc em{background-position: -83px -237px;display: inline-block;width: 86px;height: 86px;vertical-align: middle;}
+.icon-d-g,.icon-d,.icon-c{display: inline-block;width: 24px;height: 18px;vertical-align: middle;margin-left:-12px;position:absolute;top:50%;margin-top:-9px;left:50%;}
+.icon-login-mm,.icon-login-mz{display: inline-block;width: 42px;height: 42px;vertical-align: middle;}
+.icon-login-mm{background-position: -111px -480px;}
+.icon-login-mz{background-position: -111px -445px;}
+.Correct,.Wrong{display: inline-block;width: 20px;height: 18px;vertical-align: middle;}
+.Correct{background-position: -75px -420px;}
+.Wrong{background-position: -120px -420px;}
+.icon-d-g{background-position: -237px -68px;}
+.icon-d{background-position: -167px -119px;}
+.icon-c{background-position: -274px -69px;}
+.icon-ws{background-position: -231px -173px;}
+.icon-xw{background-position: -198px -175px;}
+.icon-sw{background-position: -138px -176px;}
+.icon-hp{background-position: -294px -156px;}
+.icon-zp{background-position: -295px -202px;}
+.icon-cp{background-position: -295px -251px;}
+.icon-sfrz{background-position: -334px -88px;}
+.icon-xlrz{background-position: -337px -142px;}
+.icon-jsrz{background-position: -336px -197px;}
+.icon-zyzz{background-position: -333px -250px;}
+.icon-hjsrz{background-position: -335px -307px;}
+.icon-zs{background-position: -334px -367px;}
+.icon-aq{background-position: -329px -428px;}
+.icon-bm{background-position: -281px -308px;}
+.icon-zy{background-position: -285px -368px;}
+
+
+.onlineConsult-gld-activ-one, .onlineConsult-gld dl em {background: rgba(0, 0, 0, 0) url("../img/r-kf-ico.jpg") no-repeat scroll 0 0;}
+.onlineConsult-gld .gT-btn {background-position: 0 0;}
+.onlineConsult-gld .smgz-btn {background-position: 0 -50px;}
+.onlineConsult-gld .zxzx-btn {background-position: 0 -100px;}
+.onlineConsult-gld .wtfk-btn {background-position: 0 -150px;}
+.icon-dian{display: inline-block;width: 4px;height: 4px;background-position: -375px -515px;}
+.star-level-1{background: url("../img/star-level.png") no-repeat;display: inline-block; height: 16px;overflow: hidden; width: 85px;}
+.star-1-1 {background-position: 0 -1px;}
+.star-1-2 {background-position: 0 -19px;}
+.star-1-3 {background-position: 0 -38px;}
+.star-1-4 {background-position: 0 -57px;}
+.star-1-5 {background-position: 0 -76px;}
+
+.rl-wrap-bg{background:#fff url(../img/rl-b-bg.jpg) no-repeat 50% 0;}
+
+.icon-xl-u,.icon-bf,.icon-u-dh,.u-icon-xy,.u-icon-dd,.u-icon-kb,.u-icon-jrkc,.u-icon-numb{background: url(../img/u-icon-1.png) no-repeat;}
+.u-icon-numb,.u-icon-jrkc{background-position: -1px -134px;display: inline-block;width: 33px;height: 30px;vertical-align: middle;}
+.u-icon-xy,.u-icon-dd,.u-icon-kb{display: inline-block;width: 95px;height: 95px;vertical-align: middle;}
+.u-icon-xy{background-position: -283px -258px;}
+.u-icon-dd{background-position: -283px -126px;}
+.u-icon-kb{background-position: -283px -1px;}
+.u-icon-jrkc{background-position: 3px -190px;}
+.icon-u-dh{background-position: -4px -238px;}
+.icon-xl-u{background-position: -78px -293px;}
+.icon-bf{display: inline-block;width: 40px;height: 40px;vertical-align: middle;background-position: -12px -292px;}
+.u-t-inws-bg{background: url(../img/jd.png) no-repeat;}
+.u-t-inws-bg-1{background-position: center 0px;}
+.u-t-inws-bg-2{background-position: center -89px;}
+.u-t-inws-bg-3{background-position: center -179px;}
+.u-t-inws-bg-4{background-position: center -269px;}
+
+.u-a-set-btn, .u-common-btn {background: -webkit-gradient(linear, left top, left bottom, from(#ffffff), to(#EDF4FC));background: -moz-linear-gradient(top, #ffffff, #EDF4FC); background: -ms-linear-gradient(top, #ffffff, #EDF4FC);filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffff', endColorstr='#EDF4FC');}
+
+.u-t-mechan-bg{background: url(../img/jg-jd.png) no-repeat;}
+.u-t-mechan-bg-1{background-position: center 0px;}
+.u-t-mechan-bg-2{background-position: center -95px;}
+.u-t-mechan-bg-3{background-position: center -196px;}

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="MagorMapper">
+	<resultMap type="Major" id="MagorResultMap">
+		<result property="id" column="id"/>
+		<result property="name" column="name"/>
+		<result property="status" column="status"/>
+		<result property="sort" column="sort"/>
+	</resultMap>
+	
+	<sql id="edu_major_columns">
+		edu_major.id,
+		edu_major.name,
+		edu_major.status,
+		edu_major.sort
+	</sql>
+	
+	<sql id="edu_major_properties">
+		#{id},
+		#{name},
+		#{status},
+		#{sort}
+	
+	</sql>
+	
+	
+	<!--科目列表分页 -->
+	<select id="queryMajorListByPage" resultMap="MagorResultMap" parameterType="Map">
+		select
+		<include refid="edu_major_columns"/>
+		from
+		edu_major
+		<where>
+		edu_major.status!=2	
+		<if test="id!=null and id>0">
+		and edu_major.id=#{id}
+		</if>
+		<if test="name!=null and name!=''">
+		and edu_major.name like concat("%"#{name}"%")
+		</if>
+		<if test="status!=null and status>=0">
+		and edu_major.status=#{status}
+		</if>
+		</where>
+		order by edu_major.sort desc
+	</select>
+	
+	
+	<update id="updateMajorById" parameterType="Major">
+		update edu_major
+		set edu_major.status=#{status}
+		where
+		edu_major.id=#{id}
+	</update>
+	
+	<insert id="addMajor" parameterType="Major" keyColumn="id" keyProperty="id"  useGeneratedKeys="true">
+		insert  edu_major(
+		<include refid="edu_major_columns"/>
+		)values(
+		<include refid="edu_major_properties"/>
+		)	
+	</insert>
+	<select id="queryMajorAllList" resultMap="MagorResultMap">
+		select
+		<include refid="edu_major_columns"/>
+		from
+		edu_major
+		where
+		edu_major.status!=2	
+	</select>
+	
+	<!-- 根据年级编号查询科目列表 -->
+	<select id="queryMajorListBySubjectId" parameterType="Long" resultMap="MagorResultMap">
+		select <include refid="edu_major_columns"/>
+		FROM edu_major
+		where edu_major.id in 
+		(
+			select 
+			edu_subject_major.major_id 
+			from edu_subject_major left join sys_subject on edu_subject_major.subject_id = sys_subject.SUBJECT_ID 
+			where sys_subject.SUBJECT_ID = #{value} or sys_subject.parent_id = #{value}
+		)
+		and edu_major.status!=2
+	</select>
+	<select id="queryMajorById" parameterType="Long" resultMap="MagorResultMap">
+		select <include refid="edu_major_columns"/> from edu_major where id=#{value}
+	</select>
+</mapper>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserFeedbackMapper">
+<!--     在这里添加了新的字段 type @Author wangzhuang -->
+	<resultMap id="UserFeedbackResult" type="UserFeedback">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="content" column="content" />
+		<result property="qq" column="qq" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="name" column="name" />
+		<result property="createTime" column="create_time" />
+		<result property="type" column="type" />
+		<result property="img" column="img" />		
+	</resultMap>
+<!--     在这里添加了新的字段 type @Author wangzhuang -->
+	<sql id="edu_user_feedback_columns">
+		edu_user_feedback.id,
+		edu_user_feedback.user_id,
+		edu_user_feedback.content,
+		edu_user_feedback.qq,
+		edu_user_feedback.mobile,
+		edu_user_feedback.email,
+		edu_user_feedback.name,
+		edu_user_feedback.create_time,
+		edu_user_feedback.type,
+		edu_user_feedback.img
+	</sql>
+<!--     在这里添加了新的字段 type @Author wangzhuang -->
+	<sql id="edu_user_feedback_properties">
+		#{id},
+		#{userId},
+		#{content},
+		#{qq},
+		#{mobile},
+		#{email},
+		#{name},
+		#{createTime},
+		#{type},
+		#{img}
+	</sql>
+  
+<!--    添加userFeed 我在这里添加了type @Author wangzhuang -->
+	<insert id="createUserFeedback" parameterType="UserFeedback"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_feedback (
+		<include refid="edu_user_feedback_columns" />
+		) VALUES (
+		<include refid="edu_user_feedback_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserFeedbackById" parameterType="Long">
+		delete from
+		edu_user_feedback
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateUserFeedback" parameterType="UserFeedback">
+		update
+		edu_user_feedback SET
+		id = #{id},
+		user_id = #{userId},
+		content = #{content},
+		qq = #{qq},
+		mobile = #{mobile},
+		email = #{email},
+		name = #{name}
+		where
+		id = #{id}
+
+	</update>
+
+	<select id="getUserFeedbackById" resultMap="UserFeedbackResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_feedback_columns" />
+		from edu_user_feedback
+		where
+		id = #{value}
+	</select>
+	<select id="getUserFeedbackList" resultMap="UserFeedbackResult" parameterType="java.util.HashMap">
+		select
+		<include refid="edu_user_feedback_columns" />
+		from edu_user_feedback
+		<where>
+		<if test="e.mobile!=null and e.mobile!=''">
+	    edu_user_feedback.mobile like "%"#{e.mobile}"%"
+		</if>
+		<if test="e.email!=null and e.email!=''">
+		and edu_user_feedback.email like "%"#{e.email}"%"
+		</if>
+		<if test="e.type!=null and e.type>-1">
+	    and edu_user_feedback.type=#{e.type}
+		</if>
+		</where> 
+		order by edu_user_feedback.id DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getUserFeedbackListCount" resultType="int" parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_user_feedback
+		<where>
+		<if test="e.mobile!=null and e.mobile!=''">
+		edu_user_feedback.mobile like "%"#{e.mobile}"%"
+		</if>
+		<if test="e.email!=null and e.email!=''">
+		and edu_user_feedback.email like "%"#{e.email}"%"
+		</if>
+		<if test="e.type!=null and e.type>-1">
+	    and edu_user_feedback.type=#{e.type}
+		</if>
+	    </where> 
+	</select>
+
+</mapper>

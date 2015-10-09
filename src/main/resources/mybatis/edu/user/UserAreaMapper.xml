@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAreaMapper">
+
+	<resultMap id="UserAreaResult" type="UserArea">
+		<result property="id" column="id" />
+		<result property="parentId" column="parent_id" />
+		<result property="areaName" column="area_name" />
+		<result property="areaType" column="area_type" />
+		<result property="areaNameEn" column="area_name_en" />
+		<result property="checkShow" column="check_show" />
+		<result property="proName" column="proName" />
+	</resultMap>
+
+	<resultMap id="UserAreaDTOResult" type="UserArea">
+		<id property="id" column="id" />
+		<result property="parentId" column="parent_id" />
+		<result property="areaName" column="area_name" />
+		<result property="areaType" column="area_type" />
+		<result property="areaNameEn" column="area_name_en" />
+		<result property="checkShow" column="check_show" />
+		<collection property="areaList" ofType="UserArea">
+			<id property="id" column="district_id"/>
+			<result property="areaName" column="district_name"/>
+			<result property="areaType" column="district_type"/>
+			<result property="areaNameEn" column="district_name_en"/>
+			<result property="checkShow" column="district_check_show"/>
+		</collection>
+	</resultMap>
+	
+	<sql id="edu_user_area_columns">
+		edu_user_area.id,
+		edu_user_area.parent_id,
+		edu_user_area.area_name,
+		edu_user_area.area_type,
+		edu_user_area.area_name_en,
+		edu_user_area.check_show
+	</sql>
+
+	<sql id="edu_user_area_properties">
+		#{id}, 
+		#{parentId},
+		#{areaName},
+		#{areaType},
+		#{areaNameEn},
+		#{checkShow}
+	</sql>
+
+	<insert id="createUserArea" parameterType="UserArea" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_area (
+		<include refid="edu_user_area_columns" />
+		) VALUES (
+		<include refid="edu_user_area_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserAreaById" parameterType="Long">
+		delete from edu_user_area  
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateUserArea" parameterType="UserArea">
+		update edu_user_area SET
+		parent_id = #{parentId},
+		area_name = #{areaName},
+		area_type = #{areaType},
+		area_name_en = #{areaNameEn},
+		check_show = #{checkShow}
+		where
+		id = #{id}
+	</update>
+
+	<!-- 查询所有的城市 -->
+	<select id="getAllUserAreaList" resultMap="UserAreaResult"
+		parameterType="Map">
+		select                                      
+		<include refid="edu_user_area_columns" />		
+		from edu_user_area
+	</select>
+	
+	<select id="getUserAreaById" resultMap="UserAreaResult"
+		parameterType="Long">
+		select                                           
+		<include refid="edu_user_area_columns" />				
+		from edu_user_area
+		where
+		id = #{value}
+	</select>
+	
+	<!-- 查询地域列表 -->
+	<select id="getUserAreaList" resultMap="UserAreaResult"
+		parameterType="UserArea">
+		select
+		area_1.id,
+		area_1.parent_id,
+		area_1.area_name,
+		area_1.area_type,
+		area_1.area_name_en,
+		area_1.check_show,
+		area_2.AREA_NAME as proName
+		from edu_user_area area_1 LEFT JOIN edu_user_area area_2 ON area_2.ID = area_1.PARENT_ID
+		<where>
+			<if test="areaType != null and areaType != 0">
+				and area_1.area_type = #{areaType}
+			</if>
+			<if test="parentId!=null and parentId!=-1 ">
+				and area_1.parent_id = #{parentId}
+			</if>
+			<if test="checkShow > 0 ">
+				and area_1.check_show = #{checkShow}
+			</if>
+		</where>
+	</select>
+
+	<!-- 查询地域列表 -->
+	<select id="queryUserAreaList" resultMap="UserAreaDTOResult" parameterType="UserArea">
+		select
+		area_1.id,
+		area_1.parent_id,
+		area_1.area_name,
+		area_1.area_type,
+		area_1.area_name_en,
+		area_1.check_show,
+		area_2.id as district_id,
+		area_2.area_name as district_name,
+		area_2.area_type as district_type,
+		area_2.area_name_en as district_name_en,
+		area_2.check_show as district_check_show
+		from edu_user_area area_1
+		LEFT JOIN edu_user_area area_2 ON area_1.ID = area_2.PARENT_ID
+		WHERE area_1.CHECK_SHOW = 2
+	</select>
+	
+	<!-- 查询省份列表 -->
+	<select id="getProvinceList" resultMap="UserAreaResult"
+		parameterType="Map">
+		select
+		<include refid="edu_user_area_columns" />
+		from edu_user_area
+		where edu_user_area.PARENT_ID = 1
+	</select>
+	
+	<!-- 批量修改是否显示 -->
+	<update id="updateUserAreaShow" parameterType="Map">
+		update edu_user_area SET
+		check_show = #{checkShow}
+		<where>
+			edu_user_area.area_type = 2
+			<if test="ids != null and ids != ''">
+				and id in (${ids})
+			</if>
+		</where>
+	</update>
+	
+	<!-- 根据id串查询地区集合 -->
+	<select id="queryUserAreaByCondition" parameterType="java.util.Map" resultMap="UserAreaResult">
+		select <include refid="edu_user_area_columns" /> from edu_user_area where id in (${ids}) and edu_user_area.check_show = 2
+	</select>
+</mapper>

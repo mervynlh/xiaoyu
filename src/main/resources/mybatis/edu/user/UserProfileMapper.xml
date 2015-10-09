@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserProfileMapper">
+
+        <resultMap id="UserProfileResult" type="UserProfile">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="value" column="value"/>
+            <result property="profiletype" column="profiletype"/>
+            <result property="userid" column="userid"/>
+            <result property="profiledate" column="profiledate"/>
+        </resultMap>
+
+        <sql id="user_profile_columns">
+            user_profile.id,
+            user_profile.name,
+            user_profile.value,
+            user_profile.profiletype,
+            user_profile.userid,
+            user_profile.profiledate
+        </sql>
+
+        <sql id="user_profile_properties">
+            #{id},
+            #{name},
+            #{value},
+            #{profiletype},
+            #{userid},
+            #{profiledate}
+        </sql>
+
+        <insert id="createUserProfile" parameterType="UserProfile" keyColumn="id" keyProperty="id">
+            insert INTO user_profile (<include refid="user_profile_columns"/>) VALUES (<include refid="user_profile_properties"/>)
+        </insert>
+
+        <delete id="deleteUserProfileById" parameterType="long">
+            delete from user_profile
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateUserProfile" parameterType="UserProfile">
+            update user_profile SET
+                id = #{id},
+                name = #{name},
+                value = #{value},
+                profiletype = #{profiletype},
+                userid = #{userid},
+                profiledate = #{profiledate}
+            where
+                id = #{id}
+
+        </update>
+
+        <select id="getUserProfileByUserId" resultMap="UserProfileResult" parameterType="long">
+            select
+            <include refid="user_profile_columns"/>
+            from user_profile
+            where
+                userid = #value#
+        </select>
+		
+        <select id="getUserProfileList" resultMap="UserProfileResult" parameterType="UserProfile">
+            select
+            <include refid="user_profile_columns"/>
+            from user_profile
+            where
+             value = #{value} and 
+             profiletype = #{profiletype}
+        </select>
+</mapper>

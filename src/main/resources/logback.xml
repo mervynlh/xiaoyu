@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<jmxConfigurator />
+
+	<appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+		<!-- 典型的日志pattern -->
+		<encoder>
+			<!--<pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>-->
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS}  %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
+    <!-- 综合时间与大小的滚动策略，先按天滚动，文件大于100mb时再按大小滚动 -->
+    <appender name="businessLogFile" class="ch.qos.logback.core.rolling.RollingFileAppender" >
+        <file>${catalina.base}/logs/business.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/business-%d{yyyy-MM-dd}_%i.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+    <!-- 错误日志 -->
+    <appender name="errorlogFile" class="ch.qos.logback.core.rolling.RollingFileAppender" >
+        <file>${catalina.base}/logs/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter" >
+            <level>ERROR</level>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${catalina.base}/logs/error-%d{yyyy-MM-dd}_%i.log.zip</fileNamePattern>
+            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
+                <maxFileSize>100MB</maxFileSize>
+            </timeBasedFileNamingAndTriggeringPolicy>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+	<!-- 演示按时间滚动的策略  写入文件-->
+	<!--<appender name="errorlogFile" class="ch.qos.logback.core.rolling.RollingFileAppender" >
+		<file>${catalina.base}/logs/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter" >
+            <level>ERROR</level>
+        </filter>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${catalina.base}/logs/error.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>%date{yyyy-MM-dd HH:mm:ss.SSS}  %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>-->
+	<!-- project default level -->
+	<logger name="com.yizhilu.os" level="INFO" />
+	<!-- business log 使用独立的appender，不继承Root的appender -->
+	<logger name="business" level="INFO" additivity="false">
+		<appender-ref ref="businessLogFile" />
+	</logger>
+	<logger name="myerror" level="ERROR" additivity="false">
+		<appender-ref ref="errorlogFile" />
+	</logger>
+    <logger name="java.sql.PreparedStatement" level="DEBUG" />
+    <logger name="java.sql.Statement" level="DEBUG" />
+    <logger name="java.sql.ResultSet" level="DEBUG" />
+    <logger name="org.springframework" level="INFO" />
+    <logger name="org.mybatis" level="INFO" />
+    <logger name="org.apache.ibatis" level="INFO" />
+    <!-- **************上面的无需改动************** -->
+
+
+
+	<!-- 需要打印SQL时，修改下面的INFO为DEBUG -->
+	<root level="DEBUG"> <!-- 正式环境使用INFO,测试时改为 DEBUG -->
+		<appender-ref ref="console" />
+        <appender-ref ref="businessLogFile" />
+        <appender-ref ref="errorlogFile" />
+	</root>
+
+
+</configuration>

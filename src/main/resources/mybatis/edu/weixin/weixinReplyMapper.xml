@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WeixinReplyMapper">
+	
+	<resultMap type="WeixinReply" id="WeixinReplyResult">
+		<result property="id" column="reply_id" />
+		<result property="keyword" column="keyword" />
+		<result property="title" column="title" />
+		<result property="content" column="content" />
+		<result property="msgType" column="msg_type" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="imageUrl" column="image_url" />
+		<result property="url" column="url" />
+	</resultMap>
+	
+	
+	<resultMap type="WeixinManyImage" id="WeixinManyImageResult">
+		<result property="id" column="id"/>
+		<result property="manyImageId" column="manyImage_id"/>
+		<result property="imageId" column="image_id"/>
+	</resultMap>
+	<resultMap type="WeixinManyImageDTO" extends="WeixinManyImageResult" id="WeixinManyImageDTOResult">
+		<result property="title" column="title"/>
+	</resultMap>
+	<sql id="edu_weixin_reply_columns">
+		edu_weixin_reply.reply_id,
+		edu_weixin_reply.keyword,
+		edu_weixin_reply.title,
+		edu_weixin_reply.content,
+		edu_weixin_reply.msg_type,
+		edu_weixin_reply.create_time,
+		edu_weixin_reply.update_time,
+		edu_weixin_reply.image_url,
+		edu_weixin_reply.url
+	</sql>
+	
+	<sql id="edu_weixin_reply_properties">
+		#{id},
+		#{keyword},
+		#{title},
+		#{content},
+		#{msgType},
+		#{createTime},
+		#{updateTime},
+		#{imageUrl},
+		#{url}
+	</sql>
+	
+	<sql id="edu_weixin_imagetext_middle_columns">
+		edu_weixin_imagetext_middle.id,
+		edu_weixin_imagetext_middle.manyImage_id,
+		edu_weixin_imagetext_middle.image_id
+	</sql>
+	
+	<sql id="edu_weixin_imagetext_middle_properties">
+		#{id},
+		#{manyImageId},
+		#{imageId}
+	</sql>
+	
+	<!-- 添加文本或图文回复 -->
+	<insert id="addWeixin" parameterType="WeixinReply" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		INSERT into
+		edu_weixin_reply(<include refid="WeixinReplyMapper.edu_weixin_reply_columns"/>)
+		 VALUES(<include refid="WeixinReplyMapper.edu_weixin_reply_properties"/>)
+	</insert>
+	
+
+	<!-- 根据类型的状态查询 -->
+	<select id="getWeixinByMsgType" parameterType="java.lang.String" resultMap="WeixinReplyMapper.WeixinReplyResult">
+		SELECT 
+		<include refid="edu_weixin_reply_columns" />
+		FROM edu_weixin_reply
+		WHERE edu_weixin_reply.msg_type=#{msgType}
+	</select>
+	
+	<!-- 根据id查询一条记录 -->
+	<select id="getWeixinByReplyId" parameterType="Long" resultMap="WeixinReplyMapper.WeixinReplyResult">
+		SELECT 
+		<include refid="WeixinReplyMapper.edu_weixin_reply_columns" />
+		FROM
+		edu_weixin_reply
+		WHERE edu_weixin_reply.reply_id=#{value}
+	</select>
+	
+	<!-- 根据id删除微信 -->
+	<delete id="delWeixinText" parameterType="Long">
+		DELETE FROM
+		edu_weixin_reply WHERE reply_id=#{value}
+	</delete>
+        
+    <!-- 更新微信回复素材 -->
+    <update id="updateWeixinReply" parameterType="WeixinReply">
+        update edu_weixin_reply
+		<set>
+			<if test="title!=null and title!='' ">
+				edu_weixin_reply.title=#{title},
+			</if>
+			edu_weixin_reply.Content=#{content},
+			edu_weixin_reply.keyword=#{keyword},
+			<if test="imageUrl!=null and imageUrl!='' ">
+				edu_weixin_reply.image_url=#{imageUrl},
+			</if>
+			<if test="url!=null and url!='' ">
+				edu_weixin_reply.url=#{url}
+			</if>
+		</set>
+		where 
+		edu_weixin_reply.reply_id=#{id}
+    </update>
+    
+	    
+    <!-- 微信回复分页 -->
+    <select id="getWeixinReplyPage" parameterType="java.util.Map" resultMap="WeixinReplyMapper.WeixinReplyResult">
+    	SELECT
+		<include refid="WeixinReplyMapper.edu_weixin_reply_columns" />
+		FROM edu_weixin_reply
+		<where>
+			<if test="e.keyword!=null and e.keyword!='' ">
+		        AND edu_weixin_reply.keyword like CONCAT('%',#{e.keyword},'%') 
+		    </if>
+		    <if test="e.msgType!=null and e.msgType>0 ">
+		        AND edu_weixin_reply.msg_type=#{e.msgType}
+		    </if>
+	   </where>
+	   ORDER BY edu_weixin_reply.create_time DESC
+	   <include refid="publicMapper.pageEnd"/>
+	</select>
+    <select id="getWeixinReplyPageCount" parameterType="java.util.Map" resultType="int">
+    	SELECT
+		count(1)
+		FROM edu_weixin_reply
+		<where>
+			<if test="e.keyword!=null and e.keyword!='' ">
+		        AND edu_weixin_reply.keyword like CONCAT('%',#{e.keyword},'%') 
+		    </if>
+		    <if test="e.msgType!=null and e.msgType>0 ">
+		        AND edu_weixin_reply.msg_type=#{e.msgType}
+		    </if>
+	   </where>
+    </select>
+	 
+    <!-- 微信图文回复分页 -->
+    <select id="getImageTextReplyPage" parameterType="java.util.Map" resultMap="WeixinReplyMapper.WeixinReplyResult">
+    	SELECT
+		<include refid="WeixinReplyMapper.edu_weixin_reply_columns" />
+		FROM edu_weixin_reply
+		WHERE
+		<!-- 图文类型 -->
+		edu_weixin_reply.msg_type=2
+		<if test="e.title!=null and e.title!='' ">
+        	AND edu_weixin_reply.title like CONCAT('%',#{e.title},'%')
+        </if>
+        ORDER BY edu_weixin_reply.create_time DESC
+       <include refid="publicMapper.pageEnd"/>
+    </select>
+    <select id="getImageTextReplyPageCount" parameterType="java.util.Map" resultType="int">
+    	SELECT
+		count(1)
+		FROM edu_weixin_reply
+		WHERE
+		<!-- 图文类型 -->
+		edu_weixin_reply.msg_type=2
+		<if test="e.title!=null and e.title!='' ">
+        	AND edu_weixin_reply.title like CONCAT('%',#{e.title},'%')
+        </if>
+    </select>
+	    
+    <!--添加多图文和图文关联  -->
+    <insert id="addWeixinManyImageText" parameterType="java.util.List">
+    	insert into edu_weixin_imagetext_middle
+		(<include refid="edu_weixin_imagetext_middle_columns"/>) values
+		<foreach collection="list" item="item" index="index"  separator=",">
+			(#{item.id},#{item.manyImageId},#{item.imageId})
+		</foreach>
+    </insert>
+    
+    <!-- 根据多图文ID删除多图文和图文关联 -->
+    <delete id="deleteWeixinManyImageTextByManyId" parameterType="Long">
+    	delete from edu_weixin_imagetext_middle where edu_weixin_imagetext_middle.manyImage_id=#{value}
+    </delete>
+	    
+    <!-- 根据图文ID删除多图文和图文关联 -->
+    <delete id="deleteWeixinManyImageTextById" parameterType="Long">
+    	delete from edu_weixin_imagetext_middle where edu_weixin_imagetext_middle.image_id=#{value}
+    </delete>
+    
+    <!-- 根据多图文ID查询多图文和图文关联 -->
+    <select id="getWeixinManyImageTextById" parameterType="Long" resultMap="WeixinManyImageDTOResult">
+    	select <include refid="edu_weixin_imagetext_middle_columns"/>,edu_weixin_reply.title from 
+    	edu_weixin_imagetext_middle 
+    	left join edu_weixin_reply on edu_weixin_imagetext_middle.image_id=edu_weixin_reply.reply_id
+    	where
+    	edu_weixin_imagetext_middle.manyImage_Id=#{value}
+    </select>
+    
+    <!-- 根据关键字模糊查询微信回复 -->
+    <select id="getWeixinBywxKeywords" parameterType="String" resultMap="WeixinReplyResult">
+    	select <include refid="edu_weixin_reply_columns"/> from 
+    	edu_weixin_reply where edu_weixin_reply.keyword like CONCAT('%',#{keyword},'%')
+    </select>
+    
+    <!-- 查询子图文 -->
+    <select id="getWeixinReplyByManyId" parameterType="Long" resultMap="WeixinReplyResult">
+    	select <include refid="edu_weixin_reply_columns"/> from 
+    	edu_weixin_reply where edu_weixin_reply.reply_id in 
+    	(select wi.image_id from edu_weixin_imagetext_middle as wi where wi.manyImage_id=#{value})
+    </select>
+</mapper>

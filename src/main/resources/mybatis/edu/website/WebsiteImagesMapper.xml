@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteImagesMapper">
+	<resultMap type="WebsiteImages" id="ImagesResult">
+		<result property="id" column="ID"/>
+		<result property="imagesUrl" column="IMAGE_URL"/>
+		<result property="mobileImagesUrl" column="MOBILE_IMAGE_URL"/>
+		<result property="linkAddress" column="LINK_ADDRESS"/>
+		<result property="title" column="TITLE"/>
+		<result property="keyWord" column="KEYWORD"/>
+		<result property="seriesNumber" column="SERIES_NUMBER"/>
+		<result property="color" column="COLOR"/>
+		<result property="previewUrl" column="PREVIEW_URL"/>
+	</resultMap>
+	<sql id="edu_website_images_columns">
+		edu_website_images.ID,
+		edu_website_images.IMAGE_URL,
+		edu_website_images.MOBILE_IMAGE_URL,
+		edu_website_images.LINK_ADDRESS,
+		edu_website_images.TITLE,
+		edu_website_images.KEYWORD,
+		edu_website_images.SERIES_NUMBER,
+		edu_website_images.COLOR,
+		edu_website_images.PREVIEW_URL
+	</sql>
+  
+	<sql id="edu_website_images_properties">
+		#{id},
+		#{imagesUrl},
+		#{mobileImagesUrl},
+		#{linkAddress},
+		#{title},
+		#{keyWord},
+		#{seriesNumber},
+		#{color},
+		#{previewUrl}
+	</sql>
+	<select id="getIndexPageBanner" parameterType="WebsiteImages" resultMap="ImagesResult">
+		select <include refid="edu_website_images_columns"/>
+		from edu_website_images order by keyword,SERIES_NUMBER DESC
+	</select>
+	<!-- 添加广告图 -->
+	<insert id="createImages" parameterType="WebsiteImages">
+		INSERT INTO edu_website_images 
+		(<include refid="edu_website_images_columns"/>) 
+		VALUES 
+		(<include refid="edu_website_images_properties"/>)
+	</insert>
+	<!-- 删除广告图 -->
+	<delete id="deleteImg" parameterType="java.lang.String">
+		DELETE FROM edu_website_images WHERE ID IN (${value})
+	</delete>
+	<!-- 广告图分页列表 -->
+	<select id="getImgPageList" resultMap="ImagesResult" parameterType="Map">
+		SELECT <include refid="edu_website_images_columns"/>
+		FROM edu_website_images 
+		<where>
+			<if test="e.imagesUrl!=null and e.imagesUrl!='' ">
+				and edu_website_images.IMAGE_URL like CONCAT('%',#{e.imagesUrl},'%')
+			</if>
+			<if test="e.linkAddress!=null and e.linkAddress!='' ">
+				and edu_website_images.LINK_ADDRESS like CONCAT('%',#{e.linkAddress},'%')
+			</if>
+			<if test="e.title!=null and e.title!='' ">
+				and edu_website_images.TITLE like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.keyWord!=null and e.keyWord!='' ">
+				and edu_website_images.KEYWORD =#{e.keyWord}
+			</if>
+		</where>
+		ORDER BY edu_website_images.keyword,edu_website_images.series_number DESC 
+		<include refid="publicMapper.pageEnd"/>  
+	</select>
+	<select id="getImgPageListCount" resultType="int" parameterType="Map">
+		SELECT COUNT(1) 
+		FROM edu_website_images 
+		<where>
+			<if test="e.imagesUrl!=null and e.imagesUrl!='' ">
+				and edu_website_images.IMAGE_URL like CONCAT('%',#{e.imagesUrl},'%')
+			</if>
+			<if test="e.linkAddress!=null and e.linkAddress!='' ">
+				and edu_website_images.LINK_ADDRESS like CONCAT('%',#{e.linkAddress},'%')
+			</if>
+			<if test="e.title!=null and e.title!='' ">
+				and edu_website_images.TITLE like CONCAT('%',#{e.title},'%')
+			</if>
+			<if test="e.keyWord!=null and e.keyWord!='' ">
+				and edu_website_images.KEYWORD =#{e.keyWord}
+			</if>
+		</where>
+	</select>
+	<!-- Id查询广告图 -->
+	<select id="getImageseById" parameterType="Long" resultMap="ImagesResult">
+		SELECT <include refid="edu_website_images_columns"/> 
+		FROM edu_website_images WHERE edu_website_images.ID=#{value}
+	</select>
+	<!-- 更新广告图 -->
+	<update id="updateImages" parameterType="WebsiteImages">
+		UPDATE edu_website_images SET 
+		edu_website_images.IMAGE_URL=#{imagesUrl},
+		edu_website_images.MOBILE_IMAGE_URL=#{mobileImagesUrl},
+		edu_website_images.LINK_ADDRESS=#{linkAddress},
+		edu_website_images.TITLE=#{title},
+		edu_website_images.KEYWORD=#{keyWord},
+		edu_website_images.SERIES_NUMBER=#{seriesNumber},
+		edu_website_images.COLOR =#{color},
+		edu_website_images.PREVIEW_URL =#{previewUrl} 
+		WHERE edu_website_images.ID =#{id}
+	</update>	
+
+</mapper>

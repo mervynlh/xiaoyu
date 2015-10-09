@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseFavoritesMapper">
+
+	<resultMap id="CourseFavoritesResult" type="CourseFavorites">
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="userId" column="user_id" />
+		<result property="addTime" column="add_time" />
+	</resultMap>
+
+	<sql id="edu_course_favorites_columns">
+		edu_course_favorites.id,
+		edu_course_favorites.course_id,
+		edu_course_favorites.user_id,
+		edu_course_favorites.add_time
+	</sql>
+
+	<sql id="edu_course_favorites_properties">
+		#{id},
+		#{courseId},
+		#{userId},
+		#{addTime}
+	</sql>
+
+	<insert id="createCourseFavorites" parameterType="CourseFavorites"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_course_favorites (
+		<include refid="edu_course_favorites_columns" />
+		) VALUES (
+		<include refid="edu_course_favorites_properties" />
+		)
+	</insert>
+
+	<delete id="deleteCourseFavoritesById" parameterType="String">
+		delete from
+		edu_course_favorites
+		where
+		id  in  (${value})
+	</delete>
+
+	<update id="updateCourseFavorites" parameterType="CourseFavorites">
+		update
+		edu_course_favorites SET
+		id = #{id},
+		course_id = #{courseId},
+		user_id =
+		#{userId},
+		add_time = #{addTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getCourseFavoritesById" resultMap="CourseFavoritesResult"
+		parameterType="Long">
+		select
+		<include refid="edu_course_favorites_columns" />
+		from edu_course_favorites
+		where
+		id = #{value}
+	</select>
+	
+	<select id="getMoreFavouriteCourse" resultType="FavouriteCourseDTO">
+			SELECT
+		edu_course.`name` as name,
+		edu_course.`title` as
+		title,
+		edu_course.`lose_abs_time` as  loseAbsTime,
+		edu_course.logo as logo,
+		edu_course.`id`as courseId
+		FROM edu_course
+		LEFT JOIN edu_course_favorites
+		ON
+		edu_course_favorites.`course_id`=edu_course.`id` 
+		group by edu_course_favorites.course_id
+		order by 
+		  count(*) desc limit 3
+	</select>
+
+	<select id="getCourseFavoritesByUserId" parameterType="Map"
+		resultType="FavouriteCourseDTO">
+		SELECT
+		edu_course.`name` as name,
+		edu_course.`title` as
+		title,
+		edu_course.`lose_abs_time` as  loseAbsTime,
+		edu_course.logo as logo,
+		edu_course.`id`as courseId,
+		EDU_COURSE_FAVORITES.Id  as favouriteId
+		FROM edu_course
+		LEFT JOIN edu_course_favorites
+		ON
+		edu_course_favorites.`course_id`=edu_course.`id`
+		<where>
+				edu_course_favorites.`user_id` = #{e}
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	
+	<select id="getCourseFavoritesByUserIdCount" parameterType="Map"
+		resultType="int">
+		SELECT
+		count(1)
+		FROM edu_course
+		LEFT JOIN edu_course_favorites
+		ON
+		edu_course_favorites.`course_id`=edu_course.`id`
+		<where>
+			edu_course_favorites.`user_id` = #{e}
+		</where>
+	</select>
+	
+	<select id="getCourseFavoritesList" resultMap="CourseFavoritesResult"
+		parameterType="CourseFavorites">
+		select
+		<include refid="edu_course_favorites_columns" />
+		from edu_course_favorites
+	</select>
+<!-- 	检查课程是否收藏过 -->
+	<select id="checkCourseFavoritesByUserIdAndCourseId" resultMap="CourseFavoritesResult"
+		parameterType="CourseFavorites">
+		select
+		<include refid="edu_course_favorites_columns" />
+		from edu_course_favorites
+		<where>
+			edu_course_favorites.user_id = #{userId}
+			and
+			edu_course_favorites.course_id = #{courseId}
+		</where>
+	</select>
+	
+</mapper>

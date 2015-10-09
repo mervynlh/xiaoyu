@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxorderDetailAssessMapper">
+
+<resultMap type="TrxorderDetailAssess" id="TrxorderDetailAssessResult">
+	<result property="id" column="id"/>
+	<result property="detailId" column="detail_id"/>
+	<result property="content" column="content"/>
+	<result property="createTime" column="create_time"/>
+	<result property="teacherId" column="teacher_id"/>
+	<result property="userId" column="user_id"/>
+	<result property="studentName" column="studentName"/>
+	<result property="teacherName" column="teacherName"/>
+</resultMap>
+<sql id="edu_trxorder_detail_assess_columns">
+	edu_trxorder_detail_assess.id,
+	edu_trxorder_detail_assess.detail_id,
+	edu_trxorder_detail_assess.content,
+	edu_trxorder_detail_assess.create_time,
+	edu_trxorder_detail_assess.teacher_id,
+	edu_trxorder_detail_assess.user_id
+</sql>
+<sql id="edu_trxorder_detail_assess_properties">
+	#{id},
+	#{detailId},
+	#{content},
+	#{createTime},
+	#{teacherId},
+	#{userId}
+</sql>
+<!-- 添加评价 -->
+<insert id="addDetailAssess" parameterType="TrxorderDetailAssess">
+	insert into edu_trxorder_detail_assess(
+	<include refid="edu_trxorder_detail_assess_columns"/>
+	)values(
+	<include refid="edu_trxorder_detail_assess_properties"/>
+	)
+</insert>
+
+<!-- 根据id查询订单流水评价 -->
+<select id="getDetailAssessInfoByDetailId" parameterType="Long" resultMap="TrxorderDetailAssessResult">
+	select <include refid="edu_trxorder_detail_assess_columns" />,
+	student.realname as studentName,
+	teacher.realname as teacherName
+	from edu_trxorder_detail_assess
+	left join edu_teacher on  edu_trxorder_detail_assess.teacher_id = edu_teacher.id
+	left join user_expand student on edu_trxorder_detail_assess.user_id = student.user_id
+	left join user_expand teacher on edu_teacher.user_id = teacher.user_id
+	where edu_trxorder_detail_assess.detail_id= #{value}
+</select>
+</mapper>

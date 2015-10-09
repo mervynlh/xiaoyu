@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherTimeTableMapper">
+
+	<resultMap id="TeacherResultTimeTable" type="TeacherTimeTable">
+		<result property="id" column="id" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="startTime" column="start_time" />
+		<result property="endTime" column="end_time" />
+		<result property="status" column="status" />
+	</resultMap>
+	
+	<sql id="teacher_timeTable_columns">
+		edu_teacher_timetable.id,
+		edu_teacher_timetable.teacher_id,
+		edu_teacher_timetable.start_time,
+		edu_teacher_timetable.end_time,
+		edu_teacher_timetable.status
+	</sql>
+
+	<sql id="teacher_timeTable_properties">
+		#{id},
+		#{teacherId},
+		#{startTime},
+		#{endTime},
+		#{status}
+	</sql>
+
+	<insert id="createTeacherTimeTable" parameterType="TeacherTimeTable"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert into edu_teacher_timetable (
+		<include refid="teacher_timeTable_columns" />
+		) values (
+		<include refid="teacher_timeTable_properties" />
+		)
+	</insert>
+	
+</mapper>

@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ShopcartMapper">
+
+	<resultMap id="ShopcartResult" type="Shopcart">
+		<result property="id" column="id" />
+		<result property="goodsid" column="goodsid" />
+		<result property="userid" column="userid" />
+		<result property="addTime" column="add_time" />
+		<result property="type" column="type" />
+		<association property="course" column="edu_course" javaType="Course">
+			<result property="id" column="courseId" />
+			<result property="subjectId" column="subjectid" />
+			<result property="name" column="name" />
+			<result property="isavaliable" column="isavaliable" />
+			<result property="addtime" column="addtime" />
+			<result property="sourceprice" column="sourceprice" />
+			<result property="currentprice" column="currentprice" />
+			<result property="title" column="title" />
+			<result property="lessionnum" column="lessionnum" />
+			<result property="coursetag" column="coursetag" />
+			<result property="logo" column="logo" />
+			<result property="updateTime" column="update_time" />
+			<result property="losetype" column="losetype" />
+			<result property="loseAbsTime" column="lose_abs_time" />
+			<result property="loseTime" column="lose_time" />
+			<result property="updateuser" column="updateuser" />
+			<result property="membertype" column="membertype" />
+			<result property="pageBuycount" column="page_buycount" />
+			<result property="pageViewcount" column="page_viewcount" />
+			<result property="freeurl" column="freeurl" />
+			<result property="sellType" column="sell_type" />
+		</association>
+	</resultMap>
+	<resultMap type="Course" id="ShopcartCourseResult">
+			<result property="id" column="courseId" />
+			<result property="name" column="name" />
+			<result property="isavaliable" column="isavaliable" />
+			<result property="addtime" column="addtime" />
+			<result property="sourceprice" column="sourceprice" />
+			<result property="currentprice" column="currentprice" />
+			<result property="title" column="title" />
+			<result property="lessionnum" column="lessionnum" />
+			<result property="coursetag" column="coursetag" />
+			<result property="logo" column="logo" />
+			<result property="updateTime" column="update_time" />
+			<result property="losetype" column="losetype" />
+			<result property="loseAbsTime" column="lose_abs_time" />
+			<result property="loseTime" column="lose_time" />
+			<result property="updateuser" column="updateuser" />
+			<result property="pageBuycount" column="page_buycount" />
+			<result property="pageViewcount" column="page_viewcount" />
+			<result property="freeurl" column="freeurl" />
+			<result property="sellType" column="sell_type" />
+	</resultMap>
+	<sql id="edu_shopcart_columns">
+		edu_shopcart.id,
+		edu_shopcart.goodsid,
+		edu_shopcart.userid,
+		edu_shopcart.add_time,
+		edu_shopcart.type
+	</sql>
+
+	<sql id="edu_shopcart_properties">
+		#{id},
+		#{goodsid},
+		#{userid},
+		#{addTime},
+		#{type}
+	</sql>
+
+	<insert id="createShopcart" parameterType="Shopcart" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_shopcart (
+		<include refid="edu_shopcart_columns" />
+		) VALUES (
+		<include refid="edu_shopcart_properties" />
+		)
+	</insert>
+
+	<delete id="deleteShopcartById" parameterType="Long">
+		delete from
+		edu_shopcart
+		where
+		id = #{value}
+	</delete>
+
+	<select id="getShopcartListByUserId" resultMap="ShopcartResult" parameterType="java.util.Map">
+		select
+		<include refid="edu_shopcart_columns" />,
+		edu_course.id courseId,
+		edu_course.name,
+		edu_course.isavaliable,
+		edu_course.addtime,
+		edu_course.sourceprice,
+		edu_course.currentprice,
+		edu_course.title,
+		edu_course.lessionnum,
+		edu_course.coursetag,
+		edu_course.logo,
+		edu_course.update_time,
+		edu_course.losetype,
+		edu_course.lose_abs_time,
+		edu_course.lose_time,
+		edu_course.updateuser,
+		edu_course.page_buycount,
+		edu_course.page_viewcount,
+		edu_course.freeurl,
+		edu_course.sell_type
+		from edu_shopcart
+		left join edu_course
+		on edu_shopcart.goodsid = edu_course.id
+		where userid=#{userId} and type =#{type}
+	</select>
+	<!-- 购物车课程集合 -->
+	<select id="getShopcartCourseList" resultMap="ShopcartCourseResult" parameterType="long">
+		select
+		edu_course.id as courseId,
+		edu_course.name,
+		edu_course.isavaliable,
+		edu_course.addtime,
+		edu_course.sourceprice,
+		edu_course.currentprice,
+		edu_course.title,
+		edu_course.lessionnum,
+		edu_course.coursetag,
+		edu_course.logo,
+		edu_course.update_time,
+		edu_course.losetype,
+		edu_course.lose_abs_time,
+		edu_course.lose_time,
+		edu_course.updateuser,
+		edu_course.page_buycount,
+		edu_course.page_viewcount,
+		edu_course.freeurl,
+		edu_course.sell_type
+		from edu_course
+		where edu_course.id in (SELECT cart.goodsid from edu_shopcart as cart where cart.userid=#{value}  and cart.type =1)
+	</select>
+	<select id="getShopcartList" resultMap="ShopcartResult"
+		parameterType="Shopcart">
+		select
+		<include refid="edu_shopcart_columns" />
+		from edu_shopcart
+		where userid=#{userid}
+		and type =#{type} and
+		edu_shopcart.goodsid =#{goodsid}
+	</select>
+	
+	<!-- 根据用户id和类型清空购物车 -->
+	<delete id="deleteShopcartByType"   parameterType="map">
+		delete from  edu_shopcart
+		where userid=#{userId} and type =#{type} 
+	</delete>
+	 
+</mapper>

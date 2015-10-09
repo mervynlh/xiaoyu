@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="publicMapper" >
+	<!-- mysql分页通用结尾 -->
+	<sql id="pageEnd">
+		limit #{page.offsetPara,jdbcType=INTEGER} ,#{page.limitPara,jdbcType=INTEGER} 
+	</sql>
+	
+    <sql id="like_left">
+        concat('%',
+    </sql>
+
+    <sql id="like_right">
+        ,'%')
+    </sql>
+
+    <sql id="increment_sql">
+        select LAST_INSERT_ID() as value
+    </sql>
+
+    
+    <select id="getsequence" parameterType="string" resultType="GuidItem">
+    	select id,project,auto_id autoId,description from sys_sequence  where project=#{project}  for update
+    </select>
+    <insert id="addsequence" parameterType="GuidItem">
+    	insert sys_sequence(project,auto_id) value(#{project},#{autoId})
+    </insert>
+    <update id="updatesequence" parameterType="GuidItem">
+    	update sys_sequence set auto_id=auto_id+1  where project=#{project}
+    </update>
+    
+</mapper>

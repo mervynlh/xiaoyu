@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherSubjectMapper">
+		
+	 <resultMap type="TeacherSubject" id="TeacherSubjectResult">
+	 		<result property="id" column="id"/>
+	 		<result property="teacherId" column="teacher_id"/>
+	 		<result property="subjectId" column="subject_id"/>
+	 		<result property="subjectName" column="subject_name"/>
+	 </resultMap>
+	 
+	 <sql id="edu_teacher_subject_columns">
+	 	edu_teacher_subject.id,
+	 	edu_teacher_subject.teacher_id,
+	 	edu_teacher_subject.subject_id
+	 </sql>
+	 
+	 <sql id="edu_teacher_subject_properties">
+	 	#{id},
+	 	#{teacherId},
+	 	#{subjectId}
+	 </sql>
+	 
+	 <!-- 添加教师教授阶段关联 -->
+	<insert id="addTeacherSubjectBatch" parameterType="list">
+		insert INTO edu_teacher_subject (
+		<include refid="edu_teacher_subject_columns" />
+		) VALUES
+		<foreach item="item" index="index" collection="list" separator=",">
+			( #{item.id},#{item.teacherId},#{item.subjectId})
+		</foreach>
+	</insert>
+		 
+	 <!--根据教师ID查询该教师教授的阶段列表  -->
+	<select id="queryTeacherSubjectByTeacherId" resultMap="TeacherSubjectResult" parameterType="Long">
+		select
+		<include refid="edu_teacher_subject_columns"/>,sys_subject.subject_name
+		from
+		edu_teacher_subject
+		left join sys_subject on edu_teacher_subject.subject_id=sys_subject.subject_id
+		where
+		edu_teacher_subject.teacher_id = #{value}
+	</select>
+	
+	<!-- 根据教师ID删除科目 -->
+	<delete id="delTeacherSubjectByTeacherId" parameterType="Long">
+		delete from
+		edu_teacher_subject
+		where
+		edu_teacher_subject.teacher_id = #{value}
+	</delete>
+	<!-- 查询教师专业的父专业 (教师开课用)-->
+	<select id="queryTeacherParentSubject" parameterType="Long" resultMap="TeacherSubjectResult">
+		select subject_id,subject_name from sys_subject
+     	where sys_subject.subject_id in( select distinct 
+		sys_subject.parent_id as subject_id
+		from
+		edu_teacher_subject
+		left join sys_subject on edu_teacher_subject.subject_id=sys_subject.subject_id
+		where
+		edu_teacher_subject.teacher_id = #{value})
+	</select>
+	<!-- 教师详情课程用 -->
+	<select id="queryTeacherSubjectByOK" resultMap="TeacherSubjectResult" parameterType="Long">
+	 	select subject_id,subject_name from sys_subject where sys_subject.subject_id in(
+			select distinct sys_subject.parent_id from sys_subject
+		    left join edu_subject_major on sys_subject.subject_id = edu_subject_major.subject_id
+		    left join edu_course on edu_subject_major.id=edu_course.subject_major_id
+		    where  edu_course.teacher_id=#{value} and statu!=1 and edu_course.isavaliable=1
+		    and edu_course.sell_type='1'
+		    group by sys_subject.subject_id
+		)
+	</select>
+</mapper>

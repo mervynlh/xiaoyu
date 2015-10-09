@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherExtendCashbackMapper">
+
+        <resultMap id="TeacherExtendCashbackResult" type="TeacherExtendCashback">
+            <result property="id" column="id"/>
+            <result property="teacherId" column="teacher_id"/>
+            <result property="userId" column="user_id"/>
+            <result property="cashbackMoney" column="cashback_money"/>
+            <result property="createTime" column="create_time"/>
+            <result property="userName" column="userName"/>
+            <result property="userType" column="userType"/>
+            <result property="email" column="email"/>
+            <result property="mobile" column="mobile"/>
+        </resultMap>
+        
+
+        <sql id="edu_teacher_extend_cashback_columns">
+            edu_teacher_extend_cashback.id,
+            edu_teacher_extend_cashback.teacher_id,
+            edu_teacher_extend_cashback.user_id,
+            edu_teacher_extend_cashback.cashback_money,
+            edu_teacher_extend_cashback.create_time
+        </sql>
+
+        <sql id="edu_teacher_extend_cashback_properties">
+            #{id},
+            #{teacherId},
+            #{userId},
+            #{cashbackMoney},
+            #{createTime}
+        </sql>
+		
+		<!-- 添加返现记录 -->
+        <insert id="createTeacherExtendCashback" parameterType="TeacherExtendCashback" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_teacher_extend_cashback (<include refid="edu_teacher_extend_cashback_columns"/>) VALUES (<include refid="edu_teacher_extend_cashback_properties"/>)
+        </insert>
+		
+		<!-- 根据条件分页查询返现记录 -->
+        <select id="getTeacherExtendCashbackList" resultMap="TeacherExtendCashbackResult" parameterType="TeacherExtendCashback">
+            select
+            DISTINCT
+            <include refid="edu_teacher_extend_cashback_columns"/>,
+            CASE
+				WHEN user_expand.realname is NOT NULL THEN user_expand.realname
+				WHEN user_user.nickname is NOT NULL THEN user_user.nickname
+			END as userName,
+			user_user.mobile,
+			user_user.email,
+			user_user.user_type as userType
+            from edu_teacher_extend_cashback 
+       		left join edu_teacher on edu_teacher_extend_cashback.teacher_id = edu_teacher.id
+       		left join user_user on edu_teacher.user_id = user_user.id
+       		left join user_expand on edu_teacher.user_id = user_expand.user_id
+           	WHERE edu_teacher_extend_cashback.teacher_id = #{e.teacherId}
+           	<if test="e.mobile != null and e.mobile != ''">
+           		and user_user.mobile like concat('%', #{e.mobile}, '%')
+           	</if>
+           	<if test="e.userName != null and e.userName != ''">
+           		and (user_expand.realname LIKE CONCAT('%', #{e.userName}, '%') or user_user.nickname LIKE CONCAT('%', #{e.userName}, '%'))
+           	</if>
+           	<if test="e.userType != null and e.userType != '' and e.userType != -1">
+           		and user_user.user_type = #{e.userType}
+           	</if>
+           	<if test="e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00' and (e.endTime == null or e.endTime == '' or e.endTime == '0000-00-00 00:00:00')">
+           		and <![CDATA[edu_teacher_extend_cashback.create_time >= #{e.startTime}]]>
+           	</if>
+           	<if test="(e.startTime == null or e.startTime == '' or e.startTime == '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+           		and <![CDATA[edu_teacher_extend_cashback.create_time <= #{e.endTime}]]>
+           	</if>
+           	<if test="(e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+           		and edu_teacher_extend_cashback.create_time BETWEEN #{e.startTime} AND #{e.endTime}
+           	</if>
+           	order by edu_teacher_extend_cashback.id desc
+           	<include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getTeacherExtendCashbackListCount" resultType="int" parameterType="TeacherExtendCashback">
+            select
+            COUNT(1)
+            from edu_teacher_extend_cashback 
+            		left join edu_teacher on edu_teacher_extend_cashback.teacher_id = edu_teacher.id
+            		left join user_user on edu_teacher.user_id = user_user.id
+            		left join user_expand on edu_teacher.user_id = user_expand.user_id
+           	WHERE edu_teacher_extend_cashback.teacher_id = #{e.teacherId}
+           	<if test="e.mobile != null and e.mobile != ''">
+           		and user_user.mobile like concat('%', #{e.mobile}, '%')
+           	</if>
+           	<if test="e.userName != null and e.userName != ''">
+           		and (user_expand.realname LIKE CONCAT('%', #{e.userName}, '%') or user_user.nickname LIKE CONCAT('%', #{e.userName}, '%'))
+           	</if>
+           	<if test="e.userType != null and e.userType != '' and e.userType != -1">
+           		and user_user.user_type = #{e.userType}
+           	</if>
+           	<if test="e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00' and (e.endTime == null or e.endTime == '' or e.endTime == '0000-00-00 00:00:00')">
+           		and <![CDATA[edu_teacher_extend_cashback.create_time >= #{e.startTime}]]>
+           	</if>
+           	<if test="(e.startTime == null or e.startTime == '' or e.startTime == '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+           		and <![CDATA[edu_teacher_extend_cashback.create_time <= #{e.endTime}]]>
+           	</if>
+           	<if test="(e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+           		and edu_teacher_extend_cashback.create_time BETWEEN #{e.startTime} AND #{e.endTime}
+           	</if>
+           	order by edu_teacher_extend_cashback.id desc
+        </select>
+        
+        <!-- 查询教师推广返现的列表 -->
+        <select id="queryTeacherCashBackByCondition" parameterType="TeacherExtendCashback" resultMap="TeacherExtendCashbackResult">
+        	select  <include refid="edu_teacher_extend_cashback_columns"/>,user_expand.realname as userName
+        	from edu_teacher_extend_cashback
+        	left join user_expand on edu_teacher_extend_cashback.user_id = user_expand.user_id
+        	where teacher_id=#{e.teacherId}
+        	order by create_time desc
+           	<include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="queryTeacherCashBackByConditionCount" parameterType="TeacherExtendCashback" resultType="int">
+        	select  count(1)
+        	from edu_teacher_extend_cashback
+        	left join user_expand on edu_teacher_extend_cashback.user_id = user_expand.user_id
+        	where teacher_id=#{e.teacherId}
+        </select>
+        <!-- 查询教师推广返现的总数 -->
+        <select id="queryTeacherCashBackToTal" parameterType="Long" resultType="java.util.Map">
+        	select  count(1) as totalNum,sum(cashback_money) as totalMoney
+        	from edu_teacher_extend_cashback
+        	where teacher_id=#{value}
+        </select>
+</mapper>

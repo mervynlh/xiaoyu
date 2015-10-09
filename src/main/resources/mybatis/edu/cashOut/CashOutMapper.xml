@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CashOutMapper">
+
+        <resultMap id="CashOutResult" type="CashOut">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="userMobile" column="user_mobile"/>
+            <result property="cashType" column="cashout_type"/>
+            <result property="bankName" column="bank_name"/>
+            <result property="bankCard" column="bank_card"/>
+            <result property="openBankName" column="open_bank_name"/>
+            <result property="openBankPerson" column="open_bank_person"/>
+            <result property="alipayAccount" column="alipay_account"/>
+            <result property="cashoutMoney" column="cashout_money"/>
+            <result property="status" column="status"/>
+            <result property="createtime" column="create_time"/>
+            <result property="optusername" column="optusername"/>
+            <result property="realname" column="realname"/>
+        </resultMap>
+
+        <sql id="edu_user_cashout_columns">
+            edu_user_cashout.id,
+            edu_user_cashout.user_id,
+            edu_user_cashout.user_mobile,
+            edu_user_cashout.cashout_type,
+            edu_user_cashout.bank_name,
+            edu_user_cashout.bank_card,
+            edu_user_cashout.open_bank_name,
+            edu_user_cashout.open_bank_person,
+            edu_user_cashout.alipay_account,
+            edu_user_cashout.cashout_money,
+            edu_user_cashout.status,
+            edu_user_cashout.create_time
+        </sql>
+
+        <sql id="edu_user_cashout_properties">
+            #{id},
+            #{userId},
+            #{userMobile},
+            #{cashType},
+            #{bankName},
+            #{bankCard},
+            #{openBankName},
+            #{openBankPerson},
+            #{alipayAccount},
+            #{cashoutMoney},
+            #{status},
+            #{createtime}
+        </sql>
+
+		<!-- 添加提现记录 -->
+        <insert id="createCashOut" parameterType="CashOut" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_cashout (<include refid="edu_user_cashout_columns"/>) VALUES (<include refid="edu_user_cashout_properties"/>)
+        </insert>
+		
+		<!-- 通过Id删除提现（更改状态为取消） -->
+        <update id="updateCashOutStatusById" parameterType="CashOut">
+            update edu_user_cashout set
+            status = #{status}
+            where
+                id = #{id}
+        </update>
+		
+
+		<!-- 通过Id查询提现记录详情 -->
+        <select id="getCashOutById" resultMap="CashOutResult" parameterType="Long">
+            select
+            <include refid="edu_user_cashout_columns"/>,
+            edu_user_cashout_opt_record.optusername
+            from edu_user_cashout
+            left join edu_user_cashout_opt_record on edu_user_cashout.id = edu_user_cashout_opt_record.cash_out_id
+            where
+                edu_user_cashout.id = #{value}
+        </select>
+		
+		<!-- 根据条件分页提现记录 -->
+        <select id="getCashOutList" resultMap="CashOutResult" parameterType="java.util.Map">
+            select
+            <include refid="edu_user_cashout_columns"/>,
+            user_expand.realname
+            from edu_user_cashout left join user_expand on edu_user_cashout.user_id = user_expand.user_id
+            <where>
+            	<if test="e.userId != null and e.userId != '' and e.userId != 0">
+            		and edu_user_cashout.user_id = #{e.userId}
+            	</if>
+            	<if test="e.userMobile != null and e.userMobile != ''">
+            		and edu_user_cashout.user_mobile LIKE CONCAT('%', #{e.userMobile}, '%')
+            	</if>
+            	<if test="e.cashType != null and e.cashType != ''">
+            		and edu_user_cashout.cashout_type = #{e.cashType}
+            	</if>
+            	<if test="e.bankName != null and e.bankName != ''">
+            		and edu_user_cashout.bank_name LIKE CONCAT('%', #{e.bankName}, '%')
+            	</if>
+            	<if test="e.status > 0">
+            		and edu_user_cashout.status = #{e.status}
+            	</if>
+            	<if test="e.alipayAccount != null and e.alipayAccount != ''">
+            		and edu_user_cashout.alipay_account LIKE CONCAT('%', #{e.alipayAccount}, '%')
+            	</if>
+            	<if test="e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00' and (e.endTime == null or e.endTime == '' or e.endTime == '0000-00-00 00:00:00')">
+            		and <![CDATA[edu_user_cashout.create_time >= #{e.startTime}]]>
+            	</if>
+            	<if test="(e.startTime == null or e.startTime == '' or e.startTime == '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+            		and <![CDATA[edu_user_cashout.create_time <= #{e.endTime}]]>
+            	</if>
+            	<if test="(e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+            		and edu_user_cashout.create_time BETWEEN #{e.startTime} AND #{e.endTime}
+            	</if>
+            </where>
+            order by edu_user_cashout.create_time desc
+            <include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getCashOutListCount" resultType="int" parameterType="java.util.Map">
+            select
+            count(1)
+            FROM edu_user_cashout left join user_expand on edu_user_cashout.user_id = user_expand.user_id
+            <where>
+            	<if test="e.userId != null and e.userId != '' and e.userId != 0">
+            		and edu_user_cashout.user_id = #{e.userId}
+            	</if>
+            	<if test="e.userMobile != null and e.userMobile != ''">
+            		and edu_user_cashout.user_mobile LIKE CONCAT('%', #{e.userMobile}, '%')
+            	</if>
+            	<if test="e.cashType != null and e.cashType != ''">
+            		and edu_user_cashout.cashout_type = #{e.cashType}
+            	</if>
+            	<if test="e.bankName != null and e.bankName != ''">
+            		and edu_user_cashout.bank_name LIKE CONCAT('%', #{e.bankName}, '%')
+            	</if>
+            	<if test="e.status > 0">
+            		and edu_user_cashout.status = #{e.status}
+            	</if>
+            	<if test="e.alipayAccount != null and e.alipayAccount != ''">
+            		and edu_user_cashout.alipay_account LIKE CONCAT('%', #{e.alipayAccount}, '%')
+            	</if>
+            	<if test="e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00' and (e.endTime == null or e.endTime == '' or e.endTime == '0000-00-00 00:00:00')">
+            		and <![CDATA[edu_user_cashout.create_time >= #{e.startTime}]]>
+            	</if>
+            	<if test="(e.startTime == null or e.startTime == '' or e.startTime == '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+            		and <![CDATA[edu_user_cashout.create_time <= #{e.endTime}]]>
+            	</if>
+            	<if test="(e.startTime != null and e.startTime != '' and e.startTime != '0000-00-00 00:00:00') and (e.endTime != null and e.endTime != '' and e.endTime != '0000-00-00 00:00:00')">
+            		and edu_user_cashout.create_time BETWEEN #{e.startTime} AND #{e.endTime}
+            	</if>
+            </where>
+        </select>
+        
+</mapper>

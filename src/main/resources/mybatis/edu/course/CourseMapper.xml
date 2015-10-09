@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseMapper">
+	<resultMap id="CourseResult" type="Course">
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="isavaliable" column="isavaliable" />
+		<result property="addtime" column="addtime" />
+		<result property="isPay" column="is_pay" />
+		<result property="currentprice" column="currentPrice" />
+		<result property="title" column="title" />
+		<result property="context" column="context" />
+		<result property="lessionnum" column="lessionnum" />
+		<result property="logo" column="logo" />
+		<result property="updateTime" column="update_time" />
+		<result property="sellType" column="sell_type" />
+        <result property="addressId" column="address_id" />
+        <result property="learningTarget" column="learning_target" />
+        <result property="liveLink" column="live_link" />
+        <result property="teacherId" column="teacher_id" />
+        <result property="liveDetails" column="live_details" />
+        <result property="liveState" column="live_state" />
+        <result property="courseModel" column="course_model" />
+        <result property="isJoinClass" column="is_join_class" />
+        <result property="joinPrise" column="join_prise" />
+        <result property="peopleNum" column="people_num" />
+        <result property="joinNum" column="join_num" />
+        <result property="suitStudent" column="suit_student"/>
+        <result property="subjectMajorId" column="subject_major_id"/>
+        <result property="subjectMajorStr" column="subject_major_str"/>
+        <result property="coursePlan" column="course_plan" />
+        <result property="classImgs" column="class_imgs" />
+        <result property="isFinsh" column="is_finsh" />
+        <result property="teacherName" column="realname" />
+	</resultMap>
+	
+	<resultMap id="CouponSubjectCourseResult" type="Course">
+		<result property="id" column="id" />
+		<result property="currentprice" column="currentPrice" />
+	</resultMap>
+	
+	<!-- 首页课程展示  把大字段context剔除了放memcache缓存-->
+	<resultMap type="CourseDto" id="WebSiteCourseResult" >
+		<result property="id" column="id" />
+		<result property="name" column="name" />
+		<result property="isavaliable" column="isavaliable" />
+		<result property="addtime" column="addtime" />
+		<result property="isPay" column="is_pay" />
+		<result property="currentprice" column="currentprice" />
+		<result property="title" column="title" />
+		<result property="lessionnum" column="lessionnum" />
+		<result property="updateTime" column="update_time" />
+		<result column="recommendId" property="recommendId" />
+		<result property="nickname" column="nickname" />
+		<result property="sellType" column="sell_type" />
+	</resultMap>
+	
+	<sql id="edu_course_columns">
+		edu_course.id,
+		edu_course.name,
+		edu_course.isavaliable,
+		edu_course.addtime,
+		edu_course.is_pay,
+		edu_course.currentprice,
+		edu_course.title,
+		edu_course.context,
+		edu_course.lessionnum,
+		edu_course.logo,
+		edu_course.update_time,
+		edu_course.sell_type,
+		edu_course.address_id,
+		edu_course.learning_target,
+		edu_course.live_link,
+		edu_course.live_details,
+		edu_course.live_state,
+		edu_course.course_model,
+		edu_course.is_join_class,
+		edu_course.join_prise,
+		edu_course.people_num,
+		edu_course.join_num,
+		edu_course.suit_student,
+		edu_course.subject_major_id,
+		edu_course.subject_major_str,
+		edu_course.teacher_id,
+		edu_course.course_plan,
+		edu_course.class_imgs,
+		edu_course.is_finsh
+	</sql>
+	
+	<sql id="teacherInfo_course">
+		edu_course.logo,
+		edu_course.name,
+		edu_course.lessionnum,
+		edu_course.course_plan,
+		edu_course.course_model,
+		edu_course.address_id,
+		edu_course.id
+	</sql>
+
+	<sql id="edu_course_properties">
+		#{id},
+		#{name},
+		#{isavaliable},
+		#{addtime},
+		#{isPay},
+		#{currentprice},
+		#{title},
+		#{context},
+		#{lessionnum},
+		#{logo},
+		#{updateTime},
+		#{sellType},
+		#{addressId},
+		#{learningTarget},
+		#{liveLink},
+		#{liveDetails},
+		#{liveState},
+		#{courseModel},
+		#{isJoinClass},
+		#{joinPrise},
+		#{peopleNum},
+		#{joinNum},
+		#{suitStudent},
+		#{subjectMajorId},
+		#{subjectMajorStr},
+		#{teacherId},
+		#{coursePlan},
+		#{classImgs},
+		#{isFinsh}
+	</sql>
+
+	<insert id="createCourse" parameterType="Course" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert into edu_course (
+		<include refid="edu_course_columns" />
+		) values (
+		<include refid="edu_course_properties" />
+		)
+	</insert>
+
+	<!-- 根据课程id删除课程（修改课程状态） -->
+	<update id="deleteCourseById" parameterType="Long">
+		update edu_course 
+		set statu=1
+		where
+		id = #{value}
+	</update>
+
+	<!-- 老师修改一对一课程信息 -->
+	<update id="updateCourseTeacher" parameterType="Course">
+		update edu_course SET
+		name = #{name},
+		context = #{context},
+		update_time = #{updateTime},
+		currentprice = #{currentprice},
+		course_model=#{courseModel},
+		subject_major_id= #{subjectMajorId},
+		subject_major_str=#{subjectMajorStr},
+		isavaliable=#{isavaliable}
+		where
+		id = #{id}
+	</update>
+	<!-- 老师修改班课课程信息 -->
+	<update id="updateClassCourseTeacher" parameterType="Course">
+		update edu_course set
+		name=#{name},
+		people_num=#{peopleNum},
+		address_id=#{addressId},
+		suit_student=#{suitStudent},
+		learning_target=#{learningTarget},
+		title=#{title},
+		context = #{context},
+		update_time = #{updateTime},
+		currentprice = #{currentprice},
+		course_model=#{courseModel},
+		is_join_class=#{isJoinClass},
+		join_prise=#{joinPrise},
+		is_finsh=#{isFinsh},
+		subject_major_id= #{subjectMajorId},
+		subject_major_str=#{subjectMajorStr},
+		course_plan=#{coursePlan},
+		class_imgs=#{classImgs},
+		isavaliable=#{isavaliable}
+		where
+		id = #{id}
+	</update>
+	<select id="getCourseById" resultMap="CourseResult" parameterType="Long">
+		select
+		<include refid="edu_course_columns" />,
+		user_expand.realname
+		from edu_course
+		left join edu_teacher on edu_teacher.id=edu_course.teacher_id
+		left join user_expand on edu_teacher.user_id=user_expand.user_id
+		where
+		edu_course.id = #{value} and edu_course.statu=0
+	</select>
+	<select id="getCourseList" resultMap="CourseResult" parameterType="Course">
+		select
+		<include refid="edu_course_columns" />
+		from edu_course where edu_course.statu=0
+	</select>
+	
+	
+	<select id="getCourseListByBro"  resultMap="CourseResult">
+		SELECT 
+		<include refid="edu_course_columns" />
+		 FROM edu_course LEFT JOIN
+		edu_course_profile ON
+		edu_course.`id` = edu_course_profile.`id`
+		ORDER BY edu_course_profile.`viewcount` DESC
+		LIMIT 5
+	</select>
+		
+	
+	<!-- 查询课程列表 -->
+	<select id="getCourseListPage" resultMap="WebSiteCourseResult" parameterType="java.util.Map">
+		select
+			edu_course.id,
+			edu_course.name,
+			edu_course.isavaliable,
+			edu_course.addtime,
+			edu_course.is_pay,
+			edu_course.title,
+			edu_course.lessionnum,
+			edu_course.update_time,
+			edu_course.sell_type,
+            edu_course.currentprice,
+            user_expand.realname as nickname
+			from edu_course
+			left join edu_teacher on edu_course.teacher_id =edu_teacher.id
+			left join user_expand on edu_teacher.user_id =user_expand.user_id
+    		left join edu_subject_major on edu_subject_major.id=edu_course.subject_major_id
+     		left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id
+     		left join edu_major on edu_subject_major.major_id=edu_major.id
+			<where>
+				edu_course.statu=0
+				<if test="e.teacherName!=null and e.teacherName!=''">
+					and user_expand.realname like concat('%',#{e.teacherName},'%')
+				</if>
+				<if test="e.id!=null and e.id!=''">
+					and edu_course.id = #{e.id} 
+				</if>
+				<if test="e.subjectId!=null and e.subjectId!=0">
+					and (sys_subject.subject_id=#{e.subjectId} or sys_subject.parent_id=#{e.subjectId})
+				</if>
+				<if test="e.majorId>0">
+					 and edu_subject_major.major_id=#{e.majorId}
+				</if>
+				<if test="e.sellType!=null and e.sellType!=''">
+					 and edu_course.sell_type=#{e.sellType}
+				</if>
+                <if test="e.isavaliable!=null and e.isavaliable!=-1">
+                    and edu_course.isavaliable=#{e.isavaliable}
+                </if>
+			</where>
+			group by edu_course.id
+			<if test="e.order==1 or e.order==0">
+				order by edu_course_profile.viewcount desc
+			</if>
+			<if test="e.order==2">
+				order by edu_course.addTime desc
+			</if>
+			<if test="e.order==3">
+				order by edu_course.currentprice asc
+			</if>
+			<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getCourseListPageCount" resultType="int" parameterType="java.util.Map">
+		select  count(1) from (
+			select edu_course.id
+			from edu_course 
+			left join edu_teacher on edu_course.teacher_id =edu_teacher.id 
+			left join user_expand on edu_teacher.user_id =user_expand.user_id 
+			left join edu_subject_major on edu_subject_major.id=edu_course.subject_major_id 
+			left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id 
+			left join edu_major on edu_subject_major.major_id=edu_major.id 
+			<where>
+				edu_course.statu=0
+				<if test="e.id!=null and e.id!=''">
+					and edu_course.id = #{e.id} 
+				</if>
+				<if test="e.teacherName!=null and e.teacherName!=''">
+					and user_expand.realname like concat('%',#{e.teacherName},'%')
+				</if>
+				<if test="e.subjectId!=null and e.subjectId!=0">
+					and (sys_subject.subject_id=#{e.subjectId} or sys_subject.parent_id=#{e.subjectId})
+				</if>
+				<if test="e.majorId>0">
+					 and edu_subject_major.major_id=#{e.majorId}
+				</if>
+				<if test="e.sellType!=null and e.sellType!=''">
+					 and edu_course.sell_type=#{e.sellType}
+				</if>
+                <if test="e.isavaliable!=null and e.isavaliable!=-1">
+                    and edu_course.isavaliable=#{e.isavaliable}
+                </if>
+			</where>
+			group by edu_course.id ) as newTable
+		</select>
+	<!-- 获取套餐下 课程详细信息 -->
+	<select id="getCourseListPackage" parameterType="list" resultType="CourseDto">
+		 SELECT	DISTINCT
+		  		edu_course.id,
+				edu_course.name,
+				edu_course.isavaliable,
+				edu_course.addtime,
+				edu_course.is_pay,
+				edu_course.currentprice,
+				edu_course.title,
+				edu_course.lessionnum,
+				edu_course.logo,
+				edu_course.freeurl,
+				edu_course.sell_type,
+				edu_course_package.order_num
+		 FROM edu_course LEFT JOIN 
+		 edu_course_package ON edu_course.id=edu_course_package.course_id
+		 WHERE edu_course_package.main_course_id in 
+		 <foreach collection="list" item="item" open="(" close=")" separator=",">
+		 	#{item}
+	 	</foreach>
+		ORDER BY edu_course_package.id DESC
+	</select>
+	
+	<select id="getCouponSubjectCourse" parameterType="Map" resultMap="CouponSubjectCourseResult">
+		select
+		edu_course.id,
+		edu_course.currentprice
+		from edu_course
+		left join edu_course_subject on edu_course.id=edu_course_subject.course_id
+		left join sys_subject on edu_course_subject.SUBJECT_ID=sys_subject.SUBJECT_ID
+		where
+		edu_course.id in (${courseIds})
+		and (edu_course_subject.subject_id=#{subjectId} or sys_subject.parent_id=#{subjectId})
+	</select>
+
+
+    
+    <select id="queryCourseListByIds" parameterType="String" resultMap="CourseResult">
+    	SELECT <include refid="edu_course_columns"/> FROM EDU_COURSE WHERE ID IN(${value}) and edu_course.statu=0
+    </select>
+	<!-- 审核/关闭课程 -->
+	<update id="verifyCourse" parameterType="java.util.Map">
+		update edu_course set isavaliable=#{isavaliable} where id in (${ids})
+	</update>
+	<!-- 审核全部课程 -->
+	<update id="verifyAllCourse">
+		update edu_course set isavaliable=1 where isavaliable=0 and statu=0
+	</update>
+	<!-- 教师详情选课查询课程信息 -->
+	<select id="queryCourseToTeacher" parameterType="QueryCourse" resultType="java.util.Map">
+		select 
+		edu_course.id as courseId,
+		edu_course.currentPrice,
+		edu_course.course_model as courseModel,
+		sys_subject.subject_name as subjectName,
+		edu_major.name as majorName
+		from  edu_course 
+		left join edu_subject_major on edu_subject_major.id=edu_course.subject_major_id
+		left join sys_subject on sys_subject.subject_id=edu_subject_major.subject_id
+		left join edu_major on edu_subject_major.major_id=edu_major.id
+		where isavaliable=1  and edu_course.statu=0
+		<if test="teacherId>0">
+		and edu_course.teacher_id=#{teacherId}
+		</if>
+		<if test="subjectId>0">
+		and (sys_subject.subject_id=#{subjectId} or sys_subject.parent_id=#{subjectId})
+		</if>
+		<if test="sellType>0">
+		and edu_course.sell_type=#{sellType}
+		</if>
+	</select>
+	<!-- 根据教师id查询班课列表(教师详情页) -->
+	<select id="getClassCourseByTeacherId" parameterType="Long" resultMap="CourseResult">
+		select <include refid="teacherInfo_course"/> from 
+		edu_course 
+		<where> 
+			sell_type=2 and edu_course.statu=0 
+			<if test="e.teacherId>0 ">
+				 and teacher_id=#{e.teacherId} 
+		    </if>
+		</where>
+		order by addTime desc
+	</select>
+	<!-- 根据id查询班课详情 -->
+	<select id="getClassCourseById" parameterType="Long" resultMap="CourseResult">
+		select 
+			edu_course.id,
+			edu_course.name,
+			edu_course.class_imgs,
+			edu_course.currentPrice,
+			edu_course.lessionnum,
+			edu_course.people_num,
+			edu_course.course_plan,
+			edu_course.address_id,
+			edu_course.suit_student,
+			edu_course.learning_target,
+			edu_course.is_join_class,
+			edu_course.course_model,
+			edu_course.suit_student,
+			edu_course.join_num,
+			edu_course.context,
+			edu_course.is_finsh,
+			user_expand.realname
+		from edu_course
+		left join edu_teacher on edu_course.teacher_id = edu_teacher.id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		where edu_course.id = #{value}
+	</select>
+	<!-- 根据教师id查询一对一 -->
+	<select id="queryOneToOneByTeacherId" parameterType="Long" resultMap="CourseResult">
+		select <include refid="edu_course_columns"/> from edu_course where teacher_id=#{value} and sell_type=1 and edu_course.statu=0 order by addTime desc
+	</select>
+	<!-- 根据教师id查询班课 -->
+	<select id="queryClassCourseByTeacherPage" parameterType="QueryCourse" resultMap="CourseResult">
+		select <include refid="edu_course_columns"/> from edu_course 
+		<where> 
+			sell_type=2 and edu_course.statu=0 
+			<if test="e.teacherId>0 ">
+				 and teacher_id=#{e.teacherId} 
+		    </if>
+		</where>
+		order by addTime desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryClassCourseByTeacherPageCount" parameterType="QueryCourse" resultType="int">
+		select count(1) from edu_course 
+		<where> 
+			sell_type=2 and edu_course.statu=0 
+			<if test="e.teacherId>0 ">
+				 and teacher_id=#{e.teacherId} 
+		    </if>
+		</where>
+	</select>
+	<!-- 更新课程课节数 -->
+	<update id="updateLessionnum" parameterType="Long">
+		update edu_course set lessionnum=(select count(1) from edu_course_kpoints where edu_course_kpoints.course_id=#{value})
+		where edu_course.id=#{value}
+	</update>
+	<!-- 查询是否有课程使用该地址 -->
+	<select id="quertyCourseNumByAddress" parameterType="Long" resultType="int">
+		select count(1) from edu_course where address_id=#{value}  and is_finsh!="FINDED"
+	</select>
+	<!-- 更新班课课程报名人数 -->
+	<update id="updateJoinNum" parameterType="Long">
+		update edu_course set  join_num=join_num+1 where id=#{value}
+	</update>
+	<!-- 更新班课课程报名状态 -->
+	<update id="updateFinshStatu" parameterType="java.util.Map">
+		update edu_course set  is_finsh=#{isFinsh} where id=#{courseId}
+	</update>
+	<!-- 查询专业是否冲突 -->
+	<select id="querySubjectMajorConflict" parameterType="java.util.Map" resultType="int">
+		select count(1) from edu_course 
+		where teacher_id=#{teacherId}
+		and subject_major_id=#{subjectMajorId} 
+		and statu=0 
+		and sell_type=#{sellType}
+		<if test="sellType==2">
+			and is_finsh!='FINSHED'
+		</if>
+		<if test="courseId!=null and courseId>0">
+			and id!=#{courseId}
+		</if>
+	</select>
+</mapper>

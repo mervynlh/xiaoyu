@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherProfileMapper">
+		
+		 <resultMap type="TeacherProfile" id="TeacherProfileResultMap">
+		 		<result property="id" column="id"/>
+		 		<result property="teacherId" column="teacher_id"/>
+		 		<result property="star" column="star"/>
+		 		<result property="assessNum" column="assess_num"/>
+		 		<result property="studentNum" column="student_num"/>
+		 		<result property="browseNum" column="browse_num"/>
+		 		<result property="collectNum" column="collect_num"/>
+		 		<result property="description" column="description"/>
+		 		<result property="attribute" column="attribute"/>
+		 		<result property="speed" column="speed"/>
+		 		<result property="goodNum" column="good_num"/>
+		 		<result property="middleNum" column="middle_num"/>
+		 		<result property="badNum" column="bad_num"/>
+				 <result property="cardStatus" column="card_status"/>
+				 <result property="educationStatus" column="education_status"/>
+				 <result property="teachingStatus" column="teaching_status"/>
+				 <result property="specialtyStatus" column="specialty_status"/>
+		 </resultMap>
+		 
+		 <sql id="edu_teacher_profile_columns">
+		 	edu_teacher_profile.id,
+		 	edu_teacher_profile.teacher_id,
+		 	edu_teacher_profile.star,
+		 	edu_teacher_profile.assess_num,
+		 	edu_teacher_profile.student_num,
+		 	edu_teacher_profile.browse_num,
+		 	edu_teacher_profile.collect_num,
+		 	edu_teacher_profile.description,
+		 	edu_teacher_profile.attribute,
+		 	edu_teacher_profile.speed,
+		 	edu_teacher_profile.good_num,
+		 	edu_teacher_profile.middle_num,
+		 	edu_teacher_profile.bad_num,
+		 	edu_teacher_profile.card_status,
+		 	edu_teacher_profile.education_status,
+		 	edu_teacher_profile.teaching_status,
+		 	edu_teacher_profile.specialty_status
+		 </sql>
+		 
+		 <sql id="edu_teacher_profile_properties">
+		 	#{id},
+		 	#{teacherId},
+		 	#{star},
+		 	#{assessNum},
+		 	#{studentNum},
+		 	#{browseNum},
+		 	#{collectNum},
+		 	#{description},
+		 	#{attribute},
+		 	#{speed},
+		 	#{goodNum},
+		 	#{middleNum},
+		 	#{badNum},
+		 	#{cardStatus},
+		 	#{educationStatus},
+		 	#{teachingStatus},
+		 	#{specialtyStatus}
+		 </sql>
+	 <!-- 根据	ID查询教师拓展 -->
+	<select id="queryTeacherProfileById" resultMap="TeacherProfileResultMap" parameterType="Long">
+		select
+		<include refid="edu_teacher_profile_columns"/>
+		from
+		edu_teacher_profile
+		where
+		edu_teacher_profile.id=#{e.id}
+	</select>
+	<!-- 修改教师星级 -->
+	<update id="updateTeacherProfile" parameterType="Map">
+		update
+		edu_teacher_profile
+		<if test="type=='star'">set star=#{count}</if>
+		where
+		edu_teacher_profile.teacher_id=#{teacherId}
+	</update>
+
+	<!-- 添加教师拓展记录 -->
+	<insert id="addTeacherProfile" parameterType="TeacherProfile" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		edu_teacher_profile(
+		<include refid="edu_teacher_profile_columns"/>
+		)values(
+	  		<include refid="edu_teacher_profile_properties"/>
+		)
+	</insert>
+	<!-- 根据教师id增加评价数-->
+	<update id="updateTeacherAssessAdd" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.assess_num = edu_teacher_profile.assess_num + 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id增加收藏数 -->
+	<update id="updateTeacherCollectAdd" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.collect_num = edu_teacher_profile.collect_num + 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id减少收藏数 -->
+	<update id="updateTeacherCollectSub" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.collect_num = edu_teacher_profile.collect_num - 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id增加浏览数 -->
+	<update id="updateTeacherBrowseNum" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.browse_num = edu_teacher_profile.browse_num + 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id增加好评数 -->
+	<update id="updateTeacherGoodNum" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.good_num = edu_teacher_profile.good_num + 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id增加中评数 -->
+	<update id="updateTeacherMiddleNum" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.middle_num = edu_teacher_profile.middle_num + 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id增加差评数 -->
+	<update id="updateTeacherBadNum" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.bad_num = edu_teacher_profile.bad_num + 1
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 根据教师id评星 -->
+	<update id="updateTeacherStar" parameterType="Long">
+		update
+			edu_teacher_profile
+		set 
+			edu_teacher_profile.star = (bad_num+middle_num+good_num)/3
+		where edu_teacher_profile.teacher_id = #{value}
+	</update>
+	<!-- 查询教师评星 -->
+	<!--<select id="queryTeacherStar" parameterType="Long" resultType="java.lang.Double">-->
+		<!--select ROUND(AVG(star), 2) from edu_teacher_profile where edu_teacher_profile.teacher_id = #{value}-->
+	<!--</select>-->
+	<!-- 根据教师id查询拓展信息 -->
+	<select id="queryTeacherProfileByTeacher" parameterType="Long" resultMap="TeacherProfileResultMap">
+		select <include refid="edu_teacher_profile_columns"/>
+		from edu_teacher_profile where teacher_id=#{value} limit 0,1
+	</select>
+	<!-- 评价后计算更新教师拓展数据 -->
+	<update id="updateProfileDescriptionAttributeSpeed" parameterType="Long">
+		update edu_teacher_profile set edu_teacher_profile.description=(select (sum(description)/count(1)) from edu_assess where edu_assess.teacher_id=#{value})
+		,attribute=(select (sum(attribute)/count(1)) from edu_assess where edu_assess.teacher_id=#{value})
+		,speed=(select (sum(speed)/count(1)) from edu_assess where edu_assess.teacher_id=#{value})
+		where edu_teacher_profile.teacher_id=#{value}
+	</update>
+
+	<!-- 教师资质审核(教师认证) -->
+	<update id="teacherAptitudeAttestation" parameterType="TeacherProfile">
+		UPDATE edu_teacher_profile SET
+		edu_teacher_profile.card_status = #{cardStatus},
+		edu_teacher_profile.education_status = #{educationStatus},
+		edu_teacher_profile.teaching_status = #{teachingStatus},
+		edu_teacher_profile.specialty_status = #{specialtyStatus}
+		WHERE edu_teacher_profile.teacher_id = #{teacherId}
+	</update>
+	<!-- 修改教师的学生人数-->
+	<update id="updateTeacherProfileStudentNum" parameterType="map">
+		UPDATE edu_teacher_profile SET
+		student_num = student_num+ 1
+		WHERE 
+		edu_teacher_profile.teacher_id = #{teacherId}
+	</update>
+</mapper>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CashOutOptRecordMapper">
+
+        <resultMap id="CashOutOptRecordResult" type="CashOutOptRecord">
+            <result property="id" column="id"/>
+            <result property="cashoutId" column="cash_out_id"/>
+            <result property="type" column="type"/>
+            <result property="optuser" column="optuser"/>
+            <result property="optusername" column="optusername"/>
+            <result property="desc" column="description"/>
+            <result property="createtime" column="createtime"/>
+        </resultMap>
+
+        <sql id="edu_user_cashout_opt_record_columns">
+            edu_user_cashout_opt_record.id,
+            edu_user_cashout_opt_record.cash_out_id,
+            edu_user_cashout_opt_record.type,
+            edu_user_cashout_opt_record.optuser,
+            edu_user_cashout_opt_record.optusername,
+            edu_user_cashout_opt_record.description,
+            edu_user_cashout_opt_record.createtime
+        </sql>
+
+        <sql id="edu_user_cashout_opt_record_properties">
+            #{id},
+            #{cashoutId},
+            #{type},
+            #{optuser},
+            #{optusername},
+            #{desc},
+            #{createtime}
+        </sql>
+
+		<!-- 添加操作记录 -->
+        <insert id="createCashOutOptRecord" parameterType="CashOutOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_cashout_opt_record (<include refid="edu_user_cashout_opt_record_columns"/>) VALUES (<include refid="edu_user_cashout_opt_record_properties"/>)
+        </insert>
+		
+		<!-- 通过Id删除操作记录 -->
+        <delete id="deleteCashOutOptRecordById" parameterType="Long">
+            delete from edu_user_cashout_opt_record
+            where
+                id = #{value}
+        </delete>
+		
+		<!-- 修改操作记录 -->
+        <update id="updateCashOutOptRecord" parameterType="CashOutOptRecord">
+            update edu_user_cashout_opt_record SET
+                id = #{id},
+                cash_out_id = #{cashoutId},
+                type = #{type},
+                optuser = #{optuser},
+                optusername = #{optusername},
+                description = #{desc},
+                createtime = #{createtime}
+            where
+                id = #{id}
+        </update>
+
+		<!-- 通过Id查询操作记录详情 -->
+        <select id="getCashOutOptRecordById" resultMap="CashOutOptRecordResult" parameterType="Long">
+            select
+            <include refid="edu_user_cashout_opt_record_columns"/>
+            from edu_user_cashout_opt_record
+            where
+                id = #{value}
+        </select>
+		
+		<!-- 根据条件分页查询操作记录 -->
+        <select id="getCashOutOptRecordList" resultMap="CashOutOptRecordResult" parameterType="java.util.Map">
+            select
+            <include refid="edu_user_cashout_opt_record_columns"/>
+            from edu_user_cashout_opt_record
+            <where>
+            	<if test="e.optusername != null and e.optusername != ''">
+            		and edu_user_cashout_opt_record.optusername LIKE CONCAT('%',#{e.optusername},'%')
+            	</if>
+            	<if test="e.cashoutId != null and e.cashoutId != '' and e.cashoutId != 0">
+            		and edu_user_cashout_opt_record.cash_out_id = #{e.cashoutId}
+            	</if>
+            </where>
+            order by edu_user_cashout_opt_record.createtime desc
+            <include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getCashOutOptRecordListCount" resultType="int" parameterType="java.util.Map">
+            select
+            count(1)
+            from edu_user_cashout_opt_record
+            <where>
+            	<if test="e.optusername != null and e.optusername != ''">
+            		and edu_user_cashout_opt_record.optusername LIKE CONCAT('%',#{e.optusername},'%')
+            	</if>
+            	<if test="e.cashoutId != null and e.cashoutId != '' and e.cashoutId != 0">
+            		and edu_user_cashout_opt_record.cash_out_id = #{e.cashoutId}
+            	</if>
+            </where>
+            order by edu_user_cashout_opt_record.createtime desc
+        </select>
+        
+</mapper>

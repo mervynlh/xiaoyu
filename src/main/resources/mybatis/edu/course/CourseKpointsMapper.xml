@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseKpointsMapper">
+
+        <resultMap id="CourseKpointsResult" type="CourseKpoints">
+            <result property="id" column="id"/>
+            <result property="courseId" column="course_id"/>
+            <result property="teacherId" column="teacher_id"/>
+            <result property="name" column="name"/>
+            <result property="addTime" column="add_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="status" column="status"/>
+            <result property="sort" column="sort"/>
+            <result property="beginTime" column="begin_time"/>
+            <result property="endTime" column="end_time"/>
+            <result property="details" column="details"/>
+            <result property="meetingId" column="meeting_id"/>
+            <result property="meetingUrl" column="meeting_url"/>
+            <result property="meetingStatus" column="meeting_status"/>
+        </resultMap>
+		
+        <sql id="course_kpoints_columns">
+            edu_course_kpoints.id,
+            edu_course_kpoints.course_id,
+            edu_course_kpoints.teacher_id,
+            edu_course_kpoints.name,
+            edu_course_kpoints.add_time,
+            edu_course_kpoints.update_time,
+            edu_course_kpoints.status,
+            edu_course_kpoints.sort,
+            edu_course_kpoints.begin_time,
+            edu_course_kpoints.end_time,
+            edu_course_kpoints.details,
+            edu_course_kpoints.meeting_id,
+            edu_course_kpoints.meeting_url,
+            edu_course_kpoints.meeting_status
+        </sql>
+
+        <sql id="course_kpoints_properties">
+            #{id},
+            #{courseId},
+            #{teacherId},
+            #{name},
+            #{addTime},
+            #{updateTime},
+            #{status},
+            #{sort},
+            #{beginTime},
+            #{endTime},
+            #{details},
+            #{meetingId},
+            #{meetingUrl},
+            #{meetingStatus}
+        </sql>
+
+		<insert id="createCoursekpoints" parameterType="CourseKpoints" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+			insert into edu_course_kpoints (<include refid="course_kpoints_columns"/>) values(<include refid="course_kpoints_properties"/>)
+		</insert>
+		
+		<select id="queryKpointsByCourseId" parameterType="Long" resultMap="CourseKpointsResult">
+			select <include refid="course_kpoints_columns"/>
+			from edu_course_kpoints
+			where course_id=#{value}
+			order by sort desc,add_time desc
+		</select>
+		<select id="queryKpointsById" parameterType="Long" resultMap="CourseKpointsResult">
+			select <include refid="course_kpoints_columns"/>
+			from edu_course_kpoints
+			where id=#{value}
+		</select>
+		
+		<delete id="delKpointById" parameterType="Long">
+			delete from edu_course_kpoints where id=#{value}
+		</delete>
+		
+		<!-- 根据课程id删除课节 -->
+		<delete id="delByCourseId" parameterType="Long">
+			delete from edu_course_kpoints where course_id=#{value}
+		</delete>
+		
+		<!-- 查询时间是否冲突 -->
+		<select id="queryConflictTime" parameterType="CourseKpoints" resultType="int">
+			select count(1) from edu_course_kpoints
+			where  ((date_add(#{beginTime},  interval -1 second)>=begin_time and end_time>=date_add(#{beginTime},  interval 1 second)) 
+					or
+			(date_add( #{endTime},  interval -1 second)>=begin_time and end_time>=date_add( #{endTime},  interval 1 second))
+				or
+				(<![CDATA[#{beginTime}<=begin_time and end_time<=#{endTime} ]]>)
+			)
+			<if test="id>0">
+				and id!=#{id}
+			</if>
+			and teacher_id=#{teacherId}
+		</select>
+		
+		<update id="updateKpoint" parameterType="CourseKpoints">
+			update edu_course_kpoints set
+			name=#{name},
+			update_time=#{updateTime},
+			sort=#{sort},
+			begin_time=#{beginTime},
+			end_time=#{endTime},
+			details=#{details}
+			where id=#{id}
+		</update>
+		<!-- 查询班课开课状态 -->
+		<select id="queryOpenStatu" parameterType="Long" resultType="int">
+			<![CDATA[select min(begin_time)>now() from edu_course_kpoints where course_id=#{value}]]>
+		</select>
+</mapper>

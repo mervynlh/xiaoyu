@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxorderMapper">
+
+	<resultMap id="TrxorderResult" type="Trxorder">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="createTime" column="create_time" />
+		<result property="payTime" column="pay_time" />
+		<result property="orderAmount" column="order_amount" />
+		<result property="minusAmount" column="minus_amount" />
+		<result property="couponAmount" column="coupon_amount" />
+		<result property="amount" column="amount" />
+		<result property="cashAmount" column="cash_amount" />
+		<result property="vmAmount" column="vm_amount" />
+		<result property="couponCodeId" column="couponCode_id" />
+		<result property="requestId" column="request_id" />
+		<result property="trxStatus" column="trx_status" />
+		<result property="payType" column="pay_type" />
+		<result property="reqChannel" column="req_channel" />
+		<result property="description" column="description" />
+		<result property="version" column="version" />
+		<result property="reqIp" column="req_ip" />
+		<result property="studentName" column="student_name" />
+		<result property="mobile" column="mobile" />
+		<result property="remarks" column="remarks" />
+		<result property="lessionNum" column="lession_num" />
+		<result property="courseId" column="course_id" />
+		<result property="courseName" column="course_name" />
+		<result property="loseTime" column="lose_time" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="lessionOver" column="lession_over" />
+		<result property="courseModel" column="course_model"/>
+		<result property="studyAddress" column="study_address"/>
+	</resultMap>
+	<resultMap type="TrxOrderDTO" id="ContractDetailed">
+		<result property="requestId" column="requestId" />
+		<result property="teacherId" column="teacher_id"/>
+		<result property="orderAmount" column="orderAmount" />
+		<result property="amount" column="amount" />
+		<result property="couponAmount" column="couponAmount" />
+		<result property="createTime" column="createTime" />
+		<result property="payTime" column="payTime" />
+		<result property="trxStatus" column="trxStatus" />
+		<result property="payType" column="pay_type" />
+		<result property="id" column="orderId" />
+		<result property="mobile" column="mobile" />
+		<result property="courseModel" column="course_model" />
+		<result property="teacherName" column="teacherName" />
+		<result property="studentName" column="studentName" />
+		<result property="lessionOver" column="lessionOver" />
+		<result property="lessionNum" column="lessionNum" />
+		<result property="courseName" column="courseName" />
+		<collection property="trxorderDetailList" ofType="TrxorderDetailDTO">
+			<result column="currentPrice" property="currentPirce" />
+			<result column="courseName" property="courseName" />
+			<result column="courseImgUrl" property="courseImgUrl" />
+			<result column="lessionNum" property="lessionNum" />
+		</collection>
+	</resultMap>
+	<resultMap type="Course" id="TrxCourseResult">
+		<result property="id" column="courseId" />
+		<result property="name" column="name" />
+		<result property="isavaliable" column="isavaliable" />
+		<result property="addtime" column="addtime" />
+		<result property="sourceprice" column="sourceprice" />
+		<result property="currentprice" column="currentprice" />
+		<result property="title" column="title" />
+		<result property="lessionnum" column="lessionnum" />
+		<result property="coursetag" column="coursetag" />
+		<result property="logo" column="logo" />
+		<result property="updateTime" column="update_time" />
+		<result property="losetype" column="losetype" />
+		<result property="loseAbsTime" column="lose_abs_time" />
+		<result property="loseTime" column="lose_time" />
+		<result property="updateuser" column="updateuser" />
+		<result property="pageBuycount" column="page_buycount" />
+		<result property="pageViewcount" column="page_viewcount" />
+		<result property="freeurl" column="freeurl" />
+		<result property="sellType" column="sell_type" />
+	</resultMap>
+
+	<resultMap type="TrxorderExpand" id="TrxorderExpandResult">
+		<result property="trxStatus" column="trx_status" />
+		<result property="sellType" column="sell_type" />
+		<result property="id" column="trxorderId" />
+		<result property="requestId" column="request_id" />
+		<result property="courseName" column="course_name" />
+		<result property="lessionNum" column="lession_num" />
+		<result property="lessionOver" column="lession_over" />
+		<result property="amount" column="amount" />
+		<result property="createTime" column="create_time" />
+		<result property="subjectMajorStr" column="subject_major_str" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="studentName" column="studentName" />
+		<result property="userId" column="user_id" />
+	</resultMap>
+	<sql id="edu_trxorder_columns">
+		edu_trxorder.id,
+		edu_trxorder.user_id,
+		edu_trxorder.create_time,
+		edu_trxorder.pay_time,
+		edu_trxorder.order_amount,
+		edu_trxorder.minus_amount,
+		edu_trxorder.coupon_amount,
+		edu_trxorder.amount,
+		edu_trxorder.cash_amount,
+		edu_trxorder.vm_amount,
+		edu_trxorder.couponCode_id,
+		edu_trxorder.request_id,
+		edu_trxorder.trx_status,
+		edu_trxorder.pay_type,
+		edu_trxorder.req_channel,
+		edu_trxorder.description,
+		edu_trxorder.version,
+		edu_trxorder.req_ip,
+		edu_trxorder.student_name,
+		edu_trxorder.mobile,
+		edu_trxorder.remarks,
+		edu_trxorder.lession_num,
+		edu_trxorder.course_id,
+		edu_trxorder.course_name,
+		edu_trxorder.lose_time,
+		edu_trxorder.teacher_id,
+		edu_trxorder.lession_over,
+		edu_trxorder.course_model,
+		edu_trxorder.study_address,
+		edu_trxorder.eva_num,
+		edu_trxorder.assess_teatostu,
+		edu_trxorder.assess_stutotea
+	</sql>
+
+
+	<sql id="edu_trxorder_properties">
+		#{id},
+		#{userId},
+		#{createTime},
+		#{payTime},
+		#{orderAmount},
+		#{minusAmount},
+		#{couponAmount},
+		#{amount},
+		#{cashAmount},
+		#{vmAmount},
+		#{couponCodeId},
+		#{requestId},
+		#{trxStatus},
+		#{payType},
+		#{reqChannel},
+		#{description},
+		#{version},
+		#{reqIp},
+		#{studentName},
+		#{mobile},
+		#{remarks},
+		#{lessionNum},
+		#{courseId},
+		#{courseName},
+		#{loseTime},
+		#{teacherId},
+		#{lessionOver},
+		#{courseModel},
+		#{studyAddress},
+		#{evaNum},
+		#{assessTeatostu},
+		#{assessStutotea}
+	</sql>
+
+	<insert id="createTrxorder" parameterType="Trxorder" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_trxorder (
+		<include refid="edu_trxorder_columns" />
+		) VALUES (
+		<include refid="edu_trxorder_properties" />
+		)
+	</insert>
+
+	<delete id="deleteTrxorderById" parameterType="Long">
+		delete from
+		edu_trxorder
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateTrxorder" parameterType="Trxorder">
+		update edu_trxorder
+		SET
+		pay_time = #{payTime},
+		order_amount = #{orderAmount},
+		minus_amount = #{minusAmount},
+		coupon_amount =
+		#{couponAmount},
+		amount = #{amount},
+		cash_amount = #{cashAmount},
+		vm_amount = #{vmAmount},
+		couponCode_id = #{couponCodeId},
+		request_id =
+		#{requestId},
+		trx_status = #{trxStatus},
+		pay_type = #{payType},
+		req_channel = #{reqChannel},
+		description = #{description},
+		version =
+		#{version},
+		req_ip = #{reqIp}
+		where
+		id = #{id}
+	</update>
+	<!-- 更新Assess TeaToStu-->
+	<update id="updateTrxorderAssessTeaToStu" parameterType="Trxorder">
+		update edu_trxorder set
+			edu_trxorder.assess_teatostu = #{assessTeatostu}
+		where edu_trxorder.id = #{id}
+	</update>
+	<!-- 更新Assess StuToTea-->
+	<update id="updateTrxorderAssessStuToTea" parameterType="Trxorder">
+		update edu_trxorder set
+			edu_trxorder.assess_stutotea = #{assessStutotea}
+		where edu_trxorder.id = #{id}
+	</update>
+	<!-- 修改订单状态 -->
+	<update id="updateTrxorderTrxStatus" parameterType="Map">
+		update edu_trxorder
+		SET
+		trx_status = #{trxStatus}
+		where id = #{id}
+	</update>
+	
+	<!-- 完成课时+1 -->
+	<update id="updateTrxorderLessionOverAdd" parameterType="Long">
+		update edu_trxorder
+		SET
+		edu_trxorder.lession_over = edu_trxorder.lession_over + 1
+		where edu_trxorder.id = #{id}
+	</update>
+	
+	<select id="getTrxorderById" resultMap="TrxorderResult"
+		parameterType="Long">
+		select
+		<include refid="edu_trxorder_columns" />
+		from edu_trxorder
+		where
+		id = #{value}
+	</select>
+
+	<resultMap id="QueryTrxorderResult" type="QueryTrxorder"
+		extends="TrxorderResult">
+		<result property="userName" column="nickname" />
+		<result property="email" column="email" />
+		<result property="mobile" column="mobile" />
+		<result property="evaNum" column="eva_num" />
+	</resultMap>
+	<resultMap id="QueryTrxorderCodeResult" type="QueryTrxorder"
+		extends="QueryTrxorderResult">
+		<result property="couponCode" column="coupon_code" />
+	</resultMap>
+	
+	<select id="getTrxorderList" resultMap="TrxorderResult"
+		parameterType="Trxorder">
+		select
+		<include refid="edu_trxorder_columns" />
+		from edu_trxorder
+		<where>
+			<if test="assessTeatostu!=null">
+				and edu_trxorder.assess_teatostu = #{assessTeatostu}
+			</if>
+			<if test="assessStutotea!=null">
+				and edu_trxorder.assess_stutotea = #{assessStutotea}
+			</if>
+			<if test="userId!=null">
+				and edu_trxorder.user_id = #{userId}
+			</if>
+			<if test="teacherId!=null">
+				and edu_trxorder.teacher_id = #{teacherId}
+			</if>
+			<if test="trxStatus!=null and trxStatus!=''">
+				and edu_trxorder.trx_status = #{trxStatus}
+			</if>
+		</where>
+	</select>
+	<!-- 根据requestId获取单个订单的信息 支付回调使用 -->
+	<select id="getTrxorderByRequestId" resultMap="TrxorderResult"
+		parameterType="String">
+		select
+		<include refid="edu_trxorder_columns" />
+		from edu_trxorder
+		where
+		request_id = #{requestId}
+	</select>
+
+	<!-- 更新订单状态为成功，网银回调 -->
+	<update id="updateTrxorderStatusSuccess" parameterType="Trxorder">
+		update
+		edu_trxorder
+		set
+		pay_time = #{payTime},
+		cash_amount = #{cashAmount},
+		vm_amount = #{vmAmount},
+		trx_status = #{trxStatus},
+		pay_type =
+		#{payType},
+		version =version+1
+		where request_id = #{requestId}
+		and
+		version = #{version}
+
+	</update>
+
+	<!-- 订单详情 -->
+	<select id="getOrderInfoById" resultMap="TrxorderResult"
+		parameterType="Long">
+		select
+		<include refid="edu_trxorder_columns" />
+		,
+		user_user.nickname,
+		user_user.email,
+		edu_coupon_code.coupon_code
+		from
+		edu_trxorder
+		left join user_user on edu_trxorder.user_id=user_user.id
+		left join edu_coupon_code on
+		edu_trxorder.couponCode_id=edu_coupon_code.id
+		where
+		edu_trxorder.id=#{value}
+	</select>
+
+	<!-- 根据条件分页查询订单列表 -->
+	<select id="queryOrderPageResult" resultMap="QueryTrxorderResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_trxorder_columns" />
+		,user_expand.realname as nickname,user_user.email,
+		user_user.mobile
+		from edu_trxorder
+		left join user_user on edu_trxorder.user_id=user_user.id
+		left join user_expand on user_user.id = user_expand.user_id
+		<where>
+			<if test="e.email!=null and e.email!=''">
+				and <![CDATA[ user_user.email=#{e.email}]]>
+			</if>
+			<if test="e.mobile!=null and e.mobile!=''">
+				and <![CDATA[ user_user.mobile=#{e.mobile}]]>
+			</if>
+			<if test="e.userName!=null and e.userName!=''">
+				and <![CDATA[ user_user.nickname=#{e.userName}]]>
+			</if>
+			<if test="e.requestId!=null and e.requestId!=''">
+				and <![CDATA[ edu_trxorder.request_id=#{e.requestId}]]>
+			</if>
+			<if test="e.userId!=null and e.userId!=''">
+				and  <![CDATA[ edu_trxorder.user_id=#{e.userId}]]>
+			</if>
+			<if test="e.trxStatus!=null and e.trxStatus!=''">
+				and <![CDATA[ edu_trxorder.trx_status=#{e.trxStatus}]]>
+			</if>
+			<if test="e.payType!=null and e.payType!=''">
+				and <![CDATA[ edu_trxorder.pay_type=#{e.payType}]]>
+			</if>
+			<if test="e.startCreateTime!=null ">
+				and <![CDATA[ edu_trxorder.create_time>=#{e.startCreateTime}]]>
+			</if>
+			<if test="e.endCreateTime!=null ">
+				and <![CDATA[ edu_trxorder.create_time<=#{e.endCreateTime}]]>
+			</if>
+			<if test="e.startPayTime!=null ">
+				and <![CDATA[ edu_trxorder.pay_time>=#{e.startPayTime}]]>
+			</if>
+			<if test="e.endPayTime!=null ">
+				and <![CDATA[ edu_trxorder.pay_time<=#{e.endPayTime}]]>
+			</if>
+			<if test="e.teacherId!=null and e.teacherId>0">
+				and <![CDATA[ edu_trxorder.teacher_id=#{e.teacherId}]]>
+			</if>
+			<if test="e.courseId>0">
+				and course_id=#{e.courseId}
+			</if>
+		</where>
+		order by edu_trxorder.create_time desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryOrderPageResultCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(1)
+		from edu_trxorder
+		left join user_user on edu_trxorder.user_id=user_user.id
+		left join user_expand on user_user.id = user_expand.user_id
+		<where>
+			<if test="e.email!=null and e.email!=''">
+				and  <![CDATA[ user_user.email=#{e.email}]]>
+			</if>
+			<if test="e.mobile!=null and e.mobile!=''">
+				and <![CDATA[ user_user.mobile=#{e.mobile}]]>
+			</if>
+			<if test="e.userName!=null and e.userName!=''">
+				and <![CDATA[ user_user.nickname=#{e.userName}]]>
+			</if>
+			<if test="e.requestId!=null and e.requestId!=''">
+				and <![CDATA[ edu_trxorder.request_id=#{e.requestId}]]>
+			</if>
+			<if test="e.userId!=null and e.userId!=''">
+				and  <![CDATA[ edu_trxorder.user_id=#{e.userId}]]>
+			</if>
+			<if test="e.trxStatus!=null and e.trxStatus!=''">
+				and <![CDATA[ edu_trxorder.trx_status=#{e.trxStatus}]]>
+			</if>
+			<if test="e.payType!=null and e.payType!=''">
+				and <![CDATA[ edu_trxorder.pay_type=#{e.payType}]]>
+			</if>
+			<if test="e.startCreateTime!=null ">
+				and <![CDATA[ edu_trxorder.create_time>=#{e.startCreateTime}]]>
+			</if>
+			<if test="e.endCreateTime!=null ">
+				and <![CDATA[ edu_trxorder.create_time<=#{e.endCreateTime}]]>
+			</if>
+			<if test="e.startPayTime!=null ">
+				and <![CDATA[ edu_trxorder.pay_time>=#{e.startPayTime}]]>
+			</if>
+			<if test="e.endPayTime!=null ">
+				and <![CDATA[ edu_trxorder.pay_time<=#{e.endPayTime}]]>
+			</if>
+			<if test="e.teacherId!=null and e.teacherId>0">
+				and <![CDATA[ edu_trxorder.teacher_id=#{e.teacherId}]]>
+			</if>
+			<if test="e.courseId>0">
+				and course_id=#{e.courseId}
+			</if>
+		</where>
+	</select>
+	<!-- 个人中订单信息 -->
+	<select id="queryOrderForUc" resultMap="ContractDetailed"
+		parameterType="java.util.HashMap">
+		select DISTINCT
+		edu_trxorder.request_id requestId,
+		edu_trxorder.teacher_id,
+		IFNULL(edu_trxorder.order_amount,0) as orderAmount,
+		IFNULL(edu_trxorder.amount,0) as amount,
+		IFNULL(edu_trxorder.lession_num,0) as lessionNum,
+		IFNULL(edu_trxorder.lession_over,0) as lessionOver,
+		edu_trxorder.id as
+		orderId,
+		edu_trxorder.create_time as createTime,
+		edu_trxorder.pay_time
+		as payTime,
+		edu_trxorder.trx_status as trxStatus,
+		edu_trxorder.pay_type,
+		edu_trxorder.course_model,
+		edu_trxorder.coupon_amount as couponAmount,
+		edu_course.logo as
+		courseImgUrl,
+		edu_course.name as courseName,
+		edu_course.title as
+		courseTitle,
+		edu_trxorder_detail.current_price,
+		a.realname as
+		teacherName,
+		b.realname as studentName
+		from edu_trxorder
+		left join
+		user_user on edu_trxorder.user_id=user_user.id
+		left join
+		`edu_trxorder_detail` on edu_trxorder.id =
+		edu_trxorder_detail.trxorder_id
+		left join edu_course on edu_course.id =
+		edu_trxorder.course_id
+		left join edu_teacher on edu_trxorder.teacher_id
+		= edu_teacher.id
+		left join user_expand a on edu_teacher.user_id =
+		a.user_id
+		left join user_expand b on edu_trxorder.user_id = b.user_id
+		<where>
+			<if test="e.userId!=null and e.userId!=''">
+				AND       <![CDATA[ edu_trxorder.user_id=#{e.userId}]]>
+			</if>
+			<if test="e.teacherId!=null and e.teacherId!=''">
+				AND       <![CDATA[ edu_trxorder.teacher_id=#{e.teacherId}]]>
+			</if>
+			<if test="e.payType!=null and e.payType!=''">
+				AND      <![CDATA[ edu_trxorder.trx_status=#{e.payType}]]>
+			</if>
+			<if test="e.id!=null and e.id!=''">
+				AND      <![CDATA[ edu_trxorder.id=#{e.id}]]>
+			</if>
+			<if
+				test="e.trxStatus != null and e.trxStatus != '' and e.trxStatus != 'all'">
+				AND      <![CDATA[ edu_trxorder.trx_status = #{e.trxStatus}]]>
+			</if>
+		</where>
+		order by edu_trxorder.create_time desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="queryOrderForUcCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select count(DISTINCT edu_trxorder.request_id)
+		from edu_trxorder
+		left
+		join user_user on
+		edu_trxorder.user_id=user_user.id
+		left join
+		`edu_trxorder_detail` on
+		edu_trxorder.id =
+		edu_trxorder_detail.trxorder_id
+		left join edu_course
+		on edu_course.id =
+		edu_trxorder.course_id
+		left join edu_teacher on
+		edu_trxorder.teacher_id
+		= edu_teacher.id
+		left join user_expand a on
+		edu_teacher.user_id =
+		a.user_id
+		left join user_expand b on
+		edu_trxorder.user_id = b.user_id
+		<where>
+			<if test="e.payType!=null and e.payType!=''">
+				AND    <![CDATA[ edu_trxorder.trx_status=#{e.payType}]]>
+			</if>
+			<if test="e.userId!=null and e.userId!=''">
+				AND      <![CDATA[ edu_trxorder.user_id=#{e.userId}]]>
+			</if>
+			<if test="e.teacherId!=null and e.teacherId!=''">
+				AND       <![CDATA[ edu_trxorder.teacher_id=#{e.teacherId}]]>
+			</if>
+			<if test="e.id!=null and e.id!=''">
+				AND      <![CDATA[ edu_trxorder.id=#{e.id}]]>
+			</if>
+			<if
+				test="e.trxStatus != null and e.trxStatus != '' and e.trxStatus != 'all'">
+				AND      <![CDATA[ edu_trxorder.trx_status = #{e.trxStatus}]]>
+			</if>
+		</where>
+	</select>
+	<!-- 订单id查询流水的课程集合 -->
+	<select id="getTrxCourseByRequestId" parameterType="String"
+		resultMap="TrxCourseResult">
+		SELECT
+		edu_course.id as courseId,
+		edu_course.name,
+		edu_course.isavaliable,
+		edu_course.addtime,
+		edu_course.sourceprice,
+		edu_course.currentprice,
+		edu_course.title,
+		edu_course.lessionnum,
+		edu_course.coursetag,
+		edu_course.logo,
+		edu_course.update_time,
+		edu_course.losetype,
+		edu_course.lose_abs_time,
+		edu_course.lose_time,
+		edu_course.updateuser,
+		edu_course.page_buycount,
+		edu_course.page_viewcount,
+		edu_course.freeurl,
+		edu_course.sell_type
+		from
+		edu_course
+		WHERE
+		edu_course.id IN (SELECT trx.course_id from
+		edu_trxorder_detail as trx
+		WHERE trx.request_id=#{value})
+	</select>
+	<!-- 获得网站订单数和销售额 -->
+	<select id="getOrderTotalAndSales" resultType="Map">
+		SELECT
+		COUNT(edu_trxorder.`id`) orderNum,
+		SUM(amount) salesNum
+		FROM
+		edu_trxorder
+		WHERE edu_trxorder.trx_status='SUCCESS' AND
+		edu_trxorder.pay_type!='FREE' AND edu_trxorder.pay_type!='INTEGRAL'
+	</select>
+
+	<select id="getTrxorderUnPay" resultMap="TrxorderResult">
+		select
+		<include refid="edu_trxorder_columns" />
+		from edu_trxorder
+		where
+		trx_status = 'INIT'
+	</select>
+	<!-- 更新订单状态为已过期，定时调用 -->
+	<update id="updateTrxorderStatus" parameterType="Trxorder">
+		update
+		edu_trxorder
+		set
+		trx_status = #{trxStatus},
+		version =version+1
+
+		where
+		request_id = #{requestId}
+
+	</update>
+	<delete id="deleteOrderOverStatus" parameterType="Date">
+		delete from edu_trxorder where 
+		<![CDATA[ create_time<=#{date}]]>
+		and trx_status = 'OVER'
+	</delete>
+	<!-- 查询订单详情 -->
+	<select id="getTrxorderExpandById" parameterType="Long"
+		resultMap="TrxorderExpandResult">
+		select
+		edu_trxorder.trx_status,
+		edu_trxorder.create_time,
+		edu_trxorder.request_id,
+		edu_trxorder.course_name,
+		edu_course.sell_type,
+		edu_course.subject_major_str,
+		edu_trxorder.lession_num,
+		edu_trxorder.lession_over,
+		edu_trxorder.amount,
+		edu_trxorder.id,
+		edu_trxorder.teacher_id,
+		edu_trxorder.user_id
+		from
+		edu_trxorder
+		left join edu_course on edu_trxorder.course_id = edu_course.id
+		where
+		edu_trxorder.id = #{value}
+	</select>
+	<!-- 查询订单详情列表 -->
+	<select id="getTrxorderExpandByTeacherId" parameterType="java.util.HashMap"
+		resultMap="TrxorderExpandResult">
+		select
+		edu_trxorder.id,
+		edu_course.sell_type,
+		edu_course.subject_major_str,
+		edu_trxorder.lession_num,
+		user_user.nickname as studentName,
+		edu_trxorder.teacher_id
+		from edu_trxorder
+		left join edu_course on edu_trxorder.course_id = edu_course.id
+		left join user_user on edu_trxorder.user_id = user_user.id
+		where  edu_trxorder.trx_status = 'FINISH' 
+		and 	edu_trxorder.teacher_id = #{e.teacherId}
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getTrxorderExpandByTeacherIdCount" parameterType="java.util.HashMap"
+		resultType="int">
+		select
+		count(1)
+		from edu_trxorder
+		left join edu_course on edu_trxorder.course_id = edu_course.id
+		where  edu_trxorder.trx_status = 'FINISH' 
+		and 	edu_trxorder.teacher_id = #{e.teacherId}
+	</select>
+	
+	<select id="getTeacherStudents" parameterType="Trxorder" resultMap="TrxorderResult">
+		select 
+		<include refid="edu_trxorder_columns"/>
+		from edu_trxorder
+		<where>
+			and edu_trxorder.trx_status = "SUCCESS" 
+			<if test="teacherId!=null and teacherId>0">
+				and edu_trxorder.teacher_id = #{teacherId}
+			</if>
+			<if test="userId!=null and userId>0">
+				and edu_trxorder.user_id = #{userId}
+			</if>
+		</where>
+	</select>
+	<!-- 首页订单展示 -->
+	<select id="indexOrder" resultMap="ContractDetailed">
+		select 
+		edu_trxorder.teacher_id, 
+		users.realname as studentName,
+		user_user.mobile,
+		edu_trxorder.course_name as courseName,
+   		edu_trxorder.lession_num as lessionNum,
+		teachers.realname as teacherName
+		from edu_trxorder
+		left join user_expand as users on users.user_id=edu_trxorder.user_id
+ 	    left join user_user on users.user_id = user_user.id
+		left join edu_teacher on edu_teacher.id=edu_trxorder.teacher_id
+   		left join user_expand as teachers on teachers.user_id=edu_teacher.user_id
+		where 1=1 and trx_status='SUCCESS' 
+		order by pay_time desc
+		limit 0,12
+	</select>
+	<!-- 查询该用户是否已报名 -->
+	<select id="queryUserIsJoin" parameterType="java.util.Map" resultType="int">
+		select count(1) from edu_trxorder where user_id=#{userId} and course_id=#{courseId} and trx_status=#{trxStatus}
+	</select>
+</mapper>

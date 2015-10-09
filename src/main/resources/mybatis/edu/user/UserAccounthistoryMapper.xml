@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAccounthistoryMapper">
+
+	<resultMap id="UserAccounthistoryResult" type="UserAccounthistory">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="trxorderId" column="trxorder_id" />
+		<result property="requestId" column="request_id" />
+		<result property="outTradeNo" column="out_trade_no" />
+		<result property="accountId" column="account_id" />
+		<result property="createTime" column="create_time" />
+		<result property="isDisplay" column="is_display" />
+		<result property="balance" column="balance" />
+		<result property="cashAmount" column="cash_amount" />
+		<result property="vmAmount" column="vm_amount" />
+		<result property="trxAmount" column="trx_amount" />
+		<result property="description" column="description" />
+		<result property="actHistoryType" column="act_history_type" />
+		<result property="bizType" column="biz_type" />
+		<result property="version" column="version" />
+	</resultMap>
+
+	<sql id="edu_user_accounthistory_columns">
+		edu_user_accounthistory.id,
+		edu_user_accounthistory.user_id,
+		edu_user_accounthistory.trxorder_id,
+		edu_user_accounthistory.request_id,
+		edu_user_accounthistory.out_trade_no,
+		edu_user_accounthistory.account_id,
+		edu_user_accounthistory.create_time,
+		edu_user_accounthistory.is_display,
+		edu_user_accounthistory.balance,
+		edu_user_accounthistory.trx_amount,
+		edu_user_accounthistory.cash_amount,
+		edu_user_accounthistory.vm_amount,
+		edu_user_accounthistory.description,
+		edu_user_accounthistory.act_history_type,
+		edu_user_accounthistory.biz_type,
+		edu_user_accounthistory.version
+	</sql>
+
+	<sql id="edu_user_accounthistory_properties">
+		#{id},
+		#{userId},
+		#{trxorderId},
+		#{requestId},
+		#{outTradeNo},
+		#{accountId},
+		#{createTime},
+		#{isDisplay},
+		#{balance},
+		#{trxAmount},
+		#{cashAmount},
+		#{vmAmount},
+		#{description},
+		#{actHistoryType},
+		#{bizType},
+		#{version}
+	</sql>
+
+	<insert id="createUserAccounthistory" parameterType="UserAccounthistory"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_accounthistory (
+		<include refid="edu_user_accounthistory_columns" />
+		) VALUES (
+		<include refid="edu_user_accounthistory_properties" />
+		)
+	</insert>
+
+	<select id="getUserAccounthistoryById" resultMap="UserAccounthistoryResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_accounthistory_columns" />
+		from edu_user_accounthistory
+		where
+		user_id = #{value}
+
+	</select>
+	
+	<select id="getUserAccounthistoryByOutTtradeNo" resultMap="UserAccounthistoryResult" parameterType="String">
+		select
+		<include refid="edu_user_accounthistory_columns" />
+		from edu_user_accounthistory
+		where
+		out_trade_no = #{value} and out_trade_no != ''
+
+	</select>
+	
+	<select id="getUserAccounthistoryList" resultMap="UserAccounthistoryResult"
+		parameterType="UserAccounthistory">
+		select
+		<include refid="edu_user_accounthistory_columns" />
+		from edu_user_accounthistory
+		<where>
+			<if test="userId != null and userId!=''">
+				and edu_user_accounthistory.user_id = #{userId}
+			</if>
+		</where>
+	</select>
+
+
+	<select id="getUserAccounthistoryListByCondition" resultMap="UserAccounthistoryResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_user_accounthistory_columns" />
+		from edu_user_accounthistory
+		<where>
+			<if test="e.userId != null and e.userId!=''">
+				edu_user_accounthistory.user_id = #{e.userId}
+			</if>
+			<if test="e.bizType != null and e.bizType!=''">
+				and edu_user_accounthistory.biz_type = #{e.bizType}
+			</if>
+			<if test="e.actHistoryType != null and e.actHistoryType!=''">
+				and edu_user_accounthistory.act_history_type = #{e.actHistoryType}
+			</if>
+			<if test="e.startTime!=null">
+				and  <![CDATA[  edu_user_accounthistory.create_time >= #{e.startTime} ]]>
+			</if>
+			<if test="e.endTime!=null">
+			 and <![CDATA[ edu_user_accounthistory.create_time <= #{e.endTime}]]>
+			</if>
+		</where>
+		order by edu_user_accounthistory.create_time DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getUserAccounthistoryListByConditionCount" resultType="int" parameterType="java.util.HashMap">
+		select
+		count(*)
+		from edu_user_accounthistory
+		<where>
+			<if test="e.userId != null and e.userId!=''">
+				edu_user_accounthistory.user_id = #{e.userId}
+			</if>
+			<if test="e.bizType != null and e.bizType!=''">
+				and edu_user_accounthistory.biz_type = #{e.bizType}
+			</if>
+			<if test="e.actHistoryType != null and e.actHistoryType!=''">
+				and edu_user_accounthistory.act_history_type = #{e.actHistoryType}
+			</if>
+			<if test="e.startTime!=null">
+				and  <![CDATA[  edu_user_accounthistory.create_time >= #{e.startTime} ]]>
+			</if>
+			<if test="e.endTime!=null">
+			 and <![CDATA[ edu_user_accounthistory.create_time <= #{e.endTime}]]>
+			</if>
+		</where>
+	</select>
+	
+	<!-- 个人中心账户历史，隐藏后台操作 -->
+	<select id="getWebUserAccounthistoryListByCondition" resultMap="UserAccounthistoryResult" parameterType="java.util.HashMap">
+		select
+		<include refid="edu_user_accounthistory_columns" />
+		from edu_user_accounthistory
+		<where>
+			edu_user_accounthistory.is_display=0
+			<if test="e.userId != null and e.userId!=''">
+				and edu_user_accounthistory.user_id = #{e.userId}
+			</if>
+			<if test="e.bizType != null and e.bizType!=''">
+				and edu_user_accounthistory.biz_type = #{e.bizType}
+			</if>
+			<if test="e.actHistoryType != null and e.actHistoryType!=''">
+				and edu_user_accounthistory.act_history_type = #{e.actHistoryType}
+			</if>
+			<if test="e.startTime!=null">
+				and  <![CDATA[  edu_user_accounthistory.create_time >= #{e.startTime} ]]>
+			</if>
+			<if test="e.endTime!=null">
+			 and <![CDATA[ edu_user_accounthistory.create_time <= #{e.endTime}]]>
+			</if>
+		</where>
+		order by edu_user_accounthistory.create_time DESC
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getWebUserAccounthistoryListByConditionCount" resultType="int" parameterType="java.util.HashMap">
+		select
+		count(*)
+		from edu_user_accounthistory
+		<where>
+			edu_user_accounthistory.is_display=0
+			<if test="e.userId != null and e.userId!=''">
+				and edu_user_accounthistory.user_id = #{e.userId}
+			</if>
+			<if test="e.bizType != null and e.bizType!=''">
+				and edu_user_accounthistory.biz_type = #{e.bizType}
+			</if>
+			<if test="e.actHistoryType != null and e.actHistoryType!=''">
+				and edu_user_accounthistory.act_history_type = #{e.actHistoryType}
+			</if>
+			<if test="e.startTime!=null">
+				and  <![CDATA[  edu_user_accounthistory.create_time >= #{e.startTime} ]]>
+			</if>
+			<if test="e.endTime!=null">
+			 and <![CDATA[ edu_user_accounthistory.create_time <= #{e.endTime}]]>
+			</if>
+		</where>
+	</select>
+</mapper>

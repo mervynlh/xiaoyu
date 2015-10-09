@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserLoginLogMapper">
+
+	<resultMap id="UserLoginLogResult" type="UserLoginLog">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="loginIp" column="login_ip" />
+		<result property="loginTime" column="login_time" />
+		<result property="address" column="address" />
+		<result property="osname" column="osname" />
+		<result property="userAgent" column="user_agent" />
+	</resultMap>
+
+	<resultMap type="UserLoginLog" id="UserLoginLogAndInfoResult" extends="UserLoginLogResult">
+		<result property="email" column="email"/>
+	</resultMap>
+	<sql id="user_login_log_columns">
+		user_login_log.id,
+		user_login_log.user_id,
+		user_login_log.login_ip,
+		user_login_log.login_time,
+		user_login_log.address,
+		user_login_log.osname,
+		user_login_log.user_agent
+	</sql>
+
+	<sql id="user_login_log_properties">
+		#{id},
+		#{userId},
+		#{loginIp},
+		#{loginTime},
+		#{address},
+		#{osname},
+		#{userAgent}
+	</sql>
+
+	<insert id="createUserLoginLog" parameterType="UserLoginLog"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO user_login_log (
+		<include refid="user_login_log_columns" />
+		) VALUES (
+		<include refid="user_login_log_properties" />
+		)
+	</insert>
+
+	<update id="updateUserLoginLog" parameterType="UserLoginLog">
+		update user_login_log SET
+		address =#{address}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getUserLoginLogById" resultMap="UserLoginLogResult"
+		parameterType="Long">
+		select
+		<include refid="user_login_log_columns" />
+		from user_login_log
+		where
+		id = #{value}
+
+	</select>
+
+	<select id="getUserLoginLogList" resultMap="UserLoginLogResult"
+		parameterType="UserLoginLog">
+		select
+		<include refid="user_login_log_columns" />
+		from user_login_log where user_login_log.address is null limit 0,10000
+	</select>
+	<!-- 查询前台登陆log -->
+	<select id="getUserLoginLogListPage" parameterType="Map" resultMap="UserLoginLogAndInfoResult">
+		select <include refid="user_login_log_columns" />,
+		user_user.email
+		from user_login_log
+		left join user_user on user_login_log.user_id=user_user.id
+		<where>
+		<if test="e.userId!='' and e.userId!=null">
+		and user_login_log.user_id=#{e.userId}
+		</if>
+		<if test="e.email!=null  and e.email!=''">
+		and user_user.email=#{e.email}
+		</if>
+	 	<if test="e.startDate!='' and e.startDate!=null">
+		and <![CDATA[user_login_log.login_time>=#{e.startDate}]]>
+		</if>
+		<if test=" e.endDate!=null and e.endDate!='' ">
+		and <![CDATA[user_login_log.login_time<=#{e.endDate}]]> 
+		</if>
+		</where>
+		order by user_login_log.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getUserLoginLogListPageCount" parameterType="Map" resultType="int">
+		select count(1) from user_login_log
+		left join user_user on user_login_log.user_id=user_user.id
+		<where>
+		<if test="e.userId!='' and e.userId!=null">
+		and user_login_log.user_id=#{e.userId}
+		</if>
+		<if test="e.email!=null  and e.email!=''">
+		and user_user.email=#{e.email}
+		</if>
+	 	<if test="e.startDate!='' and e.startDate!=null">
+		and <![CDATA[user_login_log.login_time>=#{e.startDate}]]>
+		</if>
+		<if test=" e.endDate!=null and e.endDate!='' ">
+		and <![CDATA[user_login_log.login_time<=#{e.endDate}]]> 
+		</if>
+		</where>
+	</select>
+</mapper>

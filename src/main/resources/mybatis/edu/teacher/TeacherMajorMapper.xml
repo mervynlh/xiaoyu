@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherMajorMapper">
+		
+	 <resultMap type="TeacherMajor" id="TeacherMajorResult">
+	 		<result property="id" column="id"/>
+	 		<result property="teacherId" column="teacher_id"/>
+	 		<result property="majorId" column="major_id"/>
+	 		<result property="majorName" column="name"/>
+	 </resultMap>
+	 
+	 <sql id="edu_teacher_major_columns">
+	 	edu_teacher_major.id,
+	 	edu_teacher_major.teacher_id,
+	 	edu_teacher_major.major_id
+	 </sql>
+	 
+	 <sql id="edu_teacher_major_properties">
+	 	#{id},
+	 	#{teacherId},
+	 	#{majorId}
+	 </sql>
+	 
+	 <!-- 添加教师科目关联 -->
+	<insert id="addTeacherMajorBatch" parameterType="list">
+		insert INTO edu_teacher_major (
+		<include refid="edu_teacher_major_columns" />
+		) VALUES
+		<foreach item="item" index="index" collection="list" separator=",">
+			( #{item.id},#{item.teacherId},#{item.majorId})
+		</foreach>
+	</insert>
+		 
+	 <!--根据教师ID查询该教师教授的科目列表  -->
+	<select id="queryTeacherMajorByTeacherId" resultMap="TeacherMajorResult" parameterType="Long">
+		select
+		<include refid="edu_teacher_major_columns"/>,edu_major.name
+		from
+		edu_teacher_major
+		left join edu_major on edu_teacher_major.major_id=edu_major.id
+		where
+		edu_teacher_major.teacher_id = #{value}
+	</select>
+	
+	<!-- 根据教师ID删除科目 -->
+	<delete id="delTeacherMajorByTeacherId" parameterType="Long">
+		delete from
+		edu_teacher_major
+		where
+		edu_teacher_major.teacher_id = #{value}
+	</delete>
+</mapper>

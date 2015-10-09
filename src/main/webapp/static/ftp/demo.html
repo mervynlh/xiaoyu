@@ -1,0 +1,301 @@
+
+<!DOCTYPE HTML>
+
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<meta http-equiv="X-UA-Compatible" content="IE=9, IE=8"> 
+	<title>首页-268在线教育平台软件-中国在线教育平台第一品牌</title>
+	<meta name="author" content="268教育(www.268xue.com)"/> 
+	<meta name="keywords" content="268教育,在线教育,网校搭建,网校,网络教育,远程教育,云网校,在线学习,在线考试" />
+	<meta name="description" content="268在线教育是一家专注“在线教育平台”的互联网公司，在国内属顶级在线教育解决方案提供商中的领跑者。为大、中型客户提供领先的在线教育平台方案服务。"/> 
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"> 
+	<link rel="stylesheet" type="text/css" href="http://t.268xue.com/static/edu/css/common.css">
+	<link rel="stylesheet" type="text/css" href="http://t.268xue.com/static/edu/css/page-style.css">
+	<script type="text/javascript" src="http://t.268xue.com/static/common/jquery-1.11.1.min.js"></script>
+	<script type="text/javascript" src="http://t.268xue.com/static/common/pageJs.js"></script>
+	<script type="text/javascript" src="http://t.268xue.com/static/common/webutils.js"></script>
+	<script type="text/javascript" src="http://t.268xue.com/static/common/web_top.js"></script>
+	<script type="text/javascript" src="http://t.268xue.com/static/common/header_msg.js"></script>
+    <script type="text/javascript" src="http://t.268xue.com/static/common/emailList.js"></script>
+	<!--[if lt IE 9]><script src="http://t.268xue.com/static/common/html5.js"></script><![endif]-->
+	<script type="text/javascript">
+		var baselocation = "http://t.268xue.com";
+		var imagesPath = "http://t.268xue.com";
+		var usercookiekey="sid";
+		var mydomain="";
+		var keImageUploadUrl="http://image.268xue.com/imgk4?base=eduplat";//kindeditor中使用的路径需要2个参数来区分项目和模块
+		var uploadSimpleUrl="http://image.268xue.com/gok4?base=eduplat";//单独的上传按钮使用的路径
+		var uploadSwfUrl="http://image.268xue.com/goswf";//uplopad的js上传使用的路径
+        var staticImageServer ="http://static.268xue.com";//上传后返回路径
+        //搜索
+		function getSearch(){
+			var searchStr=$("#course").val();
+			if(searchStr!="输入你想学的课程"){
+				$("#courseName").val(searchStr);
+			}
+			$("#formSearch").submit();
+		}
+		
+		$(function(){
+			var url=window.document.location.pathname;
+			$("a[href$='"+url+"']").parent().addClass("current");
+		});
+
+	</script>
+
+</head>
+<body class="W-body">
+	<!-- 公共头引入 开始 -->
+	<div class="topBarWrap">
+		<div class="w1000">
+			<section class="cleafix">
+				<ul class="t-link c-ccc fr">
+					<li class="undis userNameLi"><tt class="c-666 vam">欢迎你</tt></li>
+					<li class="undis userNameLi"><a href="/uc/home"><img src="" id="cusImg" width="24" height="24" class="vam" /><tt class="c-666 ml5 cusName"></tt></a>|</li>
+					<li class="pr undis newsLi"><tt class="tip-news pa undis" id="msgCountId" title="">0</tt><a href="/letter" title="">消息</a>|</li>
+					<li class="undis outLi"><a href="javascript:void(0)" onclick="javascript:exit()" title="退出">退出</a>|</li>
+					<li class="undis loginLi"><a href="/login" title="登录" >登录</a>|</li>
+					<li class="undis registerLi"><a href="/register" title="注册" >注册</a>|</li>
+					<li class="undis forgetPasswordLi"><a href="/front/forget_passwd" title="忘记密码">忘记密码</a>|</li>
+					<li><a href="javascript:addFavorite();" title="收藏本站" rel="sidebar" class="collect">收藏本站</a></li>
+				</ul><!-- /t-link -->
+			</section>
+		</div>
+	</div>
+	<header id="header" class="png">
+		<section class="head-wrap">
+			<section class="w1000">
+				<h1><a href="/" title="268在线教育平台软件" class="png"><img src="http://static.268xue.com/upload/eduplatform_268/default/logo/logo.png" class="logo-2013"/></a></h1>
+				<div>
+					
+					<section class="topSearchWrap">
+						<div class="tsTabCont">
+							<section class="tsTabContInp">
+								<input type="text"  onkeyup="enterSubmit(event,'getSearch()')" placeholder="输入你想学的课程" x-webkit-speech="" class="tscInp" id="course"/>
+								<a href="javascript:void(0);" onclick="getSearch()"  class="tscBtn">搜 索</a>
+							</section>
+							<form id="formSearch" method="post" action="/front/showcoulist">
+								<input id="courseName"  type="hidden" name="queryCourse.name" value=""/>
+							</form>
+						</div>
+					</section>
+					<section class="top-link pr">
+						<div class="mt30">
+							<section class="my-course-wrap pr">
+								<a href="javascript: void(0)" class="aMyCour m-c-btn hand"><tt class="vam f-fM">我的课程</tt><em class="icon14 ml5">&nbsp;</em></a>
+								<div class="m-c-box undis">
+									<section class="pr m-c">
+										<span class="pa white-bg">&nbsp;</span>
+										
+										<div id="notLogin" class="tac undis">
+											<em class="c-tips-2 icon24">&nbsp;</em>
+											<font class="c-999 fsize12 vam">对不起，你还没有<a href="/login"  title="登录" class="c-master ml5">登录</a></font>
+										</div>
+										<div id="nocoursebug" class="tac undis">
+											<em class="c-tips-2 icon24">&nbsp;</em>
+											<font class="c-999 fsize12 vam">还没有学习课程，你可以去<a href="/front/showcoulist" title="选课" class="c-master ml5">选课</a></font>
+										</div>
+										<div class="my-c-list undis" id="studulist">
+											
+										</div>
+									</section>
+								</div>
+								<a href="/shopcart?command=queryShopCart" class="shopCar hand" id="myCarttitle" title="您的购物车中有0件课程"><em class="icon24">&nbsp;</em><tt class="vam f-fM" id="myCart">有0件课程</tt></a>
+							</section>
+						</div>
+					</section>
+
+					<div class="clear"></div>
+				</div>
+				<div class="clear"></div>
+			</section>
+		</section>
+		<div class="hNavWrap">
+			<section class="w1000 clearfix">
+				<aside class="fr">
+					<span class="tel unBg" style="padding: 12px 0 0 0;"><em class="icon18">&nbsp;</em><tt class="c-fff f-fM vam ml5">400 - 0602 - 0268</tt></span>
+				</aside>
+				<ul class="hNav fl" id="guideInfo"><!-- current -->
+					<li><a href="/" title="首页" >首页</a></li>
+					<li><a href="/front/showcoulist" title="课程" >课程</a></li>
+					<li><a href="/front/teacherlist" title="专家" >专家</a></li>
+					<li><a href="/exam/index" title="考试" target="_blank">考试</a></li>
+					<li><a href="/sug" title="问答" >问答</a></li>
+					<li><a href="/front/articlelist/0" title="资讯" >资讯</a></li>
+					<li><a href="/u/home" title="社区" >社区</a></li>
+					<li><a href="/book/list" title="图书" >图书</a></li>
+					<li><a href="/library/list" title="文库" >文库</a></li>
+					</ul>
+			</section>
+		</div>
+	</header>
+	<!-- 公共头引入 结束-->
+
+
+	<!-- 中间代码 -->
+
+		中间代码:需要的代码写到此位置.<br>
+		引用的公用的js,css<br>
+		点击购买按钮会跳转到购物车："/shopcart?type=1&command=addShopitem&goodsid=1"<br>
+        说明：参数goodsid=1，为课程id号。在后台课程管理》课程列表中可以看到<br>
+        登录页面弹出窗口：js调用 ：dialog('登录','',3,'','1');<br>
+        登录地址 :域名+"/login"<br>
+        注册地址：域名+"/register"<br>
+		
+		
+
+	<!-- 公共底引入 开始-->
+	<script type="text/javascript">
+	$(function(){//获得在线咨询信息 	
+		$.ajax({
+			url:baselocation+"/ajax/websiteProfile/online",
+			data:{},
+			dataType:"json",
+			type:"post",
+			success:function(result){
+				var websitemap=result.entity;//获得map
+				if(websitemap!=null&&websitemap!=''){
+					if(websitemap.online.onlineKeyWord=='OFF'){
+						$("#onlineConsultBox").hide();
+					}
+					$(".onlineC-item1").children("a").attr("href",websitemap.online.onlineUrl);
+					$(".winxinGz").children().attr("src",staticImageServer+websitemap.online.onlineImageUrl);	
+				}
+			}
+		})
+	})
+	</script>
+<!-- / 帮助 -->
+	<div class="ness-wrap">
+		<section class="w1000">
+			<ul class="ness clearfix">
+				<li>
+					<span class="n-icon n-i-1">&nbsp;</span>
+					<h4 class="hLh30 of unFw"><font class="fsize20 c-999 f-fM">独家课程</font></h4>
+					<div class="mt10">
+						<p class="c-999">各行业及企业掌门人、商业领袖讲授创业人生企业管理，品牌营销、新趋势等独家课程。</p>
+					</div>
+				</li>
+				<li>
+					<span class="n-icon n-i-2">&nbsp;</span>
+					<h4 class="hLh30 of unFw"><font class="fsize20 c-999 f-fM">答疑解惑</font></h4>
+					<div class="mt10">
+						<p class="c-999">各行业及企业掌门人、商业领袖讲授创业人生企业管理，品牌营销、新趋势等独家课程。</p>
+					</div>
+				</li>
+				<li>
+					<span class="n-icon n-i-3">&nbsp;</span>
+					<h4 class="hLh30 of unFw"><font class="fsize20 c-999 f-fM">课程分析</font></h4>
+					<div class="mt10">
+						<p class="c-999">各行业及企业掌门人、商业领袖讲授创业人生企业管理，品牌营销、新趋势等独家课程。</p>
+					</div>
+				</li>
+				<li>
+					<span class="n-icon n-i-4">&nbsp;</span>
+					<h4 class="hLh30 of unFw"><font class="fsize20 c-999 f-fM">自定义课程</font></h4>
+					<div class="mt10">
+						<p class="c-999">各行业及企业掌门人、商业领袖讲授创业人生企业管理，品牌营销、新趋势等独家课程。</p>
+					</div>
+				</li>
+				<li>
+					<span class="n-icon n-i-5">&nbsp;</span>
+					<h4 class="hLh30 of unFw"><font class="fsize20 c-999 f-fM">移动课程</font></h4>
+					<div class="mt10">
+						<p class="c-999">各行业及企业掌门人、商业领袖讲授创业人生企业管理，品牌营销、新趋势等独家课程。</p>
+					</div>
+				</li>
+				<li>
+					<span class="n-icon n-i-6">&nbsp;</span>
+					<h4 class="hLh30 of unFw"><font class="fsize20 c-999 f-fM">专题活动</font></h4>
+					<div class="mt10">
+						<p class="c-999">各行业及企业掌门人、商业领袖讲授创业人生企业管理，品牌营销、新趋势等独家课程。</p>
+					</div>
+				</li>
+			</ul>
+		</section>
+	</div>
+	<!-- / 帮助 结束 -->
+<!-- /尾部-->
+	<footer>
+		<section class="f-link-wrap">
+			<div class="w1000">
+				<div class="fLink">
+					<dl class="clearfix" id="linkFriend">
+						<dt>
+							<span class="vam c-888">友情链接：</span>
+						</dt>
+						<dd><a href="#" title="268" target="_blank">268</a></dd>
+						</dl>
+				</div><!-- /fLink -->
+			</div>
+		</section>
+		<section class="foot-link">
+			<div class="w1000">
+				<div class="pt10 pb20">
+					<section class="mt20 mb10">
+						<ul class="tac">
+							<li id="linkBottom">
+								<a class="mr10 ml5" href="#" title="新手指南" target="_blank">新手指南</a>|
+								<a class="mr10 ml5" href="/help" title="帮助中心" target="_blank">帮助中心</a>|
+								<a class="mr10 ml5" href="#" title="关于我们" target="_blank">关于我们</a>|
+								<a class="mr10 ml5" href="#" title="联系我们" target="_blank">联系我们</a>|
+								<a class="mr10 ml5" href="#" title="技术支持(268教育)" >技术支持(268教育)</a>|
+								<span class="ml20"> 24小时服务热线：400 - 0602 - 0268 Email：yizhilu@268xue.com  工作时间：9:00-18:00</span>
+							</li>
+							<li class="mt5"><font class="fsize12">©2010-2013 北京易知路科技有限公司 版权所有 京公网安备11010802011695号 京ICP备13029607号</font></li>
+                            <span class="ml20"> <a class="mr10 ml5" target="_blank" href="http://www.268xue.com" title="网站开发技术支持(268教育)">Powered By 268教育</a></span>
+						</ul>
+					</section>
+				</div>
+			</div>
+		</section>
+	</footer>
+	<!-- /尾部 结束-->
+	<!-- 在线咨询 开始 -->
+	<div class="onlineConsultBox" id="onlineConsultBox">
+		<div class="onlineC-item">
+			<ul>
+				<li>
+					<div class="onlineC-item1" name="350">
+						<a href="" target="_blank" title="在线咨询" class="onlineC-ico">
+							<span class="onlineC-ico1">&nbsp;</span>
+							<p>在线咨询</p>
+						</a>
+					</div>
+				</li>
+				<li>
+					<div class="onlineC-item2" name="200">
+						<a href="javascript: void(0)" title="关注我们" class="onlineC-ico">
+							<span class="onlineC-ico2">&nbsp;</span>
+							<p>关注我们</p>
+						</a>
+						<div class="onlineC winxinGz">
+							<img src="" width="200" height="200" class="dis" />
+							<p class="tac"><span class="fsize14 c-4e">扫一扫，关注我们</span></p>
+						</div>
+					</div>
+				</li>
+				<li>
+					<div class="onlineC-item3">
+						<a href="/front/to_free_back" target="_blank" title="意见反馈" class="onlineC-ico">
+							<span class="onlineC-ico5">&nbsp;</span>
+							<p>意见反馈</p>
+						</a>
+					</div>
+				</li>
+			</ul>
+			<div class="onlineC-item4" title="回到顶部 ^" id="goTop">
+				<a href="javascript: void(0)" title="关注我们" class="onlineC-ico">
+					<span class="onlineC-ico4">&nbsp;</span>
+					<p>返回顶部</p>
+				</a>
+			</div>
+		</div>
+	</div> 
+	<!-- 在线咨询 结束 -->
+	<!-- 公共底引入 结束-->
+
+	
+	</body>
+</html>

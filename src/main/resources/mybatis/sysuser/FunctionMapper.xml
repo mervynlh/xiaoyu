@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="FunctionMapper" >
+
+    <resultMap id="FunctionResult" type="sysfunction">
+        <result property="functionId" column="function_id" />
+        <result property="parentFunctionId" column="parent_function_id" />
+        <result property="functionName" column="function_name"/>
+        <result property="functionTypeId" column="function_type_id" />
+        <result property="functionUrl" column="function_url"/>
+        <result property="createTime" column="create_time"/>
+        <result property="updateTime" column="update_time"/>
+        <result property="sort" column="sort"/>
+        <result property="functionUrlType" column="function_url_type"/>
+    </resultMap>
+
+    <sql id="sys_function_columns">
+        sys_function.function_id,
+        sys_function.parent_function_id,
+        sys_function.function_name,
+        sys_function.function_type_id,
+        sys_function.function_url,
+        sys_function.create_time,
+        sys_function.update_time,
+        sys_function.sort,
+        sys_function.function_url_type
+    </sql>
+
+    <sql id="sys_function_properties">
+        #{functionId},
+        #{parentFunctionId},
+        #{functionName},
+        #{functionTypeId},
+        #{functionUrl},
+        #{createTime},
+        #{updateTime},
+        #{sort},
+        #{functionUrlType}
+    </sql>
+
+    <insert id="createFunction" parameterType="sysfunction" useGeneratedKeys="true" keyColumn="function_id" keyProperty="functionId">
+        INSERT INTO sys_function (<include refid="sys_function_columns"/>) VALUES (<include
+            refid="sys_function_properties"/>)
+    </insert>
+
+    <delete id="deleteFunctionById" parameterType="long">
+        DELETE from sys_function
+        WHERE
+        function_id = #{value}
+    </delete>
+	<!--  批量删除 -->
+ 	<delete id="deleteFunctionByIdBatch" parameterType="list">
+        DELETE from sys_function
+        WHERE
+        function_id in <foreach collection="list" item="item" open="(" close=")" separator=",">
+        	#{item.functionId}
+        </foreach>
+    </delete>
+    
+    <update id="updateFunction" parameterType="sysfunction">
+        UPDATE sys_function SET
+        function_id = #{functionId},
+        parent_function_id = #{parentFunctionId},
+        function_name = #{functionName},
+        function_type_id = #{functionTypeId},
+        function_url = #{functionUrl},
+        sort = #{sort},
+        function_url_type = #{functionUrlType}
+        WHERE
+        function_id = #{functionId}
+    </update>
+
+    <select id="getFunctionById" resultMap="FunctionResult" parameterType="long">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function
+        where
+        function_id = #{value}
+    </select>
+
+    <select id="getFunctionList" resultMap="FunctionResult" parameterType="QueryFunctionCondition">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function
+        <where>
+        <if test="functionTypeId!=null and functionTypeId !=0 ">
+              and  sys_function.function_type_id = #{functionTypeId}
+        </if>
+        <if test="parentFunctionId!= null and parentFunctionId!=0 ">
+              and  sys_function.parent_function_id = #{parentFunctionId}
+        </if>
+        </where> 
+        order by sort desc,function_id
+    </select>
+
+    <select id="getFunctionListByRoleId" resultMap="FunctionResult" parameterType="long">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function,sys_role_function
+        where sys_function.function_id = sys_role_function.function_id
+        AND sys_role_function.ROLE_ID = #{value}
+        order by sort desc,function_id
+    </select>
+
+    <select id="getFunctionListByParentId" resultMap="FunctionResult" parameterType="long">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function
+        where sys_function.parent_function_id = #{value}
+        order by sort desc,function_id
+    </select>
+    <!-- 根据多个ParentId查询 -->
+    <select id="getFunctionListByParentIdSet" resultMap="FunctionResult" parameterType="list">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function
+        where sys_function.parent_function_id in
+        <foreach collection="list" item="item" open="(" close=")" separator=",">
+        #{item}
+        </foreach>
+        
+        order by sort desc,function_id
+    </select>
+    
+    <select id="getFirFunction" resultMap="FunctionResult" parameterType="QueryFunctionCondition">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function
+        where sys_function.parent_function_id = 0
+        order by sort desc,function_id
+    </select>
+    
+    <select id="getChildFunctionById" resultMap="FunctionResult" parameterType="long">
+        select
+        <include refid="sys_function_columns"/>
+        from sys_function
+        where sys_function.parent_function_id = #{value}
+        order by sort desc,function_id
+    </select>
+    
+    
+     <select id="getFunctionsByRoles" resultMap="FunctionResult" parameterType="list">
+        select
+        distinct
+        <include refid="sys_function_columns"/>
+        FROM 
+		 sys_function JOIN  sys_role_function
+		ON sys_function.function_id=sys_role_function.function_id
+		AND 
+		sys_role_function.role_id in
+		<foreach collection="list" item="item" open="(" close=")" separator=",">
+        #{item.roleId}
+        </foreach>
+        order by sort desc,function_id
+    </select>
+    
+</mapper>

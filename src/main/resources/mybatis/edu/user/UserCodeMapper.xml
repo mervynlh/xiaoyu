@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserCodeMapper">
+
+        <resultMap id="UserCodeResult" type="UserCode">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="type" column="type"/>
+            <result property="context" column="context"/>
+            <result property="createTime" column="create_time"/>
+            <result property="status" column="status"/>
+        </resultMap>
+
+        <sql id="edu_user_code_columns">
+            edu_user_code.id,
+            edu_user_code.user_id,
+            edu_user_code.type,
+            edu_user_code.context,
+            edu_user_code.create_time,
+            edu_user_code.status
+        </sql>
+
+        <sql id="edu_user_code_properties">
+            #{id},
+            #{userId},
+            #{type},
+            #{context},
+            #{createTime},
+            #{status}
+        </sql>
+
+        <insert id="createUserCode" parameterType="UserCode" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_code (<include refid="edu_user_code_columns"/>) VALUES (<include refid="edu_user_code_properties"/>)
+        </insert>
+
+        <delete id="deleteUserCodeById" parameterType="Long">
+            delete from edu_user_code
+            where
+                id = #{value}
+
+        </delete>
+
+        <update id="updateUserCode" parameterType="UserCode">
+            update edu_user_code SET
+                status = #{status}
+            where
+                id = #{id}
+
+        </update>
+
+        <select id="getUserCodeById" resultMap="UserCodeResult" parameterType="Long">
+            select
+            <include refid="edu_user_code_columns"/>
+            from edu_user_code
+            where
+                id = #{value}
+        </select>
+        
+</mapper>

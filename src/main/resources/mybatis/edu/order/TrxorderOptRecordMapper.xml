@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TrxorderOptRecordMapper">
+
+        <resultMap id="TrxorderOptRecordResult" type="TrxorderOptRecord">
+            <result property="id" column="id"/>
+            <result property="orderId" column="trxorder_id"/>
+            <result property="type" column="type"/>
+            <result property="optuser" column="optuser"/>
+            <result property="optusername" column="optusername"/>
+            <result property="desc" column="description"/>
+            <result property="createtime" column="createtime"/>
+            <result property="userType" column="user_type"/>
+            <result property="applicant" column="applicant"/>
+        </resultMap>
+
+		<resultMap type="TrxorderOptRecordDTO" id="TrxorderOptRecordDTOResult" extends="TrxorderOptRecordResult">
+			<result property="studentName" column="studentName"/>
+			<result property="courseName" column="course_name"/>
+			<result property="orderAmount" column="order_amount"/>
+			<result property="couponAmount" column="coupon_amount"/>
+			<result property="amount" column="amount"/>
+			<result property="requestId" column="request_id"/>
+			<result property="payType" column="pay_type"/>
+			
+			<result property="teacherName" column="teacherName"/>
+		</resultMap>
+
+        <sql id="edu_trxorder_opt_record_columns">
+            edu_trxorder_opt_record.id,
+            edu_trxorder_opt_record.trxorder_id,
+            edu_trxorder_opt_record.type,
+            edu_trxorder_opt_record.optuser,
+            edu_trxorder_opt_record.optusername,
+            edu_trxorder_opt_record.description,
+            edu_trxorder_opt_record.createtime,
+            edu_trxorder_opt_record.user_type,
+            edu_trxorder_opt_record.applicant
+        </sql>
+
+        <sql id="edu_trxorder_opt_record_properties">
+            #{id},
+            #{orderId},
+            #{type},
+            #{optuser},
+            #{optusername},
+            #{desc},
+            #{createtime},
+            #{userType},
+            #{applicant}
+        </sql>
+
+        <insert id="createTrxorderOptRecord" parameterType="TrxorderOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_trxorder_opt_record (<include refid="edu_trxorder_opt_record_columns"/>) VALUES (<include refid="edu_trxorder_opt_record_properties"/>)
+        </insert>
+
+        <delete id="deleteTrxorderOptRecordById" parameterType="Long">
+            delete from edu_trxorder_opt_record
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateTrxorderOptRecord" parameterType="TrxorderOptRecord">
+            update edu_trxorder_opt_record SET
+                id = #{id},
+                trxorder_id = #{orderId},
+                type = #{type},
+                optuser = #{optuser},
+                optusername = #{optusername},
+                description = #{desc},
+                createtime = #{createtime}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getTrxorderOptRecordById" resultMap="TrxorderOptRecordDTOResult" parameterType="Long">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>,
+            edu_trxorder.course_name,
+            edu_trxorder.order_amount,
+            edu_trxorder.coupon_amount,
+            edu_trxorder.amount,
+            edu_trxorder.request_id,
+            edu_trxorder.student_name as studentName,
+            user_expand.realname as teacherName
+            from edu_trxorder_opt_record
+            left join edu_trxorder on edu_trxorder_opt_record.trxorder_id = edu_trxorder.id
+            left join edu_teacher on edu_trxorder.teacher_id = edu_teacher.id
+            left join user_expand on edu_teacher.user_id = user_expand.user_id
+            where
+                edu_trxorder_opt_record.id = #{value}
+        </select>
+		
+        <select id="getTrxorderOptRecordList" resultMap="TrxorderOptRecordDTOResult" parameterType="java.util.HashMap">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>,
+            edu_trxorder.course_name,
+            edu_trxorder.order_amount,
+            edu_trxorder.coupon_amount,
+            edu_trxorder.amount,
+            edu_trxorder.request_id,
+            edu_trxorder.pay_type
+            from edu_trxorder_opt_record
+            left join edu_trxorder on edu_trxorder_opt_record.trxorder_id = edu_trxorder.id
+            <where>
+	       		<if test="e.type!=null and e.type!=''">
+	       			and edu_trxorder_opt_record.type = #{e.type}
+	       		</if>
+	       		<if test="e.type==null or e.type==''">
+	       			and edu_trxorder_opt_record.type in('ORDERAUDIT','ORDERSUCCESS','ORDERCANCEL')
+	       		</if>
+	       		<if test="e.userType!=null">
+	       			and edu_trxorder_opt_record.user_type = #{e.userType}
+	       		</if>
+	       		<if test="e.applicant!=null and e.applicant!=''">
+	       			and edu_trxorder_opt_record.applicant = #{e.applicant}
+	       		</if>
+	       		<if test="e.startCreateTime!=null">
+					and <![CDATA[ edu_trxorder_opt_record.createtime>=#{e.startCreateTime}]]>
+				</if>
+				<if test="e.endCreateTime!=null ">
+					and <![CDATA[ edu_trxorder_opt_record.createtime<=#{e.endCreateTime}]]>
+				</if>
+				<if test="e.requestId!=null and e.requestId!=''">
+					and edu_trxorder.request_id = #{e.requestId}
+				</if>
+				<if test="e.payType!=null and e.payType!=''">
+					and edu_trxorder.pay_type = #{e.payType}
+				</if>
+			</where>
+            <include refid="publicMapper.pageEnd" />
+        </select>
+         <select id="getTrxorderOptRecordListCount" resultType="int" parameterType="java.util.HashMap">
+            select
+            <include refid="edu_trxorder_opt_record_columns"/>
+            from edu_trxorder_opt_record
+            left join edu_trxorder on edu_trxorder_opt_record.trxorder_id = edu_trxorder.id
+           <where>
+	       		<if test="e.type!=null and e.type!=''">
+	       			and edu_trxorder_opt_record.type = #{e.type}
+	       		</if>
+	       		<if test="e.type==null or e.type==''">
+	       			and edu_trxorder_opt_record.type in('ORDERAUDIT','ORDERSUCCESS','ORDERCANCEL')
+	       		</if>
+	       		<if test="e.userType!=null">
+	       			and edu_trxorder_opt_record.user_type = #{e.userType}
+	       		</if>
+	       		<if test="e.applicant!=null and e.applicant!=''">
+	       			and edu_trxorder_opt_record.applicant = #{e.applicant}
+	       		</if>
+	       		<if test="e.startCreateTime!=null">
+					and <![CDATA[ edu_trxorder_opt_record.createtime>=#{e.startCreateTime}]]>
+				</if>
+				<if test="e.endCreateTime!=null ">
+					and <![CDATA[ edu_trxorder_opt_record.createtime<=#{e.endCreateTime}]]>
+				</if>
+				<if test="e.requestId!=null and e.requestId!=''">
+					and edu_trxorder.request_id = #{e.requestId}
+				</if>
+				<if test="e.payType!=null and e.payType!=''">
+					and edu_trxorder.pay_type = #{e.payType}
+				</if>
+			</where>
+        </select>
+</mapper>

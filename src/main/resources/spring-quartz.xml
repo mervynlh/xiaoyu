@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" default-autowire="byName">
+   
+   
+
+	 <!-- 站内用户地址信息修改-->
+     <bean id="webUserloginaddress" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false"> 
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="userService" />
+				</property>
+				<property name="targetMethod">
+					<value>updateUserAddress</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 0/10 * * * ?</value><!-- 半小时间隔 -->
+		</property>
+	</bean>
+
+	<!-- 站内系统地址信息修改-->
+     <bean id="sysUserloginaddress" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false"> 
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="loginLogService" />
+				</property>
+				<property name="targetMethod">
+					<value>updateAdminLoginLog</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 2/10 * * * ?</value><!-- 半小时间隔 -->
+		</property>
+	</bean>
+	
+	 <!-- 首页入驻教师  注册人数定时查询-->
+     <bean id="indexQueryTotal" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false"> 
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="userService" />
+				</property>
+				<property name="targetMethod">
+					<value>indexQueryTotal</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 0 0/5 * * ?</value><!-- 三小时间隔 -->
+		</property>
+	</bean>
+
+   
+	
+    <!-- 网站统计定时器 -->
+    <bean id="statisticsJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject">
+                    <ref bean="statisticsDayService" />
+                </property>
+                <property name="targetMethod">
+                    <value>addStatisticsDayAuto</value>
+                </property>
+                <property name="concurrent">
+                    <value>true</value>
+                </property>
+            </bean>
+        </property>
+        <property name="cronExpression">
+            <value>0 10 0 * * ?</value><!-- 每天0点10触发 -->
+        </property>
+    </bean>
+	<!-- 优惠券过期定时器 -->
+    <bean id="couponCodeJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="couponCodeService" />
+				</property>
+				<property name="targetMethod">
+					<value>overdueCodeByTime</value>
+				</property>
+				<property name="concurrent">
+					<value>true</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 30 0 * * ?</value><!-- 每天0点30触发 -->
+		</property>
+	 </bean>
+	<!-- 站内信过期消息删除 每天执行一次 -->
+	<bean id="delMsgJob" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="msgSystemService" />
+				</property>
+				<property name="targetMethod">
+					<value>updatePast</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 40 0 * * ?</value><!--  每天凌晨0点40触发  -->
+		</property>
+	</bean>
+    <!-- 每个月最后一日删除上个月1号之前过期订单-->
+     <bean id="deleteOrderDeadline" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false"> 
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject">
+					<ref bean="trxorderService" />
+				</property>
+				<property name="targetMethod">
+					<value>deleteOrderDeadline</value>
+				</property>
+				<property name="concurrent">
+					<value>false</value>
+				</property>
+			</bean>
+		</property>
+		<property name="cronExpression">
+			<value>0 50 0 L * ?</value><!-- 每个月最后一日 凌晨0点50触发-->
+		</property>
+	</bean>	
+	<!-- 超过时间订单自动确认定时器 -->
+    <bean id="updateTrxorderAutomaticConfirm" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject">
+                    <ref bean="trxorderDetailService" />
+                </property>
+                <property name="targetMethod">
+                    <value>updateTrxorderAutomaticConfirm</value>
+                </property>
+                <property name="concurrent">
+                    <value>true</value>
+                </property>
+            </bean>
+        </property>
+        <property name="cronExpression">
+             <value>0 2/40 * * * ?</value> <!-- 每四十分钟点触发  -->
+        </property>
+    </bean>
+    <!-- 定时修改课程状态（待上课—>>待确认课酬） -->
+    <bean id="updateTrxorderDetailByTrxStatusAndStatus" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean" lazy-init="false">
+        <property name="jobDetail">
+            <bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+                <property name="targetObject">
+                    <ref bean="trxorderDetailService" />
+                </property>
+                <property name="targetMethod">
+                    <value>updateTrxorderDetailByTrxStatusAndStatus</value>
+                </property>
+                <property name="concurrent">
+                    <value>false</value>
+                </property>
+            </bean>
+        </property>
+        <property name="cronExpression">
+            <value>0 0/20 * * * ?</value><!--  每20分钟触发  -->
+        </property>
+    </bean>
+	<!-- 定时器配置 lazy-init='false'-->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean"  lazy-init="false" autowire="no"> 
+		<property name="triggers"> 
+			<list> 
+               <!-- 用户ip地址修改 -->
+               <ref bean="webUserloginaddress"/> 
+               <!-- 系统ip地址修改 -->
+               <ref bean="sysUserloginaddress"/> 
+			   <!-- 优惠券过期定时器-->
+ 			   <ref bean="couponCodeJob"/>
+			   <!-- 站内信过期消息删除 每天执行一次 -->
+			   <ref bean="delMsgJob"/>
+               <!-- 统计数据每天晚上生成statisticsJob -->
+               <ref bean="statisticsJob"/>
+               <!-- 定时自动确认订单 -->
+              <ref bean="updateTrxorderAutomaticConfirm"/>
+               <!-- 定时修改课程状态(待上课->>待确认课酬) -->
+              <ref bean="updateTrxorderDetailByTrxStatusAndStatus"/>
+              <!-- 每月1号删除上个月1号之前过期订单 -->
+              <ref bean="deleteOrderDeadline"/>
+               <!-- 首页每三小时查询一次入驻教师人数和注册人数 -->
+              <ref bean="indexQueryTotal"/> 
+			</list>
+		</property> 
+	</bean>
+</beans>

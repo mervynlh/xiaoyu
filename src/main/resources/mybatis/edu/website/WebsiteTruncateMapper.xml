@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="WebsiteTruncateMapper">
+
+	<resultMap type="WebsiteTruncate" id="TruncateResult">
+		<result property="id" column="id"/>
+		<result property="tableName" column="table_name"/>
+		<result property="type" column="type"/>
+		<result property="desc" column="desc"/>
+	</resultMap>
+	<sql id="edu_website_truncate_columns">
+		edu_website_truncate.id,
+		edu_website_truncate.table_name,
+		edu_website_truncate.type,
+		edu_website_truncate.desc
+	</sql>
+  
+	<sql id="edu_website_truncate_properties">
+		#{id},
+		#{tableName},
+		#{type},
+		#{desc}
+	</sql>
+
+	<!-- 添加清空表 -->
+	<insert id="createTruncate" parameterType="WebsiteTruncate">
+		INSERT INTO edu_website_truncate 
+		(<include refid="edu_website_truncate_columns"/>) 
+		VALUES 
+		(<include refid="edu_website_truncate_properties"/>)
+	</insert>
+	
+	<!-- 删除清空表-->
+	<delete id="delTruncateByIds" parameterType="String">
+		DELETE FROM edu_website_truncate WHERE ID IN (${value})
+	</delete>
+	
+	<!-- 执行清空表操作 -->
+	<delete id="truncateTable" parameterType="String">
+		TRUNCATE TABLE ${value}
+	</delete>
+	
+	<!-- 更新清空表 -->
+	<update id="updateTruncate" parameterType="WebsiteTruncate">
+		update edu_website_truncate set
+		edu_website_truncate.table_name=#{tableName},
+		edu_website_truncate.type=#{type},
+		edu_website_truncate.desc=#{desc}
+		where id=#{id}
+	</update>
+	
+	<!-- 清空表列表 -->
+	<select id="getTruncatePageList" resultMap="TruncateResult" parameterType="Map">
+		SELECT <include refid="edu_website_truncate_columns"/>
+		FROM edu_website_truncate 
+		<where>
+			<if test="e.tableName!=null and e.tableName!='' ">
+				and edu_website_truncate.table_name=#{e.tableName}
+			</if>
+			<if test="e.type!=null and e.type!='' ">
+				and edu_website_truncate.type= #{e.type}
+			</if>
+		</where>
+		ORDER BY edu_website_truncate.type,edu_website_truncate.id DESC 
+		<include refid="publicMapper.pageEnd"/>  
+	</select>
+	<select id="getTruncatePageListCount" resultType="int" parameterType="Map">
+		SELECT COUNT(1) 
+		FROM edu_website_truncate 
+		<where>
+			<if test="e.tableName!=null and e.tableName!='' ">
+				and edu_website_truncate.table_name=#{e.tableName}
+			</if>
+			<if test="e.type!=null and e.type!='' ">
+				and edu_website_truncate.type= #{e.type}
+			</if>
+		</where>
+	</select>
+	
+	<!-- Id查询清空表 -->
+	<select id="getTruncateById" parameterType="Long" resultMap="TruncateResult">
+		SELECT <include refid="edu_website_truncate_columns"/> 
+		FROM edu_website_truncate WHERE edu_website_truncate.ID=#{value}
+	</select>
+	<!-- 查询清空表集合 -->
+	<select id="getTruncateList" resultMap="TruncateResult" parameterType="Map">
+		SELECT <include refid="edu_website_truncate_columns"/> 
+		FROM edu_website_truncate
+		<where>
+			<if test="ids!=null and ids!=''">
+				edu_website_truncate.id in (${ids})
+			</if>
+			<if test="type!=null and type!=''">
+				edu_website_truncate.type = #{type}
+			</if>
+		</where>
+	</select>
+</mapper>

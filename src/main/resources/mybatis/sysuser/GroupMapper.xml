@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="GroupMapper" >
+        
+        <resultMap id="GroupResult" type="sysgroup">
+            <result property="groupId" column="group_id"  />
+            <result property="parentGroupId" column="parent_group_id" />
+            <result property="groupName" column="group_name"/>
+            <result property="status" column="status" />
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="level" column="level"/>
+        </resultMap>
+
+        <sql id="sys_group_columns">
+            group_id,
+            parent_group_id,
+            group_name,
+            status,
+            create_time,
+            update_time,
+            level
+        </sql>
+
+        <sql id="sys_group_properties">
+            #{groupId},
+            #{parentGroupId},
+            #{groupName},
+            #{status},
+            #{createTime},
+            #{updateTime},
+            #{level}
+        </sql>
+
+        <insert id="addGroup" parameterType="sysgroup" useGeneratedKeys="true" keyColumn="group_id" keyProperty="groupId">
+            insert INTO sys_group (<include refid="sys_group_columns"/>) VALUES (<include refid="sys_group_properties"/>)
+        </insert>
+
+        <delete id="deleteGroupById" parameterType="long">
+            delete from sys_group
+            where
+                group_id = #{value}
+
+        </delete>
+
+        <update id="updateGroup" parameterType="sysgroup">
+            update sys_group SET
+                parent_group_id = #{parentGroupId},
+                group_name = #{groupName},
+                status = #{status},
+                create_time = #{createTime},
+                update_time = #{updateTime},
+                level = #{level}
+            where
+                group_id = #{groupId}
+
+        </update>
+
+        <select id="getGroupById" resultMap="GroupResult" parameterType="long">
+            select
+            <include refid="sys_group_columns"/>
+            from sys_group
+            where
+                group_id = #{value}
+
+
+        </select>
+
+        <select id="getGroupList" resultMap="GroupResult" parameterType="QueryGroupCondition">
+            select
+            <include refid="sys_group_columns"/>
+            from sys_group where  sys_group.status = 0
+        </select>
+        
+        
+         <select id="getGroupByLevel" resultMap="GroupResult" parameterType="int">
+            select
+            <include refid="sys_group_columns"/>
+            from sys_group where  level=#{value} and sys_group.status = 0
+        </select>
+        
+        
+        <select id="getGroupListForTechTree" resultMap="GroupResult" parameterType="QueryGroupCondition">
+            select
+            <include refid="sys_group_columns"/>
+            from sys_group
+            where sys_group.parent_group_id IS NOT NUll
+                  and sys_group.status = 0;
+        </select>
+        
+        <select id="getFirGroup" resultMap="GroupResult" parameterType="QueryGroupCondition">
+            select
+            <include refid="sys_group_columns"/>
+            from sys_group
+            where sys_group.parent_group_id = -1
+            and sys_group.status = 0
+                 <if test="thirdGroupId !=null and thirdGroupId !='0' ">
+                       and sys_group.group_id =
+                              (select G1.parent_group_id
+                                 from sys_group G1
+                                where G1.group_id = (select G2.parent_group_id
+                                                       from sys_group G2
+                                                      where G2.group_id = #{thirdGroupId}))
+	       		 </if>
+        </select>
+        
+         <select id="getChildGroupById" resultMap="GroupResult" parameterType="long">
+            select
+            <include refid="sys_group_columns"/>
+            from sys_group
+            where
+                parent_group_id = #{value}
+                  and sys_group.status = 0;
+        </select>
+        <!--end-->
+</mapper>

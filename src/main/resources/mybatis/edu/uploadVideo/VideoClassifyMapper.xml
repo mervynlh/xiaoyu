@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="VideoClassifyMapper">
+        
+        <resultMap id="VideoClassifyResult" type="VideoClassify">
+            <result property="id" column="id"/>
+            <result property="parentId" column="parentId"/>
+            <result property="name" column="name"/>
+            <result property="createTime" column="create_time"/>
+            <result property="keyword" column="keyword"/>
+            <result property="userId" column="user_id"/>
+        </resultMap>
+       
+        <sql id="edu_video_classify_columns">
+            edu_video_classify.id,
+            edu_video_classify.parentId,
+            edu_video_classify.name,
+            edu_video_classify.create_time,
+            edu_video_classify.keyword,
+            edu_video_classify.user_id
+        </sql>
+
+        <sql id="edu_video_classify_properties">
+            #{id},
+            #{parentId},
+            #{name},
+            #{createTime},
+            #{keyword},
+            #{userId}
+        </sql>
+     
+        <!-- 查询所有一级分类 -->
+        <select id="getClassifyOneAll" resultMap="VideoClassifyResult">
+        	select * from edu_video_classify where parentId=0  ORDER BY keyword DESC
+        </select>
+		<!-- 根据一级分类ID查询二级分类 -->
+        <select id="getClassifyTwoByOneId" resultMap="VideoClassifyResult" parameterType="Long">
+            SELECT * FROM edu_video_classify where parentId=#{value}
+        </select>
+        <!-- 查询该二级分类下的视频数 -->
+        <select id="getClassifyTwoVideoCount" parameterType="Long" resultType="int">
+        	select count(1) from edu_video_upload where edu_video_upload.classifyTwo=#{value} and edu_video_upload.status=0
+        </select>
+        <!-- 删除分类 -->
+        <delete id="delClassifyById" parameterType="Long">
+        	delete from edu_video_classify where id=#{value}
+        </delete>
+        <!-- 更新分类 -->
+        <update id="updateClassifyById" parameterType="VideoClassify">
+        	update edu_video_classify set
+        	parentId=#{parentId},
+        	name=#{name}
+        	where id=#{id}
+        </update>
+        <!-- 添加分类 -->
+        <insert id="createClassify" parameterType="VideoClassify" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+        	insert into edu_video_classify(<include refid="VideoClassifyMapper.edu_video_classify_columns"/>) values(<include refid="VideoClassifyMapper.edu_video_classify_properties"/>)
+       	</insert>
+        <!-- 根据ID查询分类 -->
+        <select id="getClassifyById" parameterType="Long" resultMap="VideoClassifyResult">
+        	select <include refid="VideoClassifyMapper.edu_video_classify_columns"/> from edu_video_classify where id=#{value}
+        </select>
+        <!--end-->
+        
+        <!-- 根据USERID查询分类 -->
+        <select id="getClassifyByUserId" parameterType="Long" resultMap="VideoClassifyResult">
+        	select <include refid="VideoClassifyMapper.edu_video_classify_columns"/> from edu_video_classify where user_id=#{value}
+        </select>
+        <!--end-->
+</mapper>

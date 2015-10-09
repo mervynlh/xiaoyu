@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component inheritJdk="true">
+	<exclude-output/>
+	<contentEntry url="file://$MODULE_DIR$"/>
+	<levels>
+		<level name="CCP_REST_SMS_SDK_JAVA_v2.6.3r" value="project"/>
+	</levels>
+</component>

@@ -1,0 +1,796 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherMapper">
+	<resultMap id="TeacherResult" type="Teacher">
+		<id property="id" column="id" />
+		<result property="sex" column="sex"/>
+		<result property="userId" column="user_id" />
+		<result property="status" column="status" />
+		<result property="createTime" column="create_time" />
+		<result property="degree" column="degree" />
+		<result property="finishSchool" column="finish_school" />
+		<result property="profession" column="profession" />
+		<result property="seniority" column="seniority" />
+		<result property="career" column="career" />
+		<result property="peculiarity" column="peculiarity" />
+		<result property="card" column="card" />
+		<result property="education" column="education" />
+		<result property="teaching" column="teaching" />
+		<result property="specialty" column="specialty" />
+		<result property="isProfessor" column="is_professor" />
+		<result property="soft" column="soft" />
+		<result property="lowPrice" column="low_price"/>
+		<result property="cityId" column="city_id"/>
+		<result property="districtId" column="district_id"/>
+		<result property="recommendId" column="recommendId"/>
+		<result property="studentNum" column="studentnum"/>
+		<result property="star" column="star" />
+		<result property="assessNum" column="assessNum"/>
+		<result property="cityName" column="cityName"/>
+		<result property="districtName" column="districtName"/>
+		<result property="address" column="address"/>
+		<result property="teachingEnounce" column="teaching_enounce"/>
+		<result property="auditingDate" column="auditing_date"/>
+		<result property="birthday" column="birthday"/>
+		<result property="cardStatus" column="card_status"/>
+		<result property="educationStatus" column="education_status"/>
+		<result property="teachingStatus" column="teaching_status"/>
+		<result property="specialtyStatus" column="specialty_status"/>
+		<result property="subjects" column="subjects"/>
+		<result property="majors" column="majors"/>
+		<result property="zoomMeetingUserId" column="zoom_meeting_user_id"/>
+		<collection property="userExpand" ofType="UserExpand">
+			<result property="realname" column="user_name"/>
+			<result property="avatar" column="user_avatar"/>
+			<result property="mobile" column="user_mobile"/>
+			<result property="nickname" column="user_nickname"/>
+			<result property="email" column="user_email"/>
+			<result property="age" column="user_age"/>
+			<result property="birthday" column="birthday"/>
+			<result property="hideStatus" column="user_hide_status"/>
+		</collection>
+	</resultMap>
+	<resultMap id="TeacherContentResult" type="Teacher" extends="TeacherResult">
+		<result property="teachingLive" column="teaching_live" />
+		<result property="teachingSuccess" column="teaching_success" />
+		<result property="goodAssess" column="good_num" />
+		<result property="middleAssess" column="middle_num" />
+		<result property="badAssess" column="bad_num" />
+		<result property="totalAssess" column="assess_num" />
+		<result property="studentNum" column="student_num" />
+		<result property="visitnum" column="browse_num" />
+		<result property="description" column="description" />
+		<result property="attribute" column="attribute" />
+		<result property="speed" column="speed" />
+		<result property="courseNum" column="courseNum" />
+		<result property="addressNum" column="addressNum" />
+		<result property="subjectsNum" column="subjectsNum" />
+		<result property="majorsNum" column="majorsNum" />
+		<result property="classhourNum" column="classhournum"/>
+		<result property="picPath" column="user_avatar"/>
+	</resultMap>
+	<resultMap id="TeacherListResult" type="QueryTeacher">
+		<result property="id" column="id" />
+		<result property="sex" column="sex"/>
+		<result property="seniority" column="seniority" />
+		<result property="userId" column="user_id" />
+		<result property="status" column="status" />
+		<result property="degree" column="degree" />
+		<result property="cityId" column="city_id"/>
+		<result property="profession" column="profession" />
+		<result property="isProfessor" column="is_professor"/>
+		<result property="createTime" column="create_time" />
+		<result property="soft" column="soft" />
+		<result property="star" column="star" />
+		<result property="recommendId" column="recommendId"/>
+		<result property="cityName" column="cityName"/>
+		<result property="districtName" column="districtName"/>
+		<result property="address" column="address"/>
+		<result property="picPath" column="picPath" />
+		<result property="career" column="career" />
+		<result property="lowPrice" column="low_price"/>
+		<result property="teachingEnounce" column="teaching_enounce"/>
+		<result property="subjects" column="subjects"/>
+		<result property="majors" column="majors"/>
+		<result property="courseNum" column="courseNum" />
+		<result property="cardStatus" column="card_status" />
+		<result property="educationStatus" column="education_status" />
+		<result property="teachingStatus" column="teaching_status" />
+		<result property="specialtyStatus" column="specialty_status" />
+		<collection property="userExpand" ofType="UserExpand">
+			<result property="realname" column="user_name"/>
+			<result property="avatar" column="user_avatar"/>
+			<result property="mobile" column="user_mobile"/>
+			<result property="nickname" column="user_nickname"/>
+			<result property="age" column="user_age"/>
+			<result property="email" column="user_email"/>
+			<result property="birthday" column="birthday"/>
+			<result property="hideStatus" column="user_hide_status"/>
+		</collection>
+		<!-- <collection property="courseList" column="id" ofType="Course" select="CourseMapper.getCourseByTeacherId"/>  -->
+	</resultMap>
+	<sql id="edu_teacher_columns">
+		edu_teacher.id,
+		edu_teacher.sex,
+		edu_teacher.status,
+		edu_teacher.create_time,
+		edu_teacher.user_id,
+		edu_teacher.finish_school,
+		edu_teacher.degree,
+		edu_teacher.profession,
+		edu_teacher.seniority,
+		edu_teacher.peculiarity,
+		edu_teacher.card,
+		edu_teacher.education,
+		edu_teacher.teaching,
+		edu_teacher.specialty,
+		edu_teacher.is_professor,
+		edu_teacher.soft,
+		edu_teacher.low_price,
+		edu_teacher.city_id,
+		edu_teacher.district_id,
+		edu_teacher.teaching_enounce,
+		edu_teacher.teaching_live,
+		edu_teacher.teaching_success,
+		edu_teacher.auditing_date,
+		edu_teacher.zoom_meeting_user_id
+	</sql>
+	
+	<sql id="edu_teacher_nocontent_columns">
+		edu_teacher.id,
+		edu_teacher.sex,
+		edu_teacher.status,
+		edu_teacher.create_time,
+		edu_teacher.user_id,
+		edu_teacher.finish_school,
+		edu_teacher.degree,
+		edu_teacher.profession,
+		edu_teacher.seniority,
+		edu_teacher.peculiarity,
+		edu_teacher.card,
+		edu_teacher.education,
+		edu_teacher.teaching,
+		edu_teacher.specialty,
+		edu_teacher.is_professor,
+		edu_teacher.soft,
+		edu_teacher.low_price,
+		edu_teacher.city_id,
+		edu_teacher.district_id,
+		edu_teacher.teaching_enounce,
+		edu_teacher.auditing_date,
+		edu_teacher.zoom_meeting_user_id
+	</sql>
+
+	<sql id="edu_teacher_properties">
+		#{id},
+		#{sex},
+		#{status},
+		#{createTime},
+		#{userId},
+		#{finishSchool},
+		#{degree},
+		#{profession},
+		#{seniority},
+		#{peculiarity},
+		#{card},
+		#{education},
+		#{teaching},
+		#{specialty},
+		#{isProfessor},
+		#{soft},
+		#{lowPrice},
+		#{cityId},
+		#{districtId},
+		#{teachingEnounce},
+		#{teachingLive},
+		#{teachingSuccess},
+		#{auditingDate},
+		#{zoomMeetingUserId}
+	</sql>
+	
+
+	<!-- 创建讲师 在这里有上传图片这个功能 -->
+	<insert id="createTeacher" parameterType="Teacher" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_teacher (
+		<include refid="edu_teacher_columns" />
+		) VALUES (
+		<include refid="edu_teacher_properties" />
+		)
+	</insert>
+
+	<!-- 通过ID删除教师 -->
+	<delete id="deleteTeacherById" parameterType="Long">
+		delete from
+		edu_teacher
+		where
+		id = #{value}
+	</delete>
+
+	<!-- 修改教师基本信息 -->
+	<update id="updateTeacher" parameterType="Teacher">
+		update edu_teacher SET
+		id = #{id},
+		sex = #{sex},
+		finish_school = #{finishSchool},
+		degree = #{degree},
+		profession = #{profession},
+		seniority = #{seniority},
+		peculiarity = #{peculiarity},
+		card = #{card},
+		education = #{education},
+		teaching = #{teaching},
+		specialty = #{specialty},
+		is_professor = #{isProfessor},
+		soft = #{soft},
+		`STATUS` = #{status},
+		auditing_date = #{auditingDate}
+		<if test="teachingEnounce != null and teachingEnounce != ''">
+			,teaching_enounce = #{teachingEnounce}
+		</if>
+		<if test="teachingLive != null and teachingLive != ''">
+			,teaching_live = #{teachingLive}
+		</if>
+		<if test="teachingSuccess != null and teachingSuccess != ''">
+			,teaching_success = #{teachingSuccess}
+		</if>
+		<if test="cityId != null and cityId != 0">
+			,city_id = #{cityId}
+		</if>
+		<if test="districtId != null and districtId != 0">
+			,district_id = #{districtId}
+		</if>
+		where
+		id = #{id}
+	</update>
+	<!-- 修改教师性别 -->
+	<update id="updateTeacherSex" parameterType="Teacher">
+		update edu_teacher SET
+		sex = #{sex}
+		where
+		user_id = #{userId}
+	</update>
+
+	<!-- 修改教师直播接口返回的用户ID -->
+	<update id="updateZoomMeetingUserId" parameterType="java.util.Map">
+		UPDATE edu_teacher SET
+		zoom_meeting_user_id = #{zoomMeetingUserId}
+		WHERE id = #{teacherId}
+	</update>
+	<!-- 修改教师学生人数 -->
+	<!-- <update id="updateTeacherStudentNum" parameterType="Teacher">
+		update edu_teacher SET
+		student_num = #{studentNum}
+		where
+		id = #{id}
+	</update> -->
+	
+	<!-- 韩教授认证及状态 -->
+	<update id="updateTeacherStatus" parameterType="Teacher">
+		update edu_teacher SET
+		is_professor = #{isProfessor}
+		<if test="status != null and status != 0">
+			,status = #{status}
+		</if>
+		<if test="auditingDate != null and auditingDate != ''">
+			,auditing_date = #{auditingDate}
+		</if>
+		where
+		id = #{id}
+	</update>
+	
+	<!-- 查询单个教师详细信息 -->
+	<select id="getTeacherById" resultMap="TeacherContentResult" parameterType="java.util.Map">
+		select
+		<include refid="edu_teacher_columns" />,
+		area_1.AREA_NAME as cityName,
+		area_2.AREA_NAME as districtName,
+		edu_user_address.ADDRESS as address,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile,
+		user_user.email as user_email,
+		user_expand.birthday as birthday,
+		user_expand.user_info as career,
+		user_expand.hide_status as user_hide_status,
+		edu_teacher_profile.good_num,
+		edu_teacher_profile.middle_num,
+		edu_teacher_profile.bad_num,
+		edu_teacher_profile.assess_num,
+		edu_teacher_profile.student_num,
+		edu_teacher_profile.browse_num,
+		edu_teacher_profile.description,
+		edu_teacher_profile.attribute,
+		edu_teacher_profile.speed,
+		edu_teacher_profile.card_status,
+		edu_teacher_profile.education_status,
+		edu_teacher_profile.teaching_status,
+		edu_teacher_profile.specialty_status,
+		IFNULL(edu_teacher_profile.star, 0) as star,
+		COUNT(DISTINCT edu_course.id) as courseNum,
+		group_concat(distinct sys_subject.subject_name) as subjects,
+		group_concat(distinct edu_major.name) as majors,
+		COUNT(DISTINCT edu_teacher_class_hour_${serial}.id) as classhournum
+		from edu_teacher 
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		left join edu_teacher_profile on edu_teacher.id=edu_teacher_profile.teacher_id
+		left join user_user on edu_teacher.user_id = user_user.id
+		left join edu_teacher_major on edu_teacher.id=edu_teacher_major.teacher_id
+		left join edu_teacher_subject on edu_teacher.id=edu_teacher_subject.teacher_id
+		left join sys_subject on edu_teacher_subject.subject_id=sys_subject.subject_id
+		left join edu_major on edu_teacher_major.major_id = edu_major.id
+		LEFT JOIN edu_user_area area_1 ON edu_teacher.city_id = area_1.ID
+		LEFT JOIN edu_user_area area_2 on edu_teacher.district_id = area_2.ID
+		LEFT JOIN edu_user_address ON edu_teacher.user_id = edu_user_address.user_id AND edu_user_address.IS_FIRST = 1
+		LEFT JOIN edu_course ON edu_teacher.id = edu_course.teacher_id
+		LEFT JOIN edu_teacher_class_hour_${serial} ON edu_teacher.id = edu_teacher_class_hour_${serial}.teacher_id AND edu_teacher_class_hour_${serial}.`status` = 2 AND edu_teacher_class_hour_${serial}.date_day >= date_format(now(),'%Y-%m-%d')
+		where edu_teacher.status != -1
+		and edu_teacher.id = ${teacherId}
+	</select>
+	
+	<!-- 查询单个教师详细信息 -->
+	<select id="getTeacherByUserId" resultMap="TeacherContentResult" parameterType="Long">
+		select
+		<include refid="edu_teacher_columns" />,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_expand.age as user_age,
+		user_expand.hide_status as user_hide_status,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile,
+		user_user.email as user_email,
+		user_expand.birthday as birthday,
+		edu_teacher_profile.card_status,
+		edu_teacher_profile.education_status,
+		edu_teacher_profile.teaching_status,
+		edu_teacher_profile.specialty_status,
+		GROUP_CONCAT(DISTINCT sys_subject.SUBJECT_NAME) as subjects,
+		GROUP_CONCAT(DISTINCT edu_major.`name`) as majors,
+		COUNT(DISTINCT edu_course.id) as courseNum,
+		COUNT(DISTINCT edu_user_address.id) as addressNum,
+		COUNT(DISTINCT edu_teacher_subject.id) as subjectsNum,
+		COUNT(DISTINCT edu_teacher_major.id) as majorsNum
+		from edu_teacher left join user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_course ON edu_teacher.id = edu_course.teacher_id
+		LEFT JOIN edu_user_address ON edu_teacher.user_id = edu_user_address.user_id
+		LEFT JOIN edu_teacher_profile on edu_teacher.id=edu_teacher_profile.teacher_id
+		LEFT JOIN edu_teacher_subject ON edu_teacher.id = edu_teacher_subject.teacher_id
+		LEFT JOIN sys_subject ON edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		LEFT JOIN edu_teacher_major ON edu_teacher.id = edu_teacher_major.teacher_id
+		LEFT JOIN edu_major ON edu_teacher_major.major_id = edu_major.id
+		where
+		edu_teacher.user_id = #{value}
+	</select>
+	
+	<!-- 查询教师列表 -->
+	<select id="getTeacherList" resultMap="TeacherResult"
+		parameterType="QueryTeacher">
+		select
+		<include refid="edu_teacher_nocontent_columns" />,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile
+		from edu_teacher left join user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		where edu_teacher.status = 1
+		<if test="cityId>0">
+		and edu_teacher.city_id=#{cityId} 
+		</if>
+		<if test="orderby==1">
+		order by edu_teacher.create_time desc
+		</if>
+		<if test="showNum>0">
+		limit #{showNum}
+		</if>
+	</select>
+	
+	<!-- 后台根据条件分页查询教师列表 -->
+	<select id="queryTeacherListPage" resultMap="TeacherListResult" parameterType="java.util.Map">
+		select
+		DISTINCT
+		<include refid="edu_teacher_nocontent_columns" />,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile,
+		user_user.email as user_email,
+		area_1.AREA_NAME as cityName,
+		area_2.AREA_NAME as districtName,
+		edu_user_address.ADDRESS as address
+		from edu_teacher
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_user_area area_1 ON edu_teacher.city_id = area_1.ID
+		LEFT JOIN edu_user_area area_2 on edu_teacher.district_id = area_2.ID
+		LEFT JOIN edu_user_address ON edu_teacher.user_id = edu_user_address.user_id AND edu_user_address.IS_FIRST = 1
+		<where>
+			edu_teacher.status != -1
+		<if test="e.status != null and e.status != '' and e.status != 0">
+			and edu_teacher.status = #{e.status}
+		</if>
+		<if test="e.name != null and e.name != ''">
+			and	<![CDATA[ user_expand.realname LIKE CONCAT('%',#{e.name},'%')  ]]>
+		</if>
+		<if test="e.profession != null and e.profession != ''">
+			and edu_teacher.profession LIKE CONCAT('%', #{e.profession}, '%')
+		</if>
+		<if test="e.seniority != null and e.seniority != '' and e.seniority != 0">
+			and edu_teacher.seniority = #{e.seniority}
+		</if>
+		<if test="e.degree != null and e.degree != ''">
+			and edu_teacher.degree LIKE CONCAT('%', #{e.degree}, '%')
+		</if>
+		<if test="e.isProfessor != 0">
+			and edu_teacher.is_professor = #{e.isProfessor}
+		</if>
+		<if test="e.mobile != null and e.mobile != ''">
+			and user_user.mobile LIKE CONCAT('%', #{e.mobile}, '%')
+		</if>
+		</where>
+		order by edu_teacher.soft,edu_teacher.CREATE_TIME desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryTeacherListPageCount" resultType="int" parameterType="java.util.Map">
+		select
+		count(DISTINCT edu_teacher.id)
+		from edu_teacher
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_user_area area_1 ON edu_teacher.city_id = area_1.ID
+		LEFT JOIN edu_user_area area_2 on edu_teacher.district_id = area_2.ID
+		LEFT JOIN edu_user_address ON edu_teacher.user_id = edu_user_address.user_id AND edu_user_address.IS_FIRST = 1
+		<where>
+			edu_teacher.status != -1
+		<if test="e.status != null and e.status != '' and e.status != 0">
+			and edu_teacher.status = #{e.status}
+		</if>
+		<if test="e.name != null and e.name != ''">
+			and	<![CDATA[ user_expand.realname LIKE CONCAT('%',#{e.name},'%')  ]]>
+		</if>
+		<if test="e.profession != null and e.profession != ''">
+			and edu_teacher.profession LIKE CONCAT('%', #{e.profession}, '%')
+		</if>
+		<if test="e.seniority != null and e.seniority != '' and e.seniority != 0">
+			and edu_teacher.seniority = #{e.seniority}
+		</if>
+		<if test="e.degree != null and e.degree != ''">
+			and edu_teacher.degree LIKE CONCAT('%', #{e.degree}, '%')
+		</if>
+		<if test="e.isProfessor != 0">
+			and edu_teacher.is_professor = #{e.isProfessor}
+		</if>
+		<if test="e.mobile != null and e.mobile != ''">
+			and user_user.mobile LIKE CONCAT('%', #{e.mobile}, '%')
+		</if>
+		</where>
+	</select>
+	
+	<!-- 批量查询教师列表 -->
+	<select id="queryTeacherInIds" resultMap="TeacherListResult" parameterType="String">
+		select
+		<include refid="edu_teacher_nocontent_columns" />,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile
+		from edu_teacher left join user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		<where>
+			edu_teacher.id in (${value}) edu_teacher.status != -1
+		</where>
+	</select>
+	
+	<!-- 根据专业 科目查询教师 -->
+	<select id="queryTeacherBySubjectMajor" parameterType="java.util.Map" resultMap="TeacherResult">
+		select <include refid="edu_teacher_nocontent_columns" /> ,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_expand.user_info as career,
+		user_expand.hide_status as user_hide_status,
+		edu_teacher_profile.assess_num as assessNum,
+		user_user.nickname as user_nickname,
+		group_concat(distinct sys_subject.subject_name) as subjects,
+		group_concat(distinct edu_major.name) as majors
+<!-- 		from edu_teacher  -->
+<!-- 		left join user_user on edu_teacher.user_id = user_user.id  -->
+<!-- 		left join user_expand on edu_teacher.user_id = user_expand.user_id  -->
+<!-- 		left join edu_teacher_major on edu_teacher.id=edu_teacher_major.teacher_id -->
+<!-- 		left join edu_teacher_subject on edu_teacher.id=edu_teacher_subject.teacher_id -->
+<!-- 		left join edu_teacher_profile on edu_teacher.id=edu_teacher_profile.teacher_id -->
+<!-- 		left join sys_subject on edu_teacher_subject.subject_id=sys_subject.subject_id -->
+<!-- 		left join edu_major on edu_teacher_major.major_id = edu_major.id -->
+		from edu_teacher
+		left join user_user on edu_teacher.user_id = user_user.id 
+		left join user_expand on edu_teacher.user_id = user_expand.user_id 
+		left join edu_teacher_profile on edu_teacher.id=edu_teacher_profile.teacher_id 
+		left join edu_course on edu_course.teacher_id=edu_teacher.id
+		left join edu_subject_major on edu_subject_major.id=edu_course.subject_major_id
+		left join sys_subject on edu_subject_major.subject_id=sys_subject.subject_id
+		left join edu_major on edu_subject_major.major_id=edu_major.id
+		where edu_teacher.status = 1 and edu_course.isavaliable=1
+		<if test="majorId>0">
+<!-- 		and	edu_teacher_major.major_id=#{majorId} -->
+			and edu_subject_major.major_id=#{majorId}
+		</if>
+		<if test="subjectId>0">
+		and (sys_subject.subject_id=#{subjectId} or sys_subject.parent_id=#{subjectId}) 
+		</if>
+		<if test="cityId>0">
+		and edu_teacher.city_id=#{cityId} 
+		</if>
+		group by edu_teacher.id
+		order by 
+		<if test="random!=null and random!=''">
+			rand()
+		</if>
+		<if test="random==null or random==''">
+			edu_teacher.create_time desc
+		</if>
+		<if test="num>0">
+			limit #{num}
+		</if>
+	</select>
+	
+	<select id="queryAllTeacherCount" resultType="int">
+		select count(1) from edu_teacher where status=1
+	</select>
+	
+	
+	<!-- 前台页面根据推荐模块获得教师列表 -->
+	<select id="getTeacherListByHomePage" parameterType="Long" resultMap="TeacherListResult">
+		select
+		edu_teacher.id,
+		edu_teacher.user_id,
+		edu_teacher.sex,
+		edu_teacher.city_id,
+		edu_user_area.AREA_NAME as cityName,
+		edu_teacher.profession,
+		edu_website_teacher_detail.recommendId,
+		IFNULL(edu_teacher_profile.star, 0) as star,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_expand.user_info as career,
+		user_expand.hide_status as user_hide_status,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile,
+		GROUP_CONCAT(DISTINCT sys_subject.SUBJECT_NAME) as subjects,
+		GROUP_CONCAT(DISTINCT edu_major.`name`) as majors
+		from edu_teacher 
+		left join edu_website_teacher_detail on edu_teacher.id = edu_website_teacher_detail.teacher_id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		left join edu_user_area on edu_teacher.city_id = edu_user_area.id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_teacher_profile on edu_teacher.id = edu_teacher_profile.teacher_id
+		LEFT JOIN edu_teacher_subject ON edu_teacher.id = edu_teacher_subject.teacher_id
+		LEFT JOIN sys_subject ON edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		LEFT JOIN edu_teacher_major ON edu_teacher.id = edu_teacher_major.teacher_id
+		LEFT JOIN edu_major ON edu_teacher_major.major_id = edu_major.id
+		<where>
+			<if test="value != 0">
+				edu_website_teacher_detail.recommendId=#{value}
+			</if>
+			<if test="value == 0">
+				edu_website_teacher_detail.recommendId <![CDATA[ > 0 ]]>
+			</if>
+		</where>
+		GROUP BY edu_teacher.id,edu_website_teacher_detail.recommendId
+		order by edu_website_teacher_detail.recommendId,edu_website_teacher_detail.orderNum desc,edu_website_teacher_detail.id
+	</select>
+	
+	<!-- 前台页面根据条件查询教师列表 -->
+	<select id="queryTeacherList" parameterType="QueryTeacher" resultMap="TeacherResult">
+		select
+		<include refid="edu_teacher_nocontent_columns"/>,
+		IFNULL(edu_teacher_profile.student_num, 0) as studentnum,
+		IFNULL(edu_teacher_profile.assess_num, 0) as assessNum,
+		IFNULL(edu_teacher_profile.star, 0) as star,
+		edu_teacher_profile.card_status,
+		edu_teacher_profile.education_status,
+		edu_teacher_profile.teaching_status,
+		edu_teacher_profile.specialty_status,
+		edu_user_area.AREA_NAME as cityName,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_expand.hide_status as user_hide_status,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile,
+		GROUP_CONCAT(DISTINCT sys_subject.SUBJECT_NAME) as subjects,
+		GROUP_CONCAT(DISTINCT edu_major.`name`) as majors
+		from edu_teacher
+		LEFT JOIN edu_course on edu_teacher.id = edu_course.teacher_id
+		LEFT JOIN edu_teacher_profile on edu_teacher.id = edu_teacher_profile.teacher_id
+		LEFT JOIN edu_user_area on edu_teacher.city_id = edu_user_area.id
+		LEFT JOIN user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_teacher_subject ON edu_teacher.id = edu_teacher_subject.teacher_id
+		LEFT JOIN sys_subject ON edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		LEFT JOIN edu_teacher_major ON edu_teacher.id = edu_teacher_major.teacher_id
+		LEFT JOIN edu_major ON edu_teacher_major.major_id = edu_major.id
+		<where>
+			<if test="e.cityId != null and e.cityId != 0">
+				and edu_teacher.city_id = #{e.cityId}
+			</if>
+			<if test="e.name != null and e.name != ''">
+				and ((INSTR(#{e.name},user_expand.realname) > 0 OR user_expand.realname LIKE CONCAT('%',#{e.name},'%'))
+					OR (INSTR(#{e.name},user_user.nickname) > 0 OR user_user.nickname LIKE CONCAT('%',#{e.name},'%')))
+				AND user_user.nickname != "" AND user_expand.realname != ""
+			</if>
+			<if test="e.districtId != null and e.districtId != 0">
+				and edu_teacher.district_id = #{e.districtId}
+			</if>
+			<if test="e.subjectId != null and e.subjectId != 0">
+				and (sys_subject.SUBJECT_ID = #{e.subjectId} OR sys_subject.parent_id = #{e.subjectId})
+			</if>
+			<if test="e.majorId != null and e.majorId != 0">
+				and edu_teacher_major.major_id = #{e.majorId}
+			</if>
+			<if test="e.sex != -1 and e.sex >= 0">
+				and edu_teacher.sex = #{e.sex}
+			</if>
+			<if test="e.minPrice != null and e.minPrice != '' and e.minPrice >= 0 and e.maxPrice != null and e.maxPrice != '' and e.maxPrice >= 0">
+				and edu_teacher.low_price BETWEEN #{e.minPrice} AND #{e.maxPrice}
+			</if>
+			<if test="e.minSeniority != null and e.minSeniority > -1 and e.maxSeniority != null and e.maxSeniority > 0">
+				and edu_teacher.seniority BETWEEN #{e.minSeniority} AND #{e.maxSeniority}
+			</if>
+			<if test="e.sellType != null and e.sellType != 0">
+				and edu_course.sell_type = #{e.sellType}
+			</if>
+			<if test="e.courseModel != null and e.courseModel != '' and e.courseModel != 'all'">
+				and edu_course.course_model LIKE CONCAT('%', #{e.courseModel}, '%')
+			</if>
+			<if test="e.suitStudent != null and e.suitStudent != '' and e.suitStudent != 'all'">
+				and edu_course.suit_student = #{e.suitStudent}
+			</if>
+			and edu_teacher.`STATUS` = 1
+		</where>
+		GROUP BY edu_teacher.id
+		<if test="e.order != null and e.order != ''">
+			<if test="e.order == 'human'">
+				order by edu_teacher_profile.browse_num desc
+			</if>
+			<if test="e.order == 'assess'">
+				order by edu_teacher_profile.assess_num desc
+			</if>
+			<if test="e.order == 'price'">
+				order by edu_teacher.low_price asc
+			</if>
+		</if>
+		<if test="e.order == null or e.order == ''">
+			order by edu_teacher.CREATE_TIME desc
+		</if>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryTeacherListCount" parameterType="QueryTeacher" resultType="int">
+		select 
+		count(DISTINCT edu_teacher.id)
+		from edu_teacher
+		LEFT JOIN edu_course on edu_teacher.id = edu_course.teacher_id
+		LEFT JOIN edu_teacher_profile on edu_teacher.id = edu_teacher_profile.teacher_id
+		LEFT JOIN edu_user_area on edu_teacher.city_id = edu_user_area.id
+		LEFT JOIN user_expand on edu_teacher.user_id = user_expand.user_id
+		LEFT JOIN user_user ON edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_teacher_subject ON edu_teacher.id = edu_teacher_subject.teacher_id
+		LEFT JOIN sys_subject ON edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		LEFT JOIN edu_teacher_major ON edu_teacher.id = edu_teacher_major.teacher_id
+		LEFT JOIN edu_major ON edu_teacher_major.major_id = edu_major.id
+		<where>
+			<if test="e.cityId != null and e.cityId != 0">
+				and edu_teacher.city_id = #{e.cityId}
+			</if>
+			<if test="e.name != null and e.name != ''">
+				and ((INSTR(#{e.name},user_expand.realname) > 0 OR user_expand.realname LIKE CONCAT('%',#{e.name},'%'))
+					OR (INSTR(#{e.name},user_user.nickname) > 0 OR user_user.nickname LIKE CONCAT('%',#{e.name},'%')))
+				AND user_user.nickname != "" AND user_expand.realname != ""
+			</if>
+			<if test="e.districtId != null and e.districtId != 0">
+				and edu_teacher.district_id = #{e.districtId}
+			</if>
+			<if test="e.subjectId != null and e.subjectId != 0">
+				and (sys_subject.SUBJECT_ID = #{e.subjectId} OR sys_subject.parent_id = #{e.subjectId})
+			</if>
+			<if test="e.majorId != null and e.majorId != 0">
+				and edu_teacher_major.major_id = #{e.majorId}
+			</if>
+			<if test="e.sex != -1 and e.sex >= 0">
+				and edu_teacher.sex = #{e.sex}
+			</if>
+			<if test="e.minPrice != null and e.minPrice != '' and e.minPrice >= 0 and e.maxPrice != null and e.maxPrice != '' and e.maxPrice >= 0">
+				and edu_teacher.low_price BETWEEN #{e.minPrice} AND #{e.maxPrice}
+			</if>
+			<if test="e.minSeniority != null and e.minSeniority > -1 and e.maxSeniority != null and e.maxSeniority > 0">
+				and edu_teacher.seniority BETWEEN #{e.minSeniority} AND #{e.maxSeniority}
+			</if>
+			<if test="e.sellType != null and e.sellType != 0">
+				and edu_course.sell_type = #{e.sellType}
+			</if>
+			<if test="e.courseModel != null and e.courseModel != '' and e.courseModel != 'all'">
+				and edu_course.course_model LIKE CONCAT('%', #{e.courseModel}, '%')
+			</if>
+			<if test="e.suitStudent != null and e.suitStudent != '' and e.suitStudent != 'all'">
+				and edu_course.suit_student = #{e.suitStudent}
+			</if>
+			and edu_teacher.`STATUS` = 1
+		</where>
+		<if test="e.order != null and e.order != ''">
+			<if test="e.order == 'human'">
+				order by edu_teacher_profile.browse_num desc
+			</if>
+			<if test="e.order == 'assess'">
+				order by edu_teacher_profile.assess_num desc
+			</if>
+			<if test="e.order == 'price'">
+				order by edu_teacher.low_price asc
+			</if>
+		</if>
+		<if test="e.order == null or e.order == ''">
+			order by edu_teacher.CREATE_TIME desc
+		</if>
+	</select>
+	
+	
+	<!-- 根据用户Id查询教师列表 -->
+	<select id="queryTeacherListByUserId" resultMap="TeacherListResult" parameterType="java.util.Map">
+		select 
+		DISTINCT
+		<include refid="edu_teacher_nocontent_columns"/>,
+		user_expand.realname as user_name,
+		user_expand.avatar as user_avatar,
+		user_user.nickname as user_nickname,
+		user_user.mobile as user_mobile,
+		user_expand.age as user_age,
+		edu_teacher_profile.card_status,
+		edu_teacher_profile.education_status,
+		edu_teacher_profile.teaching_status,
+		edu_teacher_profile.specialty_status,
+		IFNULL(edu_teacher_profile.star, 0) as star,
+		GROUP_CONCAT(DISTINCT sys_subject.SUBJECT_NAME) as subjects,
+		GROUP_CONCAT(DISTINCT edu_major.`name`) as majors
+		from edu_teacher 
+		left join edu_trxorder on edu_teacher.id = edu_trxorder.teacher_id
+		left join edu_teacher_profile on edu_teacher.id = edu_teacher_profile.teacher_id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		left join user_user on edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_teacher_subject ON edu_teacher.id = edu_teacher_subject.teacher_id
+		LEFT JOIN sys_subject ON edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		LEFT JOIN edu_teacher_major ON edu_teacher.id = edu_teacher_major.teacher_id
+		LEFT JOIN edu_major ON edu_teacher_major.major_id = edu_major.id
+		where edu_trxorder.trx_status = 'SUCCESS'
+		and edu_trxorder.user_id = #{e.userId}
+		and edu_teacher.status = 1
+		order by edu_trxorder.pay_time desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryTeacherListByUserIdCount" resultType="int" parameterType="java.util.Map">
+		select 
+		count(DISTINCT edu_teacher.id)
+		from edu_teacher 
+		left join edu_trxorder on edu_teacher.id = edu_trxorder.teacher_id
+		left join edu_teacher_profile on edu_teacher.id = edu_teacher_profile.teacher_id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+		left join user_user on edu_teacher.user_id = user_user.id
+		LEFT JOIN edu_teacher_subject ON edu_teacher.id = edu_teacher_subject.teacher_id
+		LEFT JOIN sys_subject ON edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		LEFT JOIN edu_teacher_major ON edu_teacher.id = edu_teacher_major.teacher_id
+		LEFT JOIN edu_major ON edu_teacher_major.major_id = edu_major.id
+		where edu_trxorder.trx_status = 'SUCCESS'
+		and edu_trxorder.user_id = #{e.userId}
+		and edu_teacher.status = 1
+		order by edu_trxorder.pay_time desc
+	</select>
+	<!-- 更新老师的城市城镇id -->
+	<update id="updateCityTown" parameterType="Teacher">
+		update edu_teacher set 
+		city_id=#{cityId},
+		district_id=#{districtId}
+		where id=#{id}
+	</update>
+	<!-- 更新教师表的最低价格 -->
+	<update id="updateLowPrice" parameterType="java.util.Map">
+		update edu_teacher set low_price=#{lowPrice} where id=#{id}
+	</update>
+</mapper>

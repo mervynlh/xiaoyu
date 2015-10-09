@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CustomerCourseMapper">
+
+        <resultMap id="CustomerCourseResult" type="CustomerCourse">
+            <result property="id" column="id"/>
+            <result property="title" column="title"/>
+            <result property="content" column="content"/>
+            <result property="teacherName" column="teacher_name"/>
+            <result property="mobile" column="mobile"/>
+            <result property="email" column="email"/>
+            <result property="status" column="status"/>
+            <result property="createTime" column="create_time"/>
+            <result property="createuserId" column="createuser_id"/>
+            <result property="joinNum" column="join_num"/>
+            <result property="remark" column="remark"/>
+        </resultMap>
+         
+         <resultMap id="CustomerCourseRecordResult" type="CustomerCourseRecord" >
+         <result property="recordId" column="id"/>
+         <result property="customerCourseId" column="customer_course_id"/>
+         <result property="userId" column="user_id"/>
+         <result property="joinTime" column="create_time"/>        
+         </resultMap>
+ 
+  	<resultMap id="QueryCustomerCourseResult" type="QueryCustomerCourse">
+            <result property="id" column="id"/>
+            <result property="title" column="title"/>
+            <result property="content" column="content"/>
+            <result property="teacherName" column="teacher_name"/>
+            <result property="mobile" column="mobile"/>
+            <result property="email" column="email"/>
+            <result property="status" column="status"/>
+            <result property="createTime" column="create_time"/>
+            <result property="createuserId" column="createuser_id"/>
+            <result property="joinNum" column="join_num"/>
+            <result property="remark" column="remark"/>
+        </resultMap>
+        
+        
+        <sql id="edu_customer_course_columns">
+            edu_customer_course.id,
+            edu_customer_course.title,
+            edu_customer_course.content,
+            edu_customer_course.teacher_name,
+            edu_customer_course.mobile,
+            edu_customer_course.email,
+            edu_customer_course.status,
+            edu_customer_course.create_time,
+            edu_customer_course.createuser_id,
+            edu_customer_course.join_num,
+            edu_customer_course.remark
+        </sql>
+
+        <sql id="edu_customer_course_properties">
+            #{id},
+            #{title},
+            #{content},
+            #{teacherName},
+            #{mobile},
+            #{email},
+            #{status},
+            #{createTime},
+            #{createuserId},
+            #{joinNum},
+            #{remark}
+        </sql>
+        <!-- 用户加入自定义课程表 -->
+        <sql id="edu_customer_course_record_columns">
+        edu_customer_course_record.id,
+        edu_customer_course_record.customer_course_id,
+        edu_customer_course_record.user_id,
+        edu_customer_course_record.create_time
+        </sql>
+        
+        <sql id="edu_customer_course_record_properties">
+        #{recordId},
+        #{customerCourseId},
+        #{userId},
+        #{joinTime}
+        </sql>
+        
+        <!-- 创建学员参加自定义课程投票记录 -->
+        <insert id="createcusCourseRecord" parameterType="CustomerCourseRecord" keyColumn="id" keyProperty="recordId" useGeneratedKeys="true">
+         insert into edu_customer_course_record(<include refid="edu_customer_course_record_columns"/>)
+                     values                    (<include refid="edu_customer_course_record_properties"/>)
+        </insert>
+         <!-- 根据条件查询用户自定义课程投票记录  -->
+         <select id="queryCusCourseRecordForList" parameterType="java.util.HashMap" resultMap="CustomerCourseRecordResult">
+         select <include refid="edu_customer_course_record_columns"/>
+         from    edu_customer_course_record
+         <where>
+         <if test="userId!=null and userId!=0">
+         <![CDATA[ and  edu_customer_course_record.user_id=#{userId} ]]>
+         </if>
+         <if test="cusCourseId!=null and cusCourseId!=0">
+          <![CDATA[ and edu_customer_course_record.customer_course_id=#{cusCourseId}]]>
+         </if>
+         </where>
+         </select>
+        
+        
+        <insert id="createCustomerCourse" parameterType="CustomerCourse" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_customer_course (<include refid="edu_customer_course_columns"/>) VALUES (<include refid="edu_customer_course_properties"/>)
+        </insert>
+
+        <delete id="deleteCustomerCourseById" parameterType="Long">
+            delete from edu_customer_course
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateCustomerCourse" parameterType="CustomerCourse">
+            update edu_customer_course SET
+                id = #{id},
+                title = #{title},
+                content = #{content},
+                teacher_name = #{teacherName},
+                mobile = #{mobile},
+                email = #{email},
+                status = #{status},
+                create_time = #{createTime},
+                createuser_id = #{createuserId},
+                join_num = #{joinNum},
+                remark = #{remark}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getCustomerCourseById" resultMap="CustomerCourseResult" parameterType="Long">
+            select
+            <include refid="edu_customer_course_columns"/>
+            from edu_customer_course
+            where
+                id = #{value}
+        </select>
+		
+		<!-- 后台分页查询CustomerCourse -->
+        <select id="getCustomerCourseList" resultMap="QueryCustomerCourseResult" parameterType="java.util.HashMap">
+            select
+            <include refid="edu_customer_course_columns"/>
+            from edu_customer_course
+            <where>
+            <if test="e.title!=null and e.title!=''">
+              <![CDATA[ and edu_customer_course.title like CONCAT('%',#{e.title},'%')]]>
+            </if>
+            <if test="e.status!=null and e.status>0">
+              <![CDATA[ and edu_customer_course.status=#{e.status}-1]]>
+            </if>
+            <if test="e.email!=null and e.email!=''">
+              <![CDATA[ and edu_customer_course.email like CONCAT('%',#{e.email},'%')]]>
+            </if>
+            <if test="e.id!=null and e.id!=''">
+              <![CDATA[ and edu_customer_course.id=#{e.id}]]>
+            </if>
+             <if test="e.teacherName!=null and e.teacherName!=''">
+              <![CDATA[ and edu_customer_course.teacher_name like CONCAT('%',#{e.teacherName},'%')]]>
+            </if>
+            </where>
+            order by edu_customer_course.create_time desc
+            <include refid="publicMapper.pageEnd" />
+        </select>
+        <select id="getCustomerCourseListCount" resultType="int" parameterType="java.util.HashMap">
+            select count(1)
+            from edu_customer_course
+            <where>
+             <if test="e.title!=null and e.title!=''">
+              <![CDATA[ and edu_customer_course.title like CONCAT('%',#{e.title},'%')]]>
+            </if>
+            <if test="e.status!=null and e.status>0">
+              <![CDATA[ and edu_customer_course.status=#{e.status}-1]]>
+            </if>
+              <if test="e.email!=null and e.email!=''">
+              <![CDATA[ and edu_customer_course.email like CONCAT('%',#{e.email},'%')]]>
+            </if>
+            <if test="e.id!=null and e.id!=''">
+              <![CDATA[ and edu_customer_course.id=#{e.id}]]>
+            </if>
+            <if test="e.teacherName!=null and e.teacherName!=''">
+              <![CDATA[ and edu_customer_course.teacher_name like CONCAT('%',#{e.teacherName},'%')]]>
+            </if>
+            </where>
+        </select>
+        
+        <!-- 前台查询自定义课程排行榜 -->
+        <select id="getCustomCourseRankings" parameterType="int" resultMap="CustomerCourseResult">
+		 select
+		 <include refid="edu_customer_course_columns"/>
+		 from edu_customer_course where edu_customer_course.status=0
+		 order by join_num desc
+		 limit #{value}
+	    </select>
+	      
+	    <!-- 前台查询自定义课程根据加入人数最多 -->
+	    <select id="getWebCustomerCourseList" parameterType="int" resultMap="QueryCustomerCourseResult">
+		    select  <include refid="edu_customer_course_columns"/>
+		    from     edu_customer_course
+		    where    edu_customer_course.status=0
+		    order by  join_num desc
+		    limit #{value}
+	    </select>
+	    
+	    <!-- 查询 参与人数记录 -->
+	    <select id="selectJoinCustomer" resultType="int">
+	    select count(1) from edu_customer_course_record 
+	    </select>
+	    
+        
+</mapper>

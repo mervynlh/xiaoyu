@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseMinusMapper">
+	<resultMap id="CourseMinusResult" type="CourseMinus">
+		<result property="id" column="id" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="courseId" column="course_id" />
+		<result property="minusNum" column="minus_num" />
+		<result property="discount" column="discount" />
+		<result property="createTime" column="create_time" />
+		<result property="details" column="details" />
+	</resultMap>
+	
+	<sql id="course_minus_columns">
+		edu_course_minus.id,
+		edu_course_minus.teacher_id,
+		edu_course_minus.course_id,
+		edu_course_minus.minus_num,
+		edu_course_minus.discount,
+		edu_course_minus.create_time,
+		edu_course_minus.details
+	</sql>
+
+	<sql id="course_minus_properties">
+		#{id},
+		#{teacherId},
+		#{courseId},
+		#{minusNum},
+		#{discount},
+		#{createTime},
+		#{details}
+	</sql>
+
+	<insert id="createCourseMinus" parameterType="CourseMinus" keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert into edu_course_minus (
+		<include refid="course_minus_columns" />
+		) values (
+		<include refid="course_minus_properties" />
+		)
+	</insert>
+	
+	<select id="queryCourseMinusById" parameterType="Long" resultMap="CourseMinusResult">
+		select <include refid="course_minus_columns" /> from edu_course_minus where id=#{value}
+	</select>
+	
+	<update id="updateCourseMinus" parameterType="CourseMinus">
+		update edu_course_minus set 
+		minus_num=#{minusNum},
+		discount=#{discount},
+		create_time=#{createTime},
+		details=#{details}
+		where id=#{id}
+	</update>
+	
+	<!-- 根据条件查询课时优惠 -->
+	<select id="queryCourseMinusCondition" parameterType="CourseMinus" resultMap="CourseMinusResult">
+		select <include refid="course_minus_columns" /> from edu_course_minus where 1=1
+		<if test="courseId>0">
+			and course_id=#{courseId}
+		</if>
+		<if test="teacherId>0">
+			and teacher_id=#{teacherId}
+		</if>
+		order by minus_num 
+		limit 0,3
+	</select>
+	<delete id="delMinusById" parameterType="Long">
+		delete from edu_course_minus where id=#{value}
+	</delete>
+	<!-- 根据条件查询课时优惠 （课时倒序）-->
+	<select id="queryCourseMinusConditionForOrder" parameterType="CourseMinus" resultMap="CourseMinusResult">
+		select <include refid="course_minus_columns" /> from edu_course_minus where 1=1
+		<if test="teacherId>0">
+			and teacher_id=#{teacherId}
+		</if>
+		<if test="minusNum>0">
+			and <![CDATA[minus_num<=]]>#{minusNum}
+		</if>
+		order by minus_num desc 
+		limit 1
+	</select>
+</mapper>

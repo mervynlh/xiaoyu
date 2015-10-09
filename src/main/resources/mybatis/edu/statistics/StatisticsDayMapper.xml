@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="StatisticsDayMapper">
+
+        <resultMap id="StatisticsDayResult" type="StatisticsDay">
+            <result property="id" column="id"/>
+            <result property="statisticsTime" column="statistics_time"/>
+            <result property="loginNum" column="login_num"/>
+            <result property="registerNum" column="register_num"/>
+            <result property="userPayCourseNum" column="user_pay_course_num"/>
+            <result property="courseNum" column="course_num"/>
+            <result property="coursePayNum" column="course_pay_num"/>
+            <result property="coursePayAmount" column="course_pay_amount"/>
+            <result property="courseRefundNum" column="course_refund_num"/>
+            <result property="weiboNum" column="weibo_num"/>
+            <result property="blogNum" column="blog_num"/>
+            <result property="assesNum" column="asses_num"/>
+            <result property="quesNum" column="ques_num"/>
+            <result property="createTime" column="create_time"/>
+            <result property="coursePubNum" column="course_pub_num"/>
+            <result property="teacherNum" column="teacher_num"/>
+            <result property="userCashOutNum" column="user_cashout_num"/>
+            <result property="userCashOutAmount" column="user_cashout_amount"/>
+        </resultMap>
+
+        <sql id="edu_statistics_day_columns">
+            edu_statistics_day.id,
+            edu_statistics_day.statistics_time,
+            edu_statistics_day.login_num,
+            edu_statistics_day.register_num,
+            edu_statistics_day.user_pay_course_num,
+            edu_statistics_day.course_num,
+            edu_statistics_day.course_pay_num,
+            edu_statistics_day.course_pay_amount,
+            edu_statistics_day.course_refund_num,
+            edu_statistics_day.weibo_num,
+            edu_statistics_day.blog_num,
+            edu_statistics_day.asses_num,
+            edu_statistics_day.ques_num,
+            edu_statistics_day.create_time,
+            edu_statistics_day.course_pub_num,
+            edu_statistics_day.teacher_num,
+            edu_statistics_day.user_cashout_num,
+             edu_statistics_day.user_cashout_amount
+         </sql>
+		 <sql id="edu_statistics_day_columns_notnull">
+            IFNULL(edu_statistics_day.id,0) as id,
+            IFNULL(edu_statistics_day.statistics_time,'') as statistics_time,
+            IFNULL(edu_statistics_day.login_num,0) as login_num,
+            IFNULL(edu_statistics_day.register_num,0) as register_num,
+            IFNULL(edu_statistics_day.user_pay_course_num,0) as user_pay_course_num,
+            IFNULL(edu_statistics_day.course_num,0) as course_num,
+           	IFNULL( edu_statistics_day.course_pay_num,0) as course_pay_num,
+            IFNULL(edu_statistics_day.course_pay_amount,0) as course_pay_amount,
+            IFNULL(edu_statistics_day.course_refund_num,0) as course_refund_num,
+            IFNULL(edu_statistics_day.weibo_num,0) as weibo_num,
+            IFNULL(edu_statistics_day.blog_num,0) as blog_num,
+            IFNULL(edu_statistics_day.asses_num,0) as asses_num,
+            IFNULL(edu_statistics_day.ques_num,0) as ques_num,
+            IFNULL(edu_statistics_day.create_time,'') as create_time,
+            IFNULL(edu_statistics_day.course_pub_num,'') as course_pub_num,
+            IFNULL(edu_statistics_day.teacher_num,'') as teacher_num,
+            IFNULL(edu_statistics_day.user_cashout_num,'') as user_cashout_num,
+             IFNULL(edu_statistics_day.user_cashout_amount,'') as user_cashout_amount
+        </sql>
+        <sql id="edu_statistics_day_columns_sum">
+        	IFNULL(sum(edu_statistics_day.id),0) as id,
+            '' as statistics_time,
+            IFNULL(sum(edu_statistics_day.login_num),0) as login_num,
+            IFNULL(sum(edu_statistics_day.register_num),0) as register_num,
+            IFNULL(sum(edu_statistics_day.user_pay_course_num),0) as user_pay_course_num,
+            IFNULL(sum(edu_statistics_day.course_num),0) as course_num,
+            IFNULL(sum(edu_statistics_day.course_pay_num),0) as course_pay_num,
+            IFNULL(sum(edu_statistics_day.course_pay_amount),0) as course_pay_amount,
+            IFNULL(sum( edu_statistics_day.course_refund_num),0) as course_refund_num,
+            IFNULL(sum(edu_statistics_day.weibo_num),0) as weibo_num,
+            IFNULL(sum( edu_statistics_day.blog_num),0) as blog_num,
+            IFNULL(sum(edu_statistics_day.asses_num),0) as asses_num,
+            IFNULL(sum(edu_statistics_day.ques_num),0) as ques_num,
+            '' as create_time,
+            IFNULL(sum(edu_statistics_day.course_pub_num),0) as course_pub_num,
+            IFNULL(sum(edu_statistics_day.teacher_num),0) as teacher_num,
+            IFNULL(sum(edu_statistics_day.user_cashout_num),0) as user_cashout_num,
+             IFNULL(sum(edu_statistics_day.user_cashout_amount),0) as user_cashout_amount
+        </sql>
+        <sql id="edu_statistics_day_properties">
+            #{id},
+            #{statisticsTime},
+            #{loginNum},
+            #{registerNum},
+            #{userPayCourseNum},
+            #{courseNum},
+            #{coursePayNum},
+            #{coursePayAmount},
+            #{courseRefundNum},
+            #{weiboNum},
+            #{blogNum},
+            #{assesNum},
+            #{quesNum},
+            #{createTime},
+            #{coursePubNum},
+            #{teacherNum},
+            #{userCashOutNum},
+            #{userCashOutAmount}
+        </sql>
+
+        <!-- 活跃人数 -->
+		<sql id="edu_statistics_loginNum">
+			select IfNULL(count(DISTINCT ul.user_id),0) from user_login_log as ul WHERE DATE_FORMAT(ul.login_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 新注册人数 -->
+		<sql id="edu_statistics_registerNum">
+			select count(1) from user_user as uu WHERE DATE_FORMAT(uu.createdate,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d') and user_type=0
+		</sql>
+		<!-- 支付成功人数(课程) -->
+		<sql id="edu_statistics_userPayCourseNum">
+			select count(DISTINCT et.user_id) from edu_trxorder as et WHERE DATE_FORMAT(et.pay_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 课程下单总数量 -->
+		<sql id="edu_statistics_courseNum">
+			select count(1) from edu_trxorder as et WHERE DATE_FORMAT(et.create_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 课程支付成功数量 -->
+		<sql id="edu_statistics_coursePayNum">
+			select count(1) from edu_trxorder as et WHERE DATE_FORMAT(et.pay_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d') and et.trx_status='SUCCESS'
+		</sql>
+		<!-- 课程支付成功金额 -->
+		<sql id="edu_statistics_coursePayAmount">
+			select IFNULL(sum(et.amount),0) from edu_trxorder as et WHERE DATE_FORMAT(et.pay_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d') and et.trx_status='SUCCESS'
+		</sql>
+		<!-- 课程退费订单量 -->
+		<sql id="edu_statistics_courseRefundNum">
+			select count(1) from edu_user_accounthistory as eu WHERE DATE_FORMAT(eu.create_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d') and eu.biz_type='COURSE' and eu.act_history_type='REFUND'
+		</sql>
+		<!-- 课程评论数 -->
+		<sql id="edu_statistics_assesNum">
+			select COUNT(1) from edu_course_assess as ec WHERE DATE_FORMAT(ec.create_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 课程发布数 -->
+		<sql id="edu_statistics_coursePubNum">
+			select COUNT(1) from edu_course as ec WHERE DATE_FORMAT(ec.addTime,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 教师入驻数 -->
+		<sql id="edu_statistics_teacherNum">
+			select COUNT(1) from edu_teacher as ec WHERE DATE_FORMAT(ec.create_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 用户提现数量 -->
+		<sql id="edu_statistics_userCashOutNum">
+			select count(1) from edu_user_cashout as ec WHERE DATE_FORMAT(ec.create_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		<!-- 用户提现金额 -->
+		<sql id="edu_statistics_userCashOutAmount">
+			select IFNULL(SUM(ec.cashout_money),0) from edu_user_cashout as ec WHERE DATE_FORMAT(ec.create_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		</sql>
+		
+		<!-- 添加网站统计web（天） -->
+        <insert id="createStatisticsDay" parameterType="Date"  >
+            insert INTO edu_statistics_day (<include refid="edu_statistics_day_columns"/>) VALUES (0,DATE_FORMAT(#{value},'%Y-%m-%d'),
+			(<include refid="edu_statistics_loginNum"/>),
+			(<include refid="edu_statistics_registerNum"/>),
+			(<include refid="edu_statistics_userPayCourseNum"/>),
+			(<include refid="edu_statistics_courseNum"/>),
+			(<include refid="edu_statistics_coursePayNum"/>),
+			(<include refid="edu_statistics_coursePayAmount"/>),
+			(<include refid="edu_statistics_courseRefundNum"/>),
+			0,0,
+			(<include refid="edu_statistics_assesNum"/>),
+			0,now(),
+			(<include refid="edu_statistics_coursePubNum"/>),
+			(<include refid="edu_statistics_teacherNum"/>),
+			(<include refid="edu_statistics_userCashOutNum"/>),
+			(<include refid="edu_statistics_userCashOutAmount"/>)
+			)
+        </insert>
+        
+        <!-- 更新社区的统计 -->
+        <update id="updateStatisticsDay" parameterType="StatisticsDay">
+        	update edu_statistics_day set 
+        	weibo_num=#{weiboNum},
+			blog_num=#{blogNum},
+			ques_num=#{quesNum}
+			where DATE_FORMAT(edu_statistics_day.statistics_time,'%Y-%m-%d')=DATE_FORMAT(#{statisticsTime},'%Y-%m-%d')
+        </update>
+        
+        <!-- 按年查询网站统计 -->
+        <select id="getStatisticsByYear" resultMap="StatisticsDayResult" parameterType="Map">
+            select
+			year.m,
+			<include refid="edu_statistics_day_columns_notnull"/>
+			FROM
+			(SELECT 12 as m UNION ALL
+			SELECT 11 UNION ALL
+			SELECT 10 UNION ALL
+			SELECT 09 UNION ALL
+			SELECT 08 UNION ALL
+			SELECT 07 UNION ALL
+			SELECT 06 UNION ALL
+			SELECT 05 UNION ALL
+			SELECT 04 UNION ALL
+			SELECT 03 UNION ALL
+			SELECT 02 UNION ALL
+			SELECT 01) as year
+			LEFT JOIN
+			(
+				SELECT
+				DATE_FORMAT(edu_statistics_day.statistics_time, '%m') as m,
+	            <include refid="edu_statistics_day_columns_sum"/>
+	            from edu_statistics_day
+	            WHERE DATE_FORMAT(edu_statistics_day.statistics_time, '%Y')=#{nowYear}
+	            GROUP BY m
+	        ) AS edu_statistics_day
+			on year.m = edu_statistics_day.m
+        </select>
+        <!-- 按月查询网站统计 -->
+        <select id="getStatisticsByMonth" resultMap="StatisticsDayResult" parameterType="Map">
+	        SELECT
+			DATE_FORMAT(day.d, '%d') as d,
+			 <include refid="edu_statistics_day_columns_notnull"/>
+			FROM
+			(SELECT
+			(#{nowMonth} - INTERVAL DAY(#{nowMonth}) DAY) + INTERVAL s DAY as d
+			FROM
+			(SELECT 31 AS s UNION ALL
+				SELECT 30 UNION ALL
+				SELECT 29 UNION ALL
+				SELECT 28 UNION ALL
+				SELECT 27 UNION ALL
+				SELECT 26 UNION ALL
+				SELECT 25 UNION ALL
+				SELECT 24 UNION ALL
+				SELECT 23 UNION ALL
+				SELECT 22 UNION ALL
+				SELECT 21 UNION ALL
+				SELECT 20 UNION ALL
+				SELECT 19 UNION ALL
+				SELECT 18 UNION ALL
+				SELECT 17 UNION ALL
+				SELECT 16 UNION ALL
+				SELECT 15 UNION ALL
+				SELECT 14 UNION ALL
+				SELECT 13 UNION ALL
+				SELECT 12 UNION ALL
+				SELECT 11 UNION ALL
+				SELECT 10 UNION ALL
+				SELECT 09 UNION ALL
+				SELECT 08 UNION ALL
+				SELECT 07 UNION ALL
+				SELECT 06 UNION ALL
+				SELECT 05 UNION ALL
+				SELECT 04 UNION ALL
+				SELECT 03 UNION ALL
+				SELECT 02 UNION ALL
+				SELECT 01 
+			) m
+			WHERE <![CDATA[s<=day(LAST_DAY(#{nowMonth})]]>)) 
+			AS day
+			LEFT JOIN
+			(
+				SELECT
+				DATE_FORMAT(edu_statistics_day.statistics_time, '%Y-%m-%d') AS d,
+	            <include refid="edu_statistics_day_columns"/>
+	            from edu_statistics_day
+	            WHERE DATE_FORMAT(edu_statistics_day.statistics_time, '%Y-%m')=#{nowYear}
+			) AS edu_statistics_day
+			ON day.d = edu_statistics_day.d
+		</select>
+		
+		<!-- 查询网站总统计,不分时间 -->
+        <select id="getStatisticsSumMsg" resultMap="StatisticsDayResult">
+	        select 
+	 			<include refid="edu_statistics_day_columns_sum"/>
+			from edu_statistics_day
+		</select>
+		<!-- 动态查询最近的活跃度 -->
+		<select id="getStatisticThirty" resultMap="StatisticsDayResult" parameterType="int">
+			select 
+	 			<include refid="edu_statistics_day_columns"/>
+			from edu_statistics_day
+			order by edu_statistics_day.statistics_time DESC
+			limit 0,#{value }
+		</select>
+		<!-- 查询时间段的统计集合 -->
+		 <select id="getStatisticsByDate" resultMap="StatisticsDayResult" parameterType="map">
+	 		select 
+ 			<include refid="edu_statistics_day_columns"/>
+			from edu_statistics_day
+			<where>
+				<if test="startTime!=null and startTime!=''">
+					and <![CDATA[edu_statistics_day.statistics_time>=#{startTime}]]>
+				</if>
+				<if test="endTime!=null and endTime!=''">
+					and <![CDATA[edu_statistics_day.statistics_time<=#{endTime}]]>
+				</if>
+			</where>
+		 </select>
+		 <!-- 日起段删除统计 -->
+		 <delete id="delStatisticsByDate" parameterType="map">
+		 	delete from edu_statistics_day 
+		 	<where>
+				<if test="startTime!=null and startTime!=''">
+					and <![CDATA[edu_statistics_day.statistics_time>=#{startTime}]]>
+				</if>
+				<if test="endTime!=null and endTime!=''">
+					and <![CDATA[edu_statistics_day.statistics_time<=#{endTime}]]>
+				</if>
+			</where>
+		 </delete>
+		 <!-- 删除指定天统计 -->
+		 <delete id="delStatisticsDay" parameterType="Date">
+		 	delete from edu_statistics_day 
+		 	WHERE DATE_FORMAT(edu_statistics_day.statistics_time,'%Y-%m-%d')=DATE_FORMAT(#{value},'%Y-%m-%d')
+		 </delete>
+	<!-- 今天的登录人数-->
+	<select id="statistics_loginNumToday" parameterType="date" resultType="int">
+		<include refid="edu_statistics_loginNum"></include>
+	</select>
+	<!-- 根据类型获取日期的统计数-->
+	<select id="getStatisticalNumByType" parameterType="map" resultType="int">
+		<if test="type=='ORDER_NUM'">
+			select count(1) from edu_trxorder as et WHERE DATE_FORMAT(et.create_time,'%Y-%m-%d')=DATE_FORMAT(#{date},'%Y-%m-%d')
+		</if>
+		<if test="type=='KPOINT_NUM'">
+			select count(1) from edu_course_kpoint as eck WHERE DATE_FORMAT(eck.add_time,'%Y-%m-%d')=DATE_FORMAT(#{date},'%Y-%m-%d')
+		</if>
+		<if test="type=='REGISTER_NUM'">
+			select count(1) from user_user as uu WHERE DATE_FORMAT(uu.createdate,'%Y-%m-%d')=DATE_FORMAT(#{date},'%Y-%m-%d')
+		</if>
+		<if test="type=='ASSES_NUM'">
+			select COUNT(1) from edu_course_assess as ec WHERE DATE_FORMAT(ec.create_time,'%Y-%m-%d')=DATE_FORMAT(#{date},'%Y-%m-%d')
+		</if>
+	</select>
+	<!-- 获取总课时 -->
+	<select id="getStatisticsKpoint" resultType="int">
+		SELECT COUNT(1) FROM EDU_COURSE_KPOINT
+	</select>
+	
+	<!-- 统计课程的购买量（受欢迎的程度） -->
+	<select id="queryStatisticsCourseByCondition" parameterType="java.util.Map" resultType="java.util.Map">
+		select 
+		edu_trxorder.course_id as courseId,
+		edu_trxorder.course_name as courseName,
+		count(*) as count,
+		user_expand.realname as teacherName,
+		edu_course.sell_type as sellType,
+		sum(amount) as totalAmount,
+		sum(lession_num) as totalLessionNum
+		from edu_trxorder
+		left join edu_course on edu_trxorder.course_id=edu_course.id
+		left join edu_teacher on edu_trxorder.teacher_id=edu_teacher.id
+		left join user_expand on edu_teacher.user_id=user_expand.user_id
+		where trx_status='success' 
+		<!-- 统计今天的课程信息数据 -->
+		<if test="e.queryType=='today'">
+		and to_days(pay_time)=to_days(now())
+		</if>
+		<!-- 统计昨天的课程信息数据 -->
+		<if test="e.queryType=='yesterday'">
+		<![CDATA[and to_days(now())-to_days(pay_time)=1  ]]>
+		</if>
+		<!-- 统计本周的课程信息数据 -->
+		<if test="e.queryType=='thisweek'">
+		and date_format(pay_time,"%U")= date_format(now(),"%U")
+		</if>
+		<!-- 统计上周的课程信息数据 -->
+		<if test="e.queryType=='lastweek'">
+		and yearweek(date_format(pay_time,'%Y-%m-%d')) = yearweek(now())-1
+		</if>
+		<!-- 统计本月的课程信息数据 -->
+		<if test="e.queryType=='thismonth'">
+		and month(pay_time)=month(now()) and year(pay_time)=year(now())
+		</if>
+		<!-- 统计上月的课程信息数据 -->
+		<if test="e.queryType=='lastmonth'">
+		and date_format(pay_time,'%Y-%m')=date_format(date_sub(curdate(), interval 1 month),'%Y-%m')
+		</if>
+		<!-- 自定义统计时间段的课程信息数据 -->
+		<if test="e.queryType=='other'">
+		<![CDATA[and date_format(pay_time,'%Y-%m-%d')<=date_format(#{e.endDate},'%Y-%m-%d') and  date_format(pay_time,'%Y-%m-%d')>=date_format(#{e.startDate},'%Y-%m-%d')]]>
+		</if>
+		<if test="e.sellType!=null and e.sellType">
+			and edu_course.sell_type=#{e.sellType}
+		</if>
+		group by course_id
+		<!-- 总金额倒序 -->
+		<if test="e.orderBy=='amountDesc'">
+		order by totalAmount desc
+		</if>
+		<!-- 总金额正序 -->
+		<if test="e.orderBy=='amountAsc'">
+		order by totalAmount
+		</if>
+		<!-- 销售量倒序 -->
+		<if test="e.orderBy=='countDesc'">
+		order by count desc
+		</if>
+		<!-- 销售量正序 -->
+		<if test="e.orderBy=='countAsc'">
+		order by count
+		</if>
+		<!-- 销售课时正序 -->
+		<if test="e.orderBy=='lessionDesc'">
+		order by totalLessionNum desc 
+		</if>
+		<!-- 销售课时正序 -->
+		<if test="e.orderBy=='lessionAsc'">
+		order by totalLessionNum
+		</if>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryStatisticsCourseByConditionCount" parameterType="java.util.Map" resultType="int">
+		select 
+		count(1)
+		from(select 
+		count(1)
+		from edu_trxorder
+		left join edu_course on edu_trxorder.course_id=edu_course.id
+		left join edu_teacher on edu_trxorder.teacher_id=edu_teacher.id
+		left join user_expand on edu_teacher.user_id=user_expand.user_id
+		where trx_status='success' 
+		<!-- 统计今天的课程信息数据 -->
+		<if test="e.queryType=='today'">
+		and to_days(pay_time)=to_days(now())
+		</if>
+		<!-- 统计昨天的课程信息数据 -->
+		<if test="e.queryType=='yesterday'">
+		<![CDATA[and to_days(now())-to_days(pay_time)=1  ]]>
+		</if>
+		<!-- 统计本周的课程信息数据 -->
+		<if test="e.queryType=='thisweek'">
+		and date_format(pay_time,"%U")= date_format(now(),"%U")
+		</if>
+		<!-- 统计上周的课程信息数据 -->
+		<if test="e.queryType=='lastweek'">
+		and yearweek(date_format(pay_time,'%Y-%m-%d')) = yearweek(now())-1
+		</if>
+		<!-- 统计本月的课程信息数据 -->
+		<if test="e.queryType=='thismonth'">
+		and month(pay_time)=month(now()) and year(pay_time)=year(now())
+		</if>
+		<!-- 统计上月的课程信息数据 -->
+		<if test="e.queryType=='lastmonth'">
+		and date_format(pay_time,'%Y-%m')=date_format(date_sub(curdate(), interval 1 month),'%Y-%m')
+		</if>
+		<!-- 自定义统计时间段的课程信息数据 -->
+		<if test="e.queryType=='other'">
+		<![CDATA[and date_format(pay_time,'%Y-%m-%d')<=date_format(#{e.endDate},'%Y-%m-%d') and  date_format(pay_time,'%Y-%m-%d')>=date_format(#{e.startDate},'%Y-%m-%d')]]>
+		</if>
+		<if test="e.sellType!=null and e.sellType">
+			and edu_course.sell_type=#{e.sellType}
+		</if>
+		group by course_id) as newTable
+	</select>
+</mapper>

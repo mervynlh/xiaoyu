@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseProfileMapper">
+
+        <resultMap id="CourseProfileResult" type="CourseProfile">
+            <result property="id" column="id"/>
+            <result property="courseId" column="course_id"/>
+            <result property="buycount" column="buycount"/>
+            <result property="viewcount" column="viewcount"/>
+            <result property="commentcount" column="commentcount"/>
+            <result property="questiongcount" column="questiongcount"/>
+            <result property="notecount" column="notecount"/>
+            <result property="playcount" column="playcount"/>
+            
+        </resultMap>
+
+        <sql id="edu_course_profile_columns">
+            edu_course_profile.id,
+            edu_course_profile.course_id,
+            edu_course_profile.buycount,
+            edu_course_profile.viewcount,
+            edu_course_profile.commentcount,
+            edu_course_profile.questiongcount,
+            edu_course_profile.notecount,
+            edu_course_profile.playcount
+        </sql>
+
+        <sql id="edu_course_profile_properties">
+            #{id},
+            #{courseId},
+            #{buycount},
+            #{viewcount},
+            #{commentcount},
+            #{questiongcount},
+            #{notecount},
+            #{playcount}
+        </sql>
+
+        <insert id="createCourseProfile" parameterType="CourseProfile" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_course_profile (<include refid="edu_course_profile_columns"/>) VALUES (<include refid="edu_course_profile_properties"/>)
+        </insert>
+
+        <delete id="deleteCourseProfileById" parameterType="Long">
+            delete from edu_course_profile
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateCourseProfile" parameterType="CourseProfile">
+            update edu_course_profile SET
+                id = #{id},
+                course_id = #{courseId},
+                buycount = #{buycount},
+                viewcount = #{viewcount},
+                commentcount = #{commentcount},
+                questiongcount = #{questiongcount},
+                notecount = #{notecount}
+            where
+                id = #{id}
+        </update>
+
+        <select id="getCourseProfileById" resultMap="CourseProfileResult" parameterType="Long">
+            select
+            <include refid="edu_course_profile_columns"/>
+            from edu_course_profile
+            where
+                id = #{value}
+        </select>
+		
+        <select id="getCourseProfileList" resultMap="CourseProfileResult" parameterType="CourseProfile">
+            select
+            <include refid="edu_course_profile_columns"/>
+            from edu_course_profile
+        </select>
+        
+        <!-- 更新课程的数据数量 -->
+        <update id="updateCount" parameterType="map" >
+        	update edu_course_profile 
+        	<if test="type=='buycount'">set buycount =buycount ${operation} #{count}</if>
+        	<if test="type=='viewcount'">set viewcount =viewcount ${operation} #{count}</if>
+        	<if test="type=='commentcount'">set commentcount =commentcount ${operation} #{count}</if>
+        	<if test="type=='questiongcount'">set questiongcount =questiongcount ${operation} #{count}</if>
+        	<if test="type=='notecount'">set notecount =notecount ${operation} #{count}</if>
+        	<if test="type=='playcount'">set playcount =playcount ${operation} #{count}</if>
+        	<if test="type=='watchpersoncount'">set watchpersoncount =watchpersoncount ${operation} #{count}</if>
+        	where course_id=#{courseId}
+        </update>
+        
+        <!-- 根据课程编号更新购买该课程的数量 -->
+        <update id="updateBuyCount" parameterType="String">
+        	update edu_course_profile 
+        	set edu_course_profile.buycount = (edu_course_profile.buycount + 1)
+        	where edu_course_profile.course_id in (#{value})
+        </update>
+        
+        <!-- 删除课程的同时删除记录 -->
+        <delete id="delByCourse" parameterType="long">
+        	delete from edu_course_profile where course_id=#{value}
+        </delete>
+</mapper>

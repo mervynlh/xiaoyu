@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseStudyhistoryMapper">
+
+	<resultMap id="CourseStudyhistoryResult" type="CourseStudyhistory">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="courseId" column="course_id" />
+		<result property="kpointId" column="kpoint_id" />
+		<result property="playercount" column="playercount" />
+		<result property="courseName" column="course_name" />
+		<result property="kpointName" column="kpoint_name" />
+		<result property="databak" column="databak" />
+		<result property="updateTime" column="update_time" />
+	</resultMap>
+
+
+	<resultMap type="CourseStudyhistory" id="AllCourseStudyhistoryResult"
+		extends="CourseStudyhistoryResult">
+		<result property="teacherName" column="name" />
+		<result property="logo" column="logo" />
+	</resultMap>
+	<sql id="edu_course_studyhistory_columns">
+		edu_course_studyhistory.id,
+		edu_course_studyhistory.user_id,
+		edu_course_studyhistory.course_id,
+		edu_course_studyhistory.kpoint_id,
+		edu_course_studyhistory.playercount,
+		edu_course_studyhistory.course_name,
+		edu_course_studyhistory.kpoint_name,
+		edu_course_studyhistory.databak,
+		edu_course_studyhistory.update_time
+	</sql>
+
+	<sql id="edu_course_studyhistory_properties">
+		#{id},
+		#{userId},
+		#{courseId},
+		#{kpointId},
+		#{playercount},
+		#{courseName},
+		#{kpointName},
+		#{databak},
+		#{updateTime}
+	</sql>
+
+	<insert id="createCourseStudyhistory" parameterType="CourseStudyhistory"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_course_studyhistory (
+		<include refid="edu_course_studyhistory_columns" />
+		) VALUES (
+		<include refid="edu_course_studyhistory_properties" />
+		)
+	</insert>
+
+	<delete id="deleteCourseStudyhistoryById" parameterType="Long">
+		delete
+		from edu_course_studyhistory
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateCourseStudyhistory" parameterType="CourseStudyhistory">
+		update
+		edu_course_studyhistory SET
+		user_id = #{userId},
+		course_id =
+		#{courseId},
+		kpoint_id = #{kpointId},
+		playercount = #{playercount},
+		course_name =#{courseName},
+		kpoint_name =#{kpointName},
+		databak =
+		#{databak},
+		update_time = #{updateTime}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getCourseStudyhistoryById" resultMap="CourseStudyhistoryResult"
+		parameterType="Long">
+		select
+		<include refid="edu_course_studyhistory_columns" />
+		from edu_course_studyhistory
+		where
+		id = #{value}
+
+	</select>
+
+	<select id="getCourseStudyhistoryList" resultMap="CourseStudyhistoryResult"
+		parameterType="CourseStudyhistory">
+		select
+		<include refid="edu_course_studyhistory_columns" />
+		from edu_course_studyhistory
+		where
+		edu_course_studyhistory.user_id =
+		#{userId}
+		and edu_course_studyhistory.course_id = #{courseId}
+		<if test="kpointId!=null and kpointId>0">
+			and
+			edu_course_studyhistory.kpoint_id = #{kpointId}
+		</if>
+	</select>
+
+	<select id="getCourseStudyhistoryListByCondition" resultMap="AllCourseStudyhistoryResult"
+		parameterType="java.util.HashMap">
+		select
+		<include refid="edu_course_studyhistory_columns" />
+		,
+		edu_teacher.name,
+		edu_course.logo
+        FROM edu_course_studyhistory
+        LEFT JOIN edu_course ON edu_course.id = edu_course_studyhistory.course_id
+        LEFT JOIN edu_course_kpoint ON edu_course_studyhistory.kpoint_id= edu_course_kpoint.id
+        LEFT JOIN edu_teacher ON edu_teacher.id = edu_course_kpoint.teacher_id
+		<where>
+			<if test="e.userId!=null and e.userId!=''">
+				and edu_course_studyhistory.user_id = #{e.userId}
+			</if>
+		</where>
+        order by edu_course_studyhistory.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getCourseStudyhistoryListByConditionCount"
+		resultType="int" parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_course_studyhistory
+		<where>
+			<if test="e.userId!=null and e.userId!=''">
+				and edu_course_studyhistory.`user_id` = #{e.userId}
+			</if>
+		</where>
+	</select>
+	<delete id="delCourseStudyhistory" parameterType="String">
+		delete from edu_course_studyhistory where id in (${value})
+	</delete>
+	<select id="getCourseStudyhistoryCount"
+		resultType="Long" parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_course_studyhistory
+		<where>
+			 edu_course_studyhistory.course_id in
+			 <foreach collection="list" item="item" open="(" close=")" separator=",">
+			 	#{item.id}
+		 	</foreach>
+			<if test="userId!=null and userId!=''">
+				and edu_course_studyhistory.`user_id` = #{userId}
+			</if>
+		</where>
+	</select>
+
+</mapper>

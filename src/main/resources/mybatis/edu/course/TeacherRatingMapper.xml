@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherRatingMapper">
+   <resultMap type="TeacherRating" id="TeacherRatingResult">
+       <result property="id" column="id"/>
+       <result property="score" column="score"/>
+       <result property="rating" column="rating"/>              
+       <result property="description" column="ddescription"/>
+   </resultMap>
+
+<!--   需要连接 edu_teacher这张表 -->
+
+   <select id="getTeacherRatingByRating" resultMap="TeacherRatingResult" parameterType="Long"> 
+     SELECT 
+     edu_teacher_rating 
+     FROM edu_teacher_rating 
+     JEFT JOIN edu_teacher
+     ON edu_teacher_rating.id = edu_teacher.star
+   </select>     
+   
+<!--    修改星级评定表 -->
+
+   <update id="updateTeacherRating" parameterType="TeacherRating">
+     UPDATA
+     edu_teacher_rating SET
+     id = #{id},
+     score = #{score},
+     rating = #{rating}
+   </update>   
+   
+<!--   通过教师id删除评论 -->
+
+   <delete id="deleteTeacherRatingById" parameterType="Long">
+      DELETE FEOM
+      edu_teacher_rating
+      WHERE
+      id = #{value}
+   </delete>
+  
+</mapper>

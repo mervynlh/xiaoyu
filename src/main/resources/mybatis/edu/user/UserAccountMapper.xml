@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAccountMapper">
+
+	<resultMap id="UserAccountResult" type="UserAccount">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="createTime" column="create_time" />
+		<result property="lastUpdateTime" column="last_update_time" />
+		<result property="balance" column="balance" />
+		<result property="forzenAmount" column="forzen_amount" />
+		<result property="cashAmount" column="cash_amount" />
+		<result property="vmAmount" column="vm_amount" />
+		<result property="accountStatus" column="account_status" />
+		<result property="version" column="version" />
+	</resultMap>
+
+
+
+
+
+
+
+	<sql id="edu_user_account_columns">
+		edu_user_account.id,
+		edu_user_account.user_id,
+		edu_user_account.create_time,
+		edu_user_account.last_update_time,
+		edu_user_account.balance,
+		edu_user_account.forzen_amount,
+		edu_user_account.cash_amount,
+		edu_user_account.vm_amount,
+		edu_user_account.account_status,
+		edu_user_account.version
+	</sql>
+
+	<sql id="edu_user_account_properties">
+		#{id},
+		#{userId},
+		#{createTime},
+		#{lastUpdateTime},
+		#{balance},
+		#{forzenAmount},
+		#{cashAmount},
+		#{vmAmount},
+		#{accountStatus},
+		#{version}
+	</sql>
+
+	<insert id="createUserAccount" parameterType="UserAccount"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_account (
+		<include refid="edu_user_account_columns" />
+		) VALUES (
+		<include refid="edu_user_account_properties" />
+		)
+	</insert>
+
+	<!-- 更新账户的信息 -->
+	<update id="updateUserAccount" parameterType="UserAccount">
+		update
+		edu_user_account SET
+		last_update_time = #{lastUpdateTime},
+		balance =
+		#{balance},
+		forzen_amount = #{forzenAmount},
+		cash_amount =
+		#{cashAmount},
+		vm_amount = #{vmAmount},
+		account_status =
+		#{accountStatus},
+		version = version+1
+		where
+		id = #{id} and
+		version=#{version}
+	</update>
+
+	<select id="getUserAccountByUserId" resultMap="UserAccountResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_account_columns" />
+		from edu_user_account
+		where
+		user_id = #{value}
+	</select>
+
+	<select id="getUserAccountList" resultMap="UserAccountResult"
+		parameterType="UserAccount">
+		select
+		<include refid="edu_user_account_columns" />
+		from edu_user_account
+	</select>
+
+
+	<select id="getuserAccountListByCondition" resultType="UserAccountDTO"
+		parameterType="java.util.HashMap">
+		select
+		edu_user_account.user_id as userId ,
+		edu_user_account.create_time createTime,
+		edu_user_account.last_update_time  lastUpdateTime,
+		edu_user_account.balance balance,
+		edu_user_account.forzen_amount forzenAmount,
+		edu_user_account.cash_amount cashAmount,
+		edu_user_account.vm_amount vmAmount,
+		edu_user_account.account_status accountStatus,
+		user_user.nickname nickName,
+		user_user.email email,
+		user_user.mobile mobile
+		from edu_user_account
+		left join user_user
+		on user_user.id =
+		edu_user_account.user_id
+		<where>
+			<if test="e.email != null and e.email!=''">
+				user_user.email=#{e.email}
+			</if>
+			<if test="e.nickname != null and e.nickname!=''">
+				and user_user.nickname like CONCAT('%',#{e.nickname},'%')
+			</if>
+			<if test="e.mobile != null and e.mobile!=''">
+				and user_user.mobile=#{e.mobile}
+			</if>
+			<if test="e.startDate !='' and e.startDate !=null and e.endDate !=null and e.endDate !='' ">
+				and edu_user_account.create_time BETWEEN #{e.startDate} and #{e.endDate}
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getuserAccountListByConditionCount" resultType="int"
+		parameterType="java.util.HashMap">
+		select
+		count(1)
+		from edu_user_account
+		left join user_user
+		on user_user.id =
+		edu_user_account.user_id
+		<where>
+			<if test="e.email != null and e.email!=''">
+				user_user.email=#{e.email}
+			</if>
+			<if test="e.nickname != null and e.nickname!=''">
+				and user_user.nickname like CONCAT ('%',#{e.nickname},'%')
+			</if>
+			<if test="e.mobile != null and e.mobile!=''">
+				and user_user.mobile=#{e.mobile}
+			</if>
+			<if test="e.startDate !='' and e.startDate !=null and e.endDate !=null and e.endDate !='' ">
+				and edu_user_account.create_time BETWEEN #{e.startDate} and #{e.endDate}
+			</if>
+		</where>
+	</select>
+	<!-- 更新用户账户状态 -->
+	<update id="updateUserAccountStatus" parameterType="Map">
+		update edu_user_account
+		set edu_user_account.account_status=#{status}
+		where edu_user_account.user_id=#{userId}
+	</update>
+	<!-- 获得用户账户详情 -->
+	<select id="getuserAccountInfo" parameterType="Long" resultType="UserAccountDTO">
+	select
+		edu_user_account.user_id as userId ,
+		edu_user_account.create_time createTime,
+		edu_user_account.last_update_time  lastUpdateTime,
+		edu_user_account.balance balance,
+		edu_user_account.forzen_amount forzenAmount,
+		edu_user_account.cash_amount cashAmount,
+		edu_user_account.vm_amount vmAmount,
+		edu_user_account.account_status accountStatus,
+		user_user.nickname nickName,
+		user_user.email email
+		from edu_user_account
+		left join user_user
+		on user_user.id =
+		edu_user_account.user_id
+		where edu_user_account.user_id=#{userId}
+	</select>
+</mapper>

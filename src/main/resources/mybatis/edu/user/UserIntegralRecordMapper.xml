@@ -1,0 +1,325 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserIntegralRecordMapper">
+
+	<resultMap id="UserIntegralRecordResult" type="UserIntegralRecord">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="score" column="score" />
+		<result property="integralType" column="integral_type" />
+		<result property="createTime" column="create_time" />
+		<result property="currentScore" column="current_score" />
+		<result property="other" column="other" />
+		<result property="fromUserId" column="from_user_id" />
+		<result property="description" column="description" />
+		<result property="status" column="status" />
+		<result property="addressId" column="address_id" />
+		<result property="address" column="address" />
+		<result property="contSignIn" column="cont_signin"/>
+	</resultMap>
+
+	<resultMap type="UserIntegralRecord" id="UserIntegralRecordInfoResult"
+		extends="UserIntegralRecordResult">
+		<result property="nickname" column="nickname" />
+		<result property="realname" column="realname" />
+		<result property="email" column="email" />
+		<result property="mobile" column="mobile" />
+		<result property="templateName" column="templateName" />
+		<result property="templateScore" column="templateScore" />
+		<result property="giftName" column="giftName" />
+		<result property="courseId" column="course_id" />
+	</resultMap>
+	<sql id="edu_user_integral_record_columns">
+		edu_user_integral_record.id,
+		edu_user_integral_record.user_id,
+		edu_user_integral_record.score,
+		edu_user_integral_record.integral_type,
+		edu_user_integral_record.create_time,
+		edu_user_integral_record.current_score,
+		edu_user_integral_record.other,
+		edu_user_integral_record.from_user_id,
+		edu_user_integral_record.description,
+		edu_user_integral_record.status,
+		edu_user_integral_record.address_id,
+		edu_user_integral_record.address,
+		edu_user_integral_record.cont_signin
+	</sql>
+
+	<sql id="edu_user_integral_record_properties">
+		#{id},
+		#{userId},
+		#{score},
+		#{integralType},
+		#{createTime},
+		#{currentScore},
+		#{other},
+		#{fromUserId},
+		#{description},
+		#{status},
+		#{addressId},
+		#{address},
+		#{contSignIn}
+	</sql>
+
+	<insert id="createUserIntegralRecord" parameterType="UserIntegralRecord"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_integral_record (
+		<include refid="edu_user_integral_record_columns" />
+		) VALUES (
+		<include refid="edu_user_integral_record_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserIntegralRecordById" parameterType="Long">
+		delete from edu_user_integral_record
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateUserIntegralRecord" parameterType="UserIntegralRecord">
+		update edu_user_integral_record SET
+		id = #{id},
+		user_id = #{userId},
+		score = #{score},
+		integral_type = #{integralType},
+		create_time = #{createTime},
+		current_score = #{currentScore},
+		other = #{other},
+		from_user_id = #{fromUserId},
+		description = #{description}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getUserIntegralRecordById" resultMap="UserIntegralRecordResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_integral_record_columns" />
+		from edu_user_integral_record
+		where
+		id = #{value}
+	</select>
+
+	<select id="getUserIntegralRecordList" resultMap="UserIntegralRecordResult"
+		parameterType="UserIntegralRecord">
+		select
+		<include refid="edu_user_integral_record_columns" />
+		from edu_user_integral_record
+	</select>
+
+	<select id="getUserDownIntegralRecordListPage" parameterType="Map"
+		resultMap="UserIntegralRecordInfoResult">
+		select
+		<include refid="edu_user_integral_record_columns" />
+		,
+		user_user.nickname,
+		user_user.email,
+		edu_user_integral_template.name templateName,
+		edu_user_integral_template.score templateScore,
+		edu_user_integral_gift.name giftName,
+		edu_user_integral_gift.course_id courseId
+		from edu_user_integral_record
+		left join user_user on edu_user_integral_record.from_user_id =user_user.id
+		left join edu_user_integral_template on
+		edu_user_integral_record.integral_type =edu_user_integral_template.id
+		left join edu_user_integral_gift on
+		edu_user_integral_record.other=edu_user_integral_gift.id and
+		edu_user_integral_template.keyword='gift'
+		<where>
+			<if test="e.userId!=''  and e.userId !=null">
+				and edu_user_integral_record.user_id=#{e.userId}
+			</if>
+			<if test="e.integralType!='' and e.integralType!=null">
+				and edu_user_integral_record.`integral_type` =#{e.integralType}
+			</if>
+		</where>
+		order by edu_user_integral_record.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+
+	<select id="getUserDownIntegralRecordListPageCount"
+		parameterType="Map" resultType="int">
+		select count(1) from edu_user_integral_record
+		<where>
+			<if test="e.userId!=''  and e.userId !=null">
+				and edu_user_integral_record.user_id=#{e.userId}
+			</if>
+			<if test="e.integralType!='' and e.integralType!=null">
+				and edu_user_integral_record.`integral_type` =#{e.integralType}
+			</if>
+		</where>
+	</select>
+
+
+
+
+	<!-- 查询积分记录列表 -->
+	<select id="getUserIntegralRecordListPage" parameterType="Map"
+		resultMap="UserIntegralRecordInfoResult">
+		select
+		<include refid="edu_user_integral_record_columns" />
+		,
+		user_user.nickname,
+		user_expand.realname,
+		user_user.email,
+		user_user.mobile,
+		edu_user_integral_template.name templateName,
+		edu_user_integral_template.score templateScore,
+		edu_user_integral_gift.name giftName,
+		edu_user_integral_gift.course_id courseId
+		from edu_user_integral_record
+		left join user_user on edu_user_integral_record.user_id =user_user.id
+		left join edu_user_integral_template on edu_user_integral_record.integral_type =edu_user_integral_template.id
+		left join edu_user_integral_gift on edu_user_integral_record.other=edu_user_integral_gift.id and edu_user_integral_template.keyword='gift'
+		left join user_expand on edu_user_integral_record.user_id=user_expand.user_id
+		<where>
+			<if test="e.userId!=''  and e.userId !=null">
+				and edu_user_integral_record.user_id=#{e.userId}
+			</if>
+			<if test="e.integralType!='' and e.integralType!=null">
+				and edu_user_integral_record.`integral_type` =#{e.integralType}
+			</if>
+		</where>
+		order by edu_user_integral_record.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getUserIntegralRecordListPageCount" parameterType="Map"
+		resultType="int">
+		select count(1) 
+		from edu_user_integral_record
+		left join user_user on edu_user_integral_record.user_id =user_user.id
+		left join edu_user_integral_template on edu_user_integral_record.integral_type =edu_user_integral_template.id
+		left join edu_user_integral_gift on edu_user_integral_record.other=edu_user_integral_gift.id and edu_user_integral_template.keyword='gift'
+		left join user_expand on edu_user_integral_record.user_id=user_expand.user_id
+		<where>
+			<if test="e.userId!=''  and e.userId !=null">
+				and edu_user_integral_record.user_id=#{e.userId}
+			</if>
+			<if test="e.integralType!='' and e.integralType!=null">
+				and edu_user_integral_record.`integral_type` =#{e.integralType}
+			</if>
+		</where>
+	</select>
+	<!-- 积分兑换记录 -->
+	<select id="getExchangeIntegralRecord" parameterType="Map"
+		resultMap="UserIntegralRecordInfoResult">
+		SELECT
+		<include refid="edu_user_integral_record_columns" />
+		,
+		user_user.nickname,
+		user_user.email,
+		user_user.mobile,
+		user_expand.realname,
+		edu_user_integral_template.name templateName,
+		edu_user_integral_template.score templateScore,
+		edu_user_integral_gift.name giftName,
+		edu_user_integral_gift.course_id courseId
+		from edu_user_integral_record
+		left join user_user on edu_user_integral_record.user_id =user_user.id
+		left join edu_user_integral_template on edu_user_integral_record.integral_type =edu_user_integral_template.id
+		left join edu_user_integral_gift on edu_user_integral_record.other=edu_user_integral_gift.id
+		left join user_expand on edu_user_integral_record.user_id=user_expand.user_id
+		where edu_user_integral_record.`other`!=0 and
+		edu_user_integral_record.integral_type=#{e.integralType}
+		<if test="e.realname !=null and e.realname !=''">
+			and user_expand.realname like concat('%',#{e.realname},'%')
+		</if>
+		<if test="e.email !=null and e.email !=''">
+			and user_user.email=#{e.email}
+		</if>
+		<if test="e.status !=null and e.status !=-1">
+			and edu_user_integral_record.status=#{e.status}
+		</if>
+		<if test="e.startDate!='' and e.startDate!=null">
+			and <![CDATA[edu_user_integral_record.create_time>=#{e.startDate}]]>
+		</if>
+		<if test=" e.endDate!=null and e.endDate!='' ">
+			and <![CDATA[edu_user_integral_record.create_time<=#{e.endDate}]]>
+		</if>
+		order by edu_user_integral_record.id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getExchangeIntegralRecordCount" parameterType="Map"
+		resultType="int">
+		select count(1) 
+		from edu_user_integral_record
+		left join user_user on edu_user_integral_record.user_id =user_user.id
+		left join edu_user_integral_template on edu_user_integral_record.integral_type =edu_user_integral_template.id
+		left join edu_user_integral_gift on edu_user_integral_record.other=edu_user_integral_gift.id
+		left join user_expand on edu_user_integral_record.user_id=user_expand.user_id
+		where edu_user_integral_record.`other`!=0 and
+		edu_user_integral_record.integral_type=#{e.integralType}
+		<if test="e.realname !=null and e.realname !=''">
+			and user_expand.realname like concat('%',#{e.realname},'%')
+		</if>
+		<if test="e.email !=null and e.email !=''">
+			and user_user.email=#{e.email}
+		</if>
+		<if test="e.status !=null and e.status !=-1">
+			and edu_user_integral_record.status=#{e.status}
+		</if>
+		<if test="e.startDate!='' and e.startDate!=null">
+			and <![CDATA[edu_user_integral_record.create_time>=#{e.startDate}]]>
+		</if>
+		<if test=" e.endDate!=null and e.endDate!='' ">
+			and <![CDATA[edu_user_integral_record.create_time<=#{e.endDate}]]>
+		</if>
+	</select>
+	<!-- 修改兑换状态 -->
+	<update id="updateIntegralRecordStatus" parameterType="Long">
+		update edu_user_integral_record
+		set edu_user_integral_record.status=1
+		where edu_user_integral_record.id=#{id}
+	</update>
+	<!-- 查询用户是否同一天登陆 -->
+	<select id="getUserScoreByToday" parameterType="UserIntegralRecord"
+		resultType="Long">
+		select count(1) from edu_user_integral_record
+		where edu_user_integral_record.user_id=#{userId} and
+		edu_user_integral_record.integral_type=#{integralType}
+		and
+		DATE_FORMAT(edu_user_integral_record.create_time,'%Y-%m-%d')=CURDATE()
+		<if test="other!=null and other!=0">
+			and edu_user_integral_record.other=#{other}
+		</if>
+		<if test="fromUserId!=null and fromUserId!=0">
+			and edu_user_integral_record.from_user_id=#{fromUserId}
+		</if>
+	</select>
+	<!-- 查询其它是否操作 -->
+	<select id="getUserScoreByOther" parameterType="UserIntegralRecord"
+		resultType="Long">
+		select count(1) from edu_user_integral_record
+		where edu_user_integral_record.user_id=#{userId} and
+		edu_user_integral_record.integral_type=#{integralType}
+		<if test="other!=null and other!=0">
+			and edu_user_integral_record.other=#{other}
+		</if>
+		<if test="fromUserId!=null and fromUserId!=0">
+			and edu_user_integral_record.from_user_id=#{fromUserId}
+		</if>
+	</select>
+
+	<!-- 根据时间查询当月签到天数 -->
+	<select id="getSignCountByTime" parameterType="Map" resultType="Integer">
+		select
+		DATE_FORMAT(create_time,'%d')
+		from edu_user_integral_record where
+		edu_user_integral_record.user_id = #{userId}
+		and <![CDATA[ edu_user_integral_record.create_time>=#{startTime}]]>
+		and <![CDATA[ edu_user_integral_record.create_time<=#{endTime}]]>
+		and edu_user_integral_record.integral_type = 14
+		group by create_time;
+	</select>
+	<!-- 查询签到数量 -->
+	<select id="getSignCount" parameterType="Map" resultType="Integer">
+		select
+		edu_user_integral_record.cont_signin
+		from edu_user_integral_record where
+		edu_user_integral_record.user_id = #{userId}
+		and <![CDATA[ edu_user_integral_record.create_time>=#{startTime}]]>
+		and <![CDATA[ edu_user_integral_record.create_time<=#{endTime}]]>
+		and edu_user_integral_record.integral_type = 14
+	</select>
+</mapper>

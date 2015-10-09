@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserIntegralTemplateMapper">
+
+        <resultMap id="UserIntegralTemplateResult" type="UserIntegralTemplate">
+            <result property="id" column="id"/>
+            <result property="name" column="name"/>
+            <result property="type" column="type"/>
+            <result property="keyword" column="keyword"/>
+            <result property="score" column="score"/>
+            <result property="status" column="status"/>
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="createUser" column="create_user"/>
+        </resultMap>
+
+        <sql id="edu_user_integral_template_columns">
+            edu_user_integral_template.id,
+            edu_user_integral_template.name,
+            edu_user_integral_template.type,
+            edu_user_integral_template.keyword,
+            edu_user_integral_template.score,
+            edu_user_integral_template.status,
+            edu_user_integral_template.create_time,
+            edu_user_integral_template.update_time,
+            edu_user_integral_template.create_user
+        </sql>
+
+        <sql id="edu_user_integral_template_properties">
+            #{id},
+            #{name},
+            #{type},
+            #{keyword},
+            #{score},
+            #{status},
+            #{createTime},
+            #{updateTime},
+            #{createUser}
+        </sql>
+
+        <insert id="createUserIntegralTemplate" parameterType="UserIntegralTemplate" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_integral_template (<include refid="edu_user_integral_template_columns"/>) VALUES (<include refid="edu_user_integral_template_properties"/>)
+        </insert>
+
+        <delete id="deleteUserIntegralTemplateById" parameterType="Long">
+            delete from edu_user_integral_template
+            where
+                id = #{value}
+        </delete>
+		<!-- 更新 -->
+        <update id="updateUserIntegralTemplate" parameterType="UserIntegralTemplate">
+            update edu_user_integral_template SET
+                name = #{name},
+                type = #{type},
+                score = #{score},
+                update_time = #{updateTime},
+                create_user = #{createUser}
+            where
+                id = #{id}
+        </update>
+		<!-- 获得详情 -->
+        <select id="getUserIntegralTemplateById" resultMap="UserIntegralTemplateResult" parameterType="Long">
+            select
+            <include refid="edu_user_integral_template_columns"/>
+            from edu_user_integral_template
+            where
+                id = #{value}
+        </select>
+		<!-- 查询积分模板列表 -->
+        <select id="getUserIntegralTemplateList" resultMap="UserIntegralTemplateResult" parameterType="UserIntegralTemplate">
+            select
+            <include refid="edu_user_integral_template_columns"/>
+            from edu_user_integral_template
+        </select>
+        <!-- 更新积分模板状态  -->
+        <update id="updateUserIntegralTemplateStatus" parameterType="UserIntegralTemplate">
+	        update edu_user_integral_template
+	        set edu_user_integral_template.status=#{status}
+	        where edu_user_integral_template.id=#{id}
+        </update>
+        <!-- 根据keyword获得积分模板 -->
+        <select id="getUserIntegralTemplateByKeyword" parameterType="string" resultMap="UserIntegralTemplateResult">
+	        select <include refid="edu_user_integral_template_columns"/>
+	        from edu_user_integral_template
+	        where edu_user_integral_template.keyword=#{keyword} and edu_user_integral_template.status=0
+        </select>
+</mapper>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="RoleMapper" >
+
+        <resultMap id="RoleResult" type="sysrole">
+            <result property="roleId" column="role_id" />
+            <result property="roleName" column="role_name"/>
+            <result property="status" column="status" />
+            <result property="createTime" column="create_time"/>
+            <result property="updateTime" column="update_time"/>
+            <result property="roleTypeId" column="role_type_id"/>
+            <result property="roleApplyScopeId" column="role_apply_scope_id" />
+        </resultMap>
+
+        <sql id="sys_role_columns">
+            sys_role.role_id,
+            sys_role.role_name,
+            sys_role.status,
+            sys_role.create_time,
+            sys_role.update_time,
+            sys_role.role_type_id,
+            sys_role.role_apply_scope_id
+        </sql>
+
+        <sql id="sys_role_properties">
+            #{roleId},
+            #{roleName},
+            #{status},
+            #{createTime},
+            #{updateTime},
+            #{roleTypeId},
+            #{roleApplyScopeId}
+        </sql>
+
+        <insert id="createRole" parameterType="sysrole" useGeneratedKeys="true" keyColumn="role_id" keyProperty="roleId">
+            insert into sys_role (<include refid="sys_role_columns"/>)
+            VALUES
+            (<include refid="sys_role_properties"/>)
+        </insert>
+
+        <delete id="deleteRoleById" parameterType="long">
+            delete from sys_role
+            where
+                role_id = #{value}
+        </delete>
+
+        <update id="updateRole" parameterType="sysrole">
+            UPDATE sys_role SET
+                role_id = #{roleId},
+                role_name = #{roleName},
+                status = #{status},
+                create_time = #{createTime},
+                update_time = #{updateTime},
+                role_apply_scope_id = #{roleApplyScopeId}
+            where
+                role_id = #{roleId}
+        </update>
+
+        <select id="getRoleById" resultMap="RoleResult" parameterType="long">
+            select
+            <include refid="sys_role_columns"/>
+            from sys_role
+            where
+                role_id = #{value}
+        </select>
+
+        <select id="getRoleList" resultMap="RoleResult" >
+            select
+            <include refid="sys_role_columns"/>
+            from sys_role
+            
+        </select>
+        
+        <select id="getRoleListByUserId" resultMap="RoleResult" parameterType="long">
+            select
+            distinct
+            <include refid="sys_role_columns"/>
+            from sys_role,sys_user_role
+            where sys_role.role_id = sys_user_role.role_id
+               AND sys_user_role.USER_ID = #{value}
+        </select>
+        
+        <select id="getRoleListByCondition" resultMap="RoleResult" parameterType="QueryRoleCondition">
+            select
+            <include refid="sys_role_columns"/>
+              from sys_role
+            <where>
+	            
+	            <if test="roleId!=null and roleId!=0">
+	            	role_id = #{roleId}
+	            </if>
+	            
+	            <if test="roleApplyScopeId!=null and roleApplyScopeId!=0">
+	            	AND role_apply_scope_id = #{roleApplyScopeId}
+	            </if>
+                
+            </where>
+          
+            
+        </select>
+        
+        <update id="updateRoleNameByRoleId" parameterType="sysrole">
+        	update sys_role set role_name=#{roleName} where role_id=#{roleId}
+        </update>
+        
+        <!--end-->
+</mapper>

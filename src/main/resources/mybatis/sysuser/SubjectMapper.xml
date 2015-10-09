@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="SubjectMapper" >
+
+    <resultMap id="SubjectResult" type="Subject">
+       <result property="subjectId" column="SUBJECT_ID" />
+       <result property="subjectName" column="SUBJECT_NAME" />
+       <result property="status" column="STATUS" />
+       <result property="createTime" column="CREATE_TIME" />
+       <result property="updateTime" column="UPDATE_TIME" />
+       <result property="parentId" column="parent_id" />
+       <result property="level" column="level" />
+       
+    </resultMap>
+
+    <sql id="sys_subject_columns">
+        sys_subject.SUBJECT_ID,
+        sys_subject.SUBJECT_NAME,
+        sys_subject.STATUS,
+        sys_subject.CREATE_TIME,
+        sys_subject.UPDATE_TIME,
+        sys_subject.parent_id,
+        sys_subject.level
+    </sql>
+
+    <sql id="sys_subject_properties">
+        #{subjectId},
+        #{subjectName},
+        #{status},
+        #{createTime},
+        #{updateTime},
+        #{parentId},
+        #{level}
+    </sql>
+
+    <insert id="createSubject" parameterType="Subject" useGeneratedKeys="true" keyColumn="SUBJECT_ID" keyProperty="subjectId">
+        INSERT INTO sys_subject (<include refid="sys_subject_columns"/>) VALUES (<include
+            refid="sys_subject_properties"/>)
+    </insert>
+
+	
+	<select id="getSubjectList" parameterType="QuerySubject" resultMap="SubjectResult">
+		select <include refid="sys_subject_columns"/>
+		from sys_subject 
+		<where>
+			status=0
+			<if test="parentId !=null and parentId!=-1">
+				and sys_subject.parent_id = #{parentId,jdbcType=INTEGER}
+			</if>
+			<if test="subjectId!=null and subjectId!=-1">
+				and subject_Id=#{subjectId,jdbcType=INTEGER}
+			</if>
+			<if test="subjectIds!=null and subjectId!=''">
+				and subject_Id in (${subjectIds})
+			</if>
+            order by parent_id,SUBJECT_ID
+		</where>
+		
+	</select>
+   	<!--  批量删除 -->
+ 	<update id="deleteSubjectByIdBatch" parameterType="list">
+        Update  sys_subject set status=2
+        WHERE
+        subject_id in <foreach collection="list" item="item" open="(" close=")" separator=",">
+        	#{item.subjectId}
+        </foreach>
+    </update>
+    
+    <select id="getSubjectBySubjectId" parameterType="QuerySubject" resultMap="SubjectResult">
+ 		select <include refid="sys_subject_columns"/> from sys_subject where subject_Id=#{subjectId,jdbcType=INTEGER}
+ 	</select>
+ 	
+ 	<update id="updateSubjectBySubjectId" parameterType="java.util.HashMap" >
+ 		update sys_subject set SUBJECT_NAME=#{subjectName},STATUS=#{status},parent_id=#{parentId},level=#{level} where SUBJECT_ID=#{subjectId,jdbcType=INTEGER}
+ 	</update>
+ 	<!-- 查询所有一级项目 -->
+ 	<select id="getSubjectOneList" resultMap="SubjectResult">
+ 		select <include refid="sys_subject_columns"/> from sys_subject where parent_id=0 and status=0
+ 	</select>
+
+    <!-- 查询所有二级项目 -->
+    <select id="getSubjectTwoList" resultMap="SubjectResult">
+        select <include refid="sys_subject_columns"/> from sys_subject where parent_id != 0 and status = 0 ORDER BY parent_id,SUBJECT_ID ASC
+    </select>
+ 	
+ 	<select id="getSubjectListByOne" parameterType="Long" resultMap="SubjectResult">
+ 		select <include refid="sys_subject_columns"/> from sys_subject where parent_id=#{value,jdbcType=INTEGER} and status=0
+ 	</select>
+ 	
+ 	<!-- 用户App -->
+ 	<select id="querySubjectNameByCourseId" parameterType="int" resultType="String">
+ 		SELECT SYS_SUBJECT.SUBJECT_NAME FROM SYS_SUBJECT
+		LEFT JOIN EDU_COURSE_SUBJECT ON EDU_COURSE_SUBJECT.SUBJECT_ID = SYS_SUBJECT.SUBJECT_ID
+		WHERE EDU_COURSE_SUBJECT.COURSE_ID=#{value}
+ 	</select>
+</mapper>

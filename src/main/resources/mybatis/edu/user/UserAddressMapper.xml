@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAddressMapper">
+
+	<resultMap id="UserAddressResult" type="UserAddress">
+		<result property="id" column="id" />
+		<result property="userId" column="user_id" />
+		<result property="receiver" column="receiver" />
+		<result property="address" column="address" />
+		<result property="postCode" column="post_code" />
+		<result property="mobile" column="mobile" />
+		<result property="isFirst" column="is_first" />
+		<result property="sendTime" column="send_time" />
+		<result property="createTime" column="create_time" />
+		<result property="provinceId" column="province_id" />
+		<result property="cityId" column="city_id" />
+		<result property="townId" column="town_id" />
+		<result property="lng" column="lng" />
+		<result property="lat" column="lat" />
+	</resultMap>
+
+	<sql id="edu_user_address_columns">
+		edu_user_address.id,
+		edu_user_address.user_id,
+		edu_user_address.receiver,
+		edu_user_address.address,
+		edu_user_address.post_code,
+		edu_user_address.mobile,
+		edu_user_address.is_first,
+		edu_user_address.send_time,
+		edu_user_address.create_time,
+		edu_user_address.province_id,
+		edu_user_address.city_id,
+		edu_user_address.town_id,
+		edu_user_address.lng,
+		edu_user_address.lat
+	</sql>
+
+	<sql id="edu_user_address_properties">
+		#{id},
+		#{userId},
+		#{receiver},
+		#{address},
+		#{postCode},
+		#{mobile},
+		#{isFirst},
+		#{sendTime},
+		#{createTime},
+		#{provinceId},
+		#{cityId},
+		#{townId},
+		#{lng},
+		#{lat}
+	</sql>
+
+	<insert id="createUserAddress" parameterType="UserAddress"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_user_address (
+		<include refid="edu_user_address_columns" />
+		) VALUES (
+		<include refid="edu_user_address_properties" />
+		)
+	</insert>
+
+	<delete id="deleteUserAddressById" parameterType="Long">
+		delete from
+		edu_user_address
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateUserAddress" parameterType="UserAddress">
+		update
+		edu_user_address SET
+		user_id = #{userId},
+<!-- 		receiver = -->
+<!-- 		#{receiver}, -->
+		address = #{address},
+<!-- 		post_code = #{postCode}, -->
+<!-- 		mobile = -->
+<!-- 		#{mobile}, -->
+		province_id = #{provinceId},
+		is_first = #{isFirst},
+		city_id = #{cityId},
+		town_id
+		= #{townId},
+		lng=#{lng},
+		lat=#{lat}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getUserAddressById" resultMap="UserAddressResult"
+		parameterType="Long">
+		select
+		<include refid="edu_user_address_columns" />
+		from edu_user_address
+		where
+		id = #{value}
+	</select>
+
+	<select id="getUserAddressList" resultMap="UserAddressResult"
+		parameterType="UserAddress">
+		select
+		<include refid="edu_user_address_columns" />
+		from edu_user_address
+		<where>
+			edu_user_address.user_id = #{userId}
+		</where>
+	</select>
+
+	<update id="updateUserAddressisFirst" parameterType="UserAddress">
+		update
+		edu_user_address SET
+		is_first = #{isFirst}
+		where
+		<if test="id!=null and id!=0 ">
+			id = #{id}
+		</if>
+		<if test="userId!=null and userId!=0 ">
+			user_id = #{userId}
+		</if>
+	</update>
+	<!-- 查询用户是否存在常用地址 -->
+	<select id="queryHaveFirst" parameterType="Long" resultType="int">
+		select count(1) from edu_user_address where user_id=#{value} and is_first=1
+	</select>
+</mapper>

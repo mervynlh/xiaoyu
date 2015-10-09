@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="KeywordMapper">
+
+        <resultMap id="KeywordResult" type="Keyword">
+            <result property="id" column="id"/>
+            <result property="keyword" column="keyword"/>
+        </resultMap>
+
+        <sql id="edu_keyword_columns">
+            edu_keyword.id,
+            edu_keyword.keyword
+        </sql>
+
+        <sql id="edu_keyword_properties">
+            #{id},
+            #{keyword}
+        </sql>
+
+        <insert id="createKeyword" parameterType="Keyword" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_keyword (<include refid="edu_keyword_columns"/>) VALUES (<include refid="edu_keyword_properties"/>)
+        </insert>
+
+        <delete id="deleteKeywordById" parameterType="Long">
+            delete from edu_keyword
+            where
+                id = #{value}
+
+        </delete>
+
+        <update id="updateKeyword" parameterType="Keyword">
+            update edu_keyword SET
+                id = #{id},
+                keyword = #{keyword}
+            where
+                id = #{id}
+
+        </update>
+
+        <select id="getKeywordById" resultMap="KeywordResult" parameterType="Long">
+            select
+            <include refid="edu_keyword_columns"/>
+            from edu_keyword
+            where
+                id = #{value}
+
+        </select>
+		
+        <select id="getKeywordList" resultMap="KeywordResult" parameterType="Keyword">
+            select
+            <include refid="edu_keyword_columns"/>
+            from edu_keyword
+            
+            <where>
+            <if test="keyword!=null and keyword!=''">
+           	 keyword  = #{keyword}
+            </if>
+            </where>
+            
+        </select>
+        
+        
+         <select id="getKeywordListPage" resultMap="KeywordResult" parameterType="java.util.HashMap">
+            select
+            <include refid="edu_keyword_columns"/>
+            from edu_keyword 
+            <where>
+            <if test="e.keyword!=null and e.keyword!=''">
+           	 keyword like CONCAT('%',#{e.keyword},'%')
+            </if>
+            </where>
+            order by id desc
+            <include refid="publicMapper.pageEnd" />
+        </select>
+        
+        
+         <select id="getKeywordListPageCount" resultType="int" parameterType="java.util.HashMap">
+            select count(1)
+            from edu_keyword
+            <where>
+            <if test="e.keyword!=null and e.keyword!=''">
+           	 keyword  like CONCAT('%',#{e.keyword},'%')
+            </if>
+            </where>
+        </select>
+        
+        
+        
+        
+        
+</mapper>

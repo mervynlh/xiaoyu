@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="ArticleMapper">
+
+	<resultMap id="ArticleResult" type="Article">
+		<result property="id" column="id" />
+		<result property="title" column="title" />
+		<result property="meta" column="meta" />
+		<result property="description" column="description" />
+		<result property="content" column="content" />
+		<result property="picture" column="picture" />
+		<result property="createTime" column="create_time" />
+		<result property="updateTime" column="update_time" />
+		<result property="author" column="author" />
+		<result property="clickTimes" column="click_times" />
+		<result property="type" column="type" />
+	</resultMap>
+
+	<sql id="edu_article_columns">
+		edu_article.id,
+		edu_article.title,
+		edu_article.meta,
+		edu_article.description,
+		edu_article.content,
+		edu_article.picture,
+		edu_article.create_time,
+		edu_article.update_time,
+		edu_article.author,
+		edu_article.click_times,
+		edu_article.type
+	</sql>
+
+	<sql id="edu_article_properties">
+		#{id},
+		#{title},
+		#{meta},
+		#{description},
+		#{content},
+		#{picture},
+		#{createTime},
+		#{updateTime},
+		#{author},
+		#{clickTimes},
+		#{type}
+	</sql>
+
+	<insert id="createArticle" parameterType="Article" keyColumn="id"
+		keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_article (
+		<include refid="edu_article_columns" />
+		) VALUES (
+		<include refid="edu_article_properties" />
+		)
+	</insert>
+
+	<delete id="deleteArticleById" parameterType="Long">
+		delete from
+		edu_article
+		where
+		id = #{value}
+	</delete>
+
+	<update id="updateArticle" parameterType="Article">
+		update edu_article SET
+		edu_article.title = #{title},
+		edu_article.meta = #{meta},
+		edu_article.description = #{description},
+		edu_article.content =#{content},
+		edu_article.picture = #{picture},
+		edu_article.update_time = #{updateTime},
+		edu_article.author = #{author},
+		edu_article.click_times =#{clickTimes},
+		edu_article.type = #{type}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getArticleById" resultMap="ArticleResult"
+		parameterType="Long">
+		select
+		<include refid="edu_article_columns" />
+		from edu_article
+		where
+		id = #{value}
+	</select>
+
+	<select id="getArticleList" resultMap="ArticleResult"
+		parameterType="Article">
+		select
+		<include refid="edu_article_columns" />
+		from edu_article
+	</select>
+	<select id="queryArticleListPage" resultMap="ArticleResult" parameterType="java.util.Map">
+		select
+		edu_article.id,
+		edu_article.title,
+		edu_article.meta,
+		edu_article.description,
+		edu_article.picture,
+		edu_article.create_time,
+		edu_article.update_time,
+		edu_article.author,
+		edu_article.click_times,
+		edu_article.type
+		from edu_article
+		<where>
+			<if test="e.type!=null and e.type!=0">
+				edu_article.type=#{e.type}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and edu_article.title like CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+		order by id desc
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryArticleListPageCount" resultType="int"
+		parameterType="java.util.Map">
+		select
+		count(1)
+		from edu_article
+		<where>
+			<if test="e.type!=null and e.type!=0">
+				edu_article.type=#{e.type}
+			</if>
+			<if test="e.title!=null and e.title!=''">
+				and edu_article.title like CONCAT('%',#{e.title},'%')
+			</if>
+		</where>
+	</select>
+	<select id="queryArticleListOrderclickTimes" resultMap="ArticleResult"
+		parameterType="java.util.Map">
+		select
+		<include refid="edu_article_columns" />
+		from edu_article
+		where type = 1
+		order by click_times desc
+		limit #{num}
+	</select>
+
+	<select id="queryArticleUpOrDown" parameterType="java.util.Map"
+		resultMap="ArticleResult">
+		select
+		<include refid="edu_article_columns" />
+		from edu_article
+		<where>
+			<if test="type==1">
+			<![CDATA[id < #{id}  ]]>
+				order  by   id   desc
+			</if>
+			<if test="type==2">
+				<![CDATA[id > #{id}   ]]>
+				order  by   id   asc
+			</if>
+		</where>
+		limit 1 
+	</select>
+	
+	<!-- 更新浏览数量 -->
+	<update id="updateArticleClickTimes" parameterType="long" >
+		update edu_article set click_times=click_times+1 where id=#{id}
+	</update>
+	<!-- 批量刪除 -->
+	<delete id="delArticleBatch">
+		delete from edu_article
+		where edu_article.id in
+		<foreach collection="array" item="item" separator="," open="(" close=")"> 
+		#{item}
+		</foreach> 
+	</delete>
+</mapper>

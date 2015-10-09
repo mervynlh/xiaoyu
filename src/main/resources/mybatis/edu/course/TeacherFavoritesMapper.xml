@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="TeacherFavoritesMapper">
+
+	<resultMap id="TeacherFavoritesResult" type="TeacherFavorites">
+		<result property="id" column="id" />
+		<result property="teacherId" column="teacher_id" />
+		<result property="userId" column="user_id" />
+		<result property="addTime" column="add_time" />
+	</resultMap>
+
+	<!-- 教师收藏Map -->
+	<resultMap type="TeacherDto" id="TeacherDtoResult">
+		<result property="age" column="age"/>
+		<result property="major" column="group_concat(DISTINCT edu_major.name)"/>
+		<result property="subject" column="group_concat(DISTINCT sys_subject.SUBJECT_NAME)"/>
+		<result property="id" column="id"/>
+		<result property="picPath" column="avatar"/>
+		<result property="name" column="realname"/>
+		<result property="seniority" column="seniority"/>
+		<result property="peculiarity" column="peculiarity"/>
+		<result property="lowPrice" column="low_price"/>
+		<result property="card" column="card"/>
+		<result property="cardStatus" column="card_status"/>
+		<result property="educationStatus" column="education_status"/>
+		<result property="teachingStatus" column="teaching_status"/>
+		<result property="specialtyStatus" column="specialty_status"/>
+		<result property="isProfessor" column="is_professor"/>
+	</resultMap>
+	
+	
+	<sql id="edu_teacher_favorites_columns">
+		edu_teacher_favorites.id,
+		edu_teacher_favorites.teacher_id,
+		edu_teacher_favorites.user_id,
+		edu_teacher_favorites.add_time
+	</sql>
+
+	<sql id="edu_teacher_favorites_properties">
+		#{id},
+		#{teacherId},
+		#{userId},
+		#{addTime}
+	</sql>
+	
+<!-- 	添加教师收藏记录 -->
+	<insert id="createTeacherFavorites" parameterType="TeacherFavorites"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_teacher_favorites (
+		<include refid="edu_teacher_favorites_columns" />
+		) VALUES (
+		<include refid="edu_teacher_favorites_properties" />
+		)
+	</insert>
+	<!-- 删除收藏教师 -->
+	<delete id="deleteTeacherFavorites" parameterType="Long">
+		delete from edu_teacher_favorites where edu_teacher_favorites.id = #{value}
+	</delete>
+<!-- 	检查教师是否收藏过 -->
+	<select id="checkTeacherFavoritesByUserIdAndTeacherId" resultMap="TeacherFavoritesResult"
+		parameterType="TeacherFavorites">
+		select
+		<include refid="edu_teacher_favorites_columns" />
+		from edu_teacher_favorites
+		<where>
+			edu_teacher_favorites.user_id = #{userId}
+			and
+			edu_teacher_favorites.teacher_id = #{teacherId}
+		</where>
+	</select>
+	
+	<!-- 根据用户id查询收藏记录 -->
+	<select id="getTeacherFavoritesByUserId" parameterType="java.util.Map" resultMap="TeacherDtoResult">
+		SELECT
+			edu_teacher.id,
+			edu_teacher.seniority,
+			edu_teacher.peculiarity,
+			edu_teacher.low_price,
+			edu_teacher_profile.card_status,
+			edu_teacher_profile.education_status,
+			edu_teacher_profile.teaching_status,
+			edu_teacher_profile.specialty_status,
+			edu_teacher.is_professor,
+    		user_expand.avatar,
+    		user_expand.realname,
+    		user_expand.age,
+    		edu_teacher_favorites.id as favoritesId,
+			group_concat(DISTINCT edu_major.name),
+    		group_concat(DISTINCT sys_subject.SUBJECT_NAME),
+    		edu_teacher.low_price
+		FROM
+    		edu_teacher_favorites    
+		left join edu_teacher on edu_teacher_favorites.teacher_id = edu_teacher.id
+		left join edu_teacher_profile on edu_teacher.id = edu_teacher_profile.teacher_id
+		left join user_expand on edu_teacher.user_id = user_expand.user_id
+ 		left join edu_teacher_major on edu_teacher_favorites.teacher_id = edu_teacher_major.teacher_id
+		left join edu_major on edu_teacher_major.major_id = edu_major.id
+		left join edu_teacher_subject on edu_teacher_favorites.teacher_id = edu_teacher_subject.teacher_id
+		left join sys_subject on edu_teacher_subject.subject_id = sys_subject.SUBJECT_ID
+		WHERE 
+			edu_teacher_favorites.user_id = #{e.id}
+		group by edu_teacher_favorites.teacher_id
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getTeacherFavoritesByUserIdCount" parameterType="java.util.Map" resultType="int">
+		SELECT
+			count(1)
+		FROM
+    		edu_teacher_favorites    
+		WHERE 
+			edu_teacher_favorites.user_id = #{e.id}
+	</select>
+</mapper>

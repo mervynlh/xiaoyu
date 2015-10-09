@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CourseTeacherMapper">
+
+	<resultMap id="CourseTeacherResult" type="CourseTeacher">
+		<result property="id" column="id" />
+		<result property="courseId" column="course_id" />
+		<result property="teacherId" column="teacher_id" />
+	</resultMap>
+	<resultMap id="TeacherCourseProfileResult" type="CourseProfile">
+		<result property="id" column="id" />
+		<result property="teacherId" column="teacher_id" />
+        <result property="courseId" column="course_id"/>
+        <result property="buycount" column="buycount"/>
+        <result property="viewcount" column="viewcount"/>
+        <result property="commentcount" column="commentcount"/>
+        <result property="questiongcount" column="questiongcount"/>
+        <result property="notecount" column="notecount"/>
+        <result property="playcount" column="playcount"/>
+        <result property="wacthPersonCount" column="wacthpersoncount"/>
+        <result property="name" column="name"/>
+    </resultMap>
+	<sql id="edu_course_teacher_columns">
+		edu_course_teacher.id,
+		edu_course_teacher.course_id,
+		edu_course_teacher.teacher_id
+	</sql>
+
+	<sql id="edu_course_teacher_properties">
+		#{id},
+		#{courseId},
+		#{teacherId}
+	</sql>
+
+	<insert id="createCourseTeacher" parameterType="CourseTeacher"
+		keyColumn="id" keyProperty="id" useGeneratedKeys="true">
+		insert INTO edu_course_teacher (
+		<include refid="edu_course_teacher_columns" />
+		) VALUES (
+		<include refid="edu_course_teacher_properties" />
+		)
+	</insert>
+	<insert id="addCourseTeacherBatch" parameterType="list">
+		insert INTO edu_course_teacher (
+		<include refid="edu_course_teacher_columns" />
+		) VALUES
+		<foreach item="item" index="index" collection="list"
+			separator=",">
+			( #{item.id},
+			#{item.courseId},
+			#{item.teacherId})
+		</foreach>
+	</insert>
+
+	<delete id="deleteCourseTeacherById" parameterType="Long">
+		delete from
+		edu_course_teacher
+		where
+		id = #{value}
+	</delete>
+
+	<delete id="deleteCourseTeacherByCourseId" parameterType="Long">
+		delete
+		from
+		edu_course_teacher
+		where
+		course_id = #{value}
+	</delete>
+
+	<update id="updateCourseTeacher" parameterType="CourseTeacher">
+		update
+		edu_course_teacher SET
+		id = #{id},
+		course_id = #{courseId},
+		teacher_id =
+		#{teacherId}
+		where
+		id = #{id}
+	</update>
+
+	<select id="getCourseTeacherById" resultMap="CourseTeacherResult"
+		parameterType="Long">
+		select
+		<include refid="edu_course_teacher_columns" />
+		from edu_course_teacher
+		where
+		id = #{value}
+	</select>
+
+	<select id="getCourseTeacherList" resultMap="CourseTeacherResult"
+		parameterType="CourseTeacher">
+		select
+		<include refid="edu_course_teacher_columns" />
+		from edu_course_teacher
+		<where>
+			<if test="courseId!=null and courseId!=''">
+			edu_course_teacher.course_Id =#{courseId}
+			</if>
+		</where>
+	</select>
+
+	<select id="getCourseTeacherListByCourse" resultType="CourseDto" parameterType="list">
+		SELECT
+		CONCAT(edu_course_teacher.course_id,'') as id,
+		CONCAT(GROUP_CONCAT(edu_teacher.id),'') as coursetag,
+		GROUP_CONCAT(edu_teacher.NAME,'') as name
+		FROM edu_teacher
+		LEFT JOIN edu_course_teacher ON
+		edu_course_teacher.teacher_id = edu_teacher.id
+		WHERE
+		edu_course_teacher.course_id IS NOT NULL and edu_course_teacher.course_id in
+		<foreach collection="list" item="item" separator="," open="("
+			close=")">
+			#{item}
+		</foreach>
+		GROUP BY edu_course_teacher.course_id
+	</select>
+	<select id="getCourseByteacher" parameterType="Map" resultMap="TeacherCourseProfileResult">
+		select
+		   edu_course_teacher.id,
+           edu_course_profile.course_id,
+           edu_course_profile.buycount,
+           edu_course_profile.viewcount,
+           edu_course_profile.commentcount,
+           edu_course_profile.questiongcount,
+           edu_course_profile.notecount,
+           edu_course_profile.playcount,
+           edu_course_profile.watchpersoncount,
+           edu_course.name
+          from edu_course_teacher
+          left join edu_course_profile on edu_course_profile.course_id = edu_course_teacher.course_id
+          left join edu_course on edu_course.id = edu_course_teacher.course_id
+          <where>
+          		<if test="e.teacherId!=null and e.teacherId>0">
+        			edu_course_teacher.teacher_id=#{e.teacherId}
+        		</if>
+          </where>
+          order by course_id DESC
+          <include refid="publicMapper.pageEnd"/>
+	</select>
+	<select id="getCourseByteacherCount" parameterType="Map" resultType="int">
+		select
+          count(1)
+          from edu_course_teacher
+          <where>
+          		<if test="e.teacherId!=null and e.teacherId>0">
+        			edu_course_teacher.teacher_id=#{e.teacherId}
+        		</if>
+          </where>
+	</select>
+
+</mapper>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="UserAccountOptRecordMapper">
+
+        <resultMap id="UserAccountOptRecordResult" type="UserAccountOptRecord">
+            <result property="id" column="id"/>
+            <result property="userId" column="user_id"/>
+            <result property="optuser" column="optuser"/>
+            <result property="optusername" column="optusername"/>
+            <result property="accountId" column="account_id"/>
+            <result property="amount" column="amount"/>
+            <result property="type" column="type"/>
+            <result property="outNo" column="out_no"/>
+            <result property="description" column="description"/>
+            <result property="createTime" column="create_time"/>
+        </resultMap>
+
+        <sql id="edu_user_account_opt_record_columns">
+            edu_user_account_opt_record.id,
+            edu_user_account_opt_record.user_id,
+            edu_user_account_opt_record.optuser,
+            edu_user_account_opt_record.optusername,
+            edu_user_account_opt_record.account_id,
+            edu_user_account_opt_record.amount,
+            edu_user_account_opt_record.type,
+            edu_user_account_opt_record.out_no,
+            edu_user_account_opt_record.description,
+            edu_user_account_opt_record.create_time
+        </sql>
+
+        <sql id="edu_user_account_opt_record_properties">
+            #{id},
+            #{userId},
+            #{optuser},
+            #{optusername},
+            #{accountId},
+            #{amount},
+            #{type},
+            #{outNo},
+            #{description},
+            #{createTime}
+        </sql>
+		<!-- 添加账户操作记录 -->
+        <insert id="createUserAccountOptRecord" parameterType="UserAccountOptRecord" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_user_account_opt_record (<include refid="edu_user_account_opt_record_columns"/>) VALUES (<include refid="edu_user_account_opt_record_properties"/>)
+        </insert>
+		<!-- 删除 -->
+        <delete id="deleteUserAccountOptRecordById" parameterType="Long">
+            delete from edu_user_account_opt_record
+            where
+                id = #{value}
+        </delete>
+
+        <update id="updateUserAccountOptRecord" parameterType="UserAccountOptRecord">
+            update edu_user_account_opt_record SET
+                id = #{id},
+                user_id = #{userId},
+                optuser=#{optuser},
+                optusername=#{optusername},
+                account_id = #{accountId},
+                amount = #{amount},
+                type = #{type},
+                out_no = #{outNo},
+                description = #{description},
+                create_time = #{createTime}
+            where
+                id = #{id}
+        </update>
+		
+        <select id="getUserAccountOptRecordById" resultMap="UserAccountOptRecordResult" parameterType="Long">
+            select
+            <include refid="edu_user_account_opt_record_columns"/>
+            from edu_user_account_opt_record
+            where
+                id = #{value}
+        </select>
+		<!-- 账户操作列表 -->
+        <select id="getUserAccountOptRecordList" resultMap="UserAccountOptRecordResult" parameterType="UserAccountOptRecord">
+            select
+            <include refid="edu_user_account_opt_record_columns"/>
+            from edu_user_account_opt_record
+        </select>
+        
+</mapper>

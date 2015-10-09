@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="AuditionMapper">
+	<sql id="edu_audition_columns">
+		edu_audition.id,
+		edu_audition.type,
+		edu_audition.teacher_name,
+		edu_audition.teacher_mobile,
+		edu_audition.student_name,
+		edu_audition.student_mobile,
+		edu_audition.start_time,
+		edu_audition.end_time,
+		edu_audition.create_time,
+		edu_audition.isrecommend,
+		edu_audition.description,
+		edu_audition.grade_id,
+		edu_audition.subject_id,
+		edu_audition.major_id,
+		edu_audition.status
+	</sql>
+	<sql id="edu_audition_properties">
+			#{id},
+			#{type},
+			#{teacherName},
+			#{teacherMobile},
+			#{studentName},
+			#{studentMobile},
+			#{startTime},
+			#{endTime},
+			#{createTime},
+			#{isRecommend},
+			#{description},
+			#{gradeId},
+			#{subjectId},
+			#{majorId},
+			#{status}
+	</sql>
+	<resultMap type="Audition" id="AuditionResult">
+		<result property="id" column="id"/>
+		<result property="type" column="type"/>
+		<result property="teacherName" column="teacher_name"/>
+		<result property="teacherMobile" column="teacher_mobile"/>
+		<result property="studentName" column="student_name"/>
+		<result property="studentMobile" column="student_mobile"/>
+		<result property="startTime" column="start_time"/>
+		<result property="endTime" column="end_time"/>
+		<result property="createTime" column="create_time"/>
+		<result property="isRecommend" column="isrecommend"/>
+		<result property="description" column="description"/>
+		<result property="gradeId" column="grade_id"/>
+		<result property="gradeName" column="grade_name"/>
+		<result property="subjectId" column="subject_id"/>
+		<result property="subjectName" column="subject_name"/>
+		<result property="majorId" column="major_id"/>
+		<result property="majorName" column="major_name"/>
+		<result property="status" column="status"/>
+	</resultMap>
+	
+	<!-- 添加约课记录 -->
+	<insert id="addAudition" parameterType="Audition">
+		insert into edu_audition(
+			<include refid="edu_audition_columns"/>
+		)values(
+			<include refid="edu_audition_properties"/>
+		)
+	</insert>
+	<!-- 根据id删除约课记录 -->
+	<delete id="deleteAuditionById" parameterType="Long">
+		delete from
+			edu_audition
+		where 
+			edu_audition.id=#{id}
+	</delete>
+	<!-- 处理约课 -->
+	<update id="updateAudition" parameterType="Map">
+		update
+			edu_audition
+		set
+			edu_audition.status = #{status}
+		where 
+			edu_audition.id=#{id}
+	</update>
+	<!-- 查询约课记录 -->
+	<select id="getAuditionList" parameterType="Map" resultMap="AuditionResult">
+		select 
+			<include refid="edu_audition_columns" />,
+    		a.SUBJECT_NAME subject_name,
+    		b.SUBJECT_NAME grade_name,
+    		edu_major.name major_name
+		FROM edu_audition
+		left join sys_subject a on a.SUBJECT_ID = edu_audition.subject_id
+		left join sys_subject b on b.SUBJECT_ID = edu_audition.grade_id
+		left join edu_major on edu_major.id = edu_audition.major_id
+		<where>
+			and type = #{e.type}
+			<if test="e.gradeId!=null">
+				and edu_audition.grade_id = #{e.gradeId}
+			</if>
+			<if test="e.studentName!=null and e.studentName!=''">
+				and edu_audition.student_name = #{e.studentName}
+			</if>
+			<if test="e.teacherName!=null and e.teacherName!=''">
+				and edu_audition.teacher_name = #{e.teacherName}
+			</if>
+			<if test="e.status!=null and e.status!=2">
+				and edu_audition.status = #{e.status}
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getAuditionListCount" parameterType="Map" resultType="int">
+		select 
+			count(1)
+		FROM
+    		edu_audition
+		<where>
+			and type = #{e.type}
+			<if test="e.gradeId!=null">
+				and edu_audition.grade_id = #{e.gradeId}
+			</if>
+			<if test="e.studentName!=null and e.studentName!=''">
+				and edu_audition.student_name = #{e.studentName}
+			</if>
+			<if test="e.teacherName!=null and e.teacherName!=''">
+				and edu_audition.teacher_name = #{e.teacherName}
+			</if>
+			<if test="e.status!=null and e.status!=2">
+				and edu_audition.status = #{e.status}
+			</if>
+		</where>
+	</select>
+	<!-- 通过id查询约课记录 -->
+	<select id="getAuditionById" parameterType="Long" resultMap="AuditionResult">
+		select 
+			<include refid="edu_audition_columns" />,
+    		a.SUBJECT_NAME subject_name,
+    		b.SUBJECT_NAME grade_name,
+    		edu_major.name major_name
+		FROM
+    		edu_audition
+		left join sys_subject a on a.SUBJECT_ID = edu_audition.subject_id
+		left join sys_subject b on b.SUBJECT_ID = edu_audition.grade_id
+		left join edu_major on edu_major.id = edu_audition.major_id
+		where 
+			edu_audition.id = #{value}
+	</select>
+	<!-- 根据年级查询约课记录 -->
+	<select id="getAuditionByGrade" parameterType="Long" resultMap="AuditionResult">
+		select
+			<include refid="edu_audition_columns" />
+		from
+			edu_audition
+		where
+			edu_audition.grade_id = #{value}
+	</select>
+</mapper>

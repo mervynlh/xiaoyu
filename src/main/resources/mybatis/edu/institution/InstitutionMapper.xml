@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="InstitutionMapper">
+	<sql id="edu_institution_columns">
+		edu_institution.Id,
+		edu_institution.name,
+		edu_institution.status,
+		edu_institution.sort,
+		edu_institution.inst_pic_url,
+		edu_institution.description,
+		edu_institution.create_time,
+		edu_institution.ID_pic_url,
+		edu_institution.license_pic_url,
+		edu_institution.applicant,
+		edu_institution.mobile,
+		edu_institution.email,
+		edu_institution.user_id
+	</sql>
+	<sql id="edu_institution_properties">
+		#{id},
+		#{name},
+		#{status},
+		#{sort},
+		#{instPictureUrl},
+		#{description},
+		#{createTime},
+		#{idPictureUrl},
+		#{licensePictureUrl},
+		#{applicant},
+		#{mobile},
+		#{email},
+		#{userId}
+	</sql>
+
+	<resultMap type="Institution" id="InstitutionResult">
+		<result property="id" column="Id" />
+		<result property="name" column="name" />
+		<result property="status" column="status" />
+		<result property="sort" column="sort" />
+		<result property="instPictureUrl" column="inst_pic_url" />
+		<result property="description" column="description" />
+		<result property="createTime" column="create_time" />
+		<result property="idPictureUrl" column="ID_pic_url" />
+		<result property="licensePictureUrl" column="license_pic_url" />
+		<result property="applicant" column="applicant" />
+		<result property="mobile" column="mobile" />
+		<result property="email" column="email" />
+		<result property="userId" column="user_id" />
+	</resultMap>
+
+	<!-- 根据机构id获取机构信息 -->
+	<select id="getInstitutionById" resultMap="InstitutionResult"
+		parameterType="Long">
+		SELECT
+		<include refid="edu_institution_columns" />
+		FROM
+		edu_institution
+		WHERE
+		edu_institution.id = #{value}
+	</select>
+
+	<!-- 根据条件查询机构列表 -->
+	<select id="queryInstitutionList" resultMap="InstitutionResult"
+		parameterType="Map">
+		SELECT
+		<include refid="edu_institution_columns" />
+		FROM
+		edu_institution
+		<where>
+			<if test="e.name!=null and e.name!=''">
+				and edu_institution.name = #{e.name}
+			</if>
+			<if test="e.status!=2">
+				and edu_institution.status = #{e.status}
+			</if>
+			<if test="e.applicant!=null and e.applicant!=''">
+				and edu_institution.applicant = #{e.applicant}
+			</if>
+			<if test="e.mobile!=null and e.mobile!=''">
+				and edu_institution.mobile = #{e.mobile}
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and edu_institution.email = #{e.email}
+			</if>
+		</where>
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="queryInstitutionListCount" resultType="int"
+		parameterType="Map">
+		SELECT
+			count(1)
+		FROM
+		edu_institution
+		<where>
+			<if test="e.name!=null and e.name!=''">
+				and edu_institution.name = #{e.name}
+			</if>
+			<if test="e.status!=2">
+				and edu_institution.status = #{e.status}
+			</if>
+			<if test="e.applicant!=null and e.applicant!=''">
+				and edu_institution.applicant = #{e.applicant}
+			</if>
+			<if test="e.mobile!=null and e.mobile!=''">
+				and edu_institution.mobile = #{e.mobile}
+			</if>
+			<if test="e.email!=null and e.email!=''">
+				and edu_institution.email = #{e.email}
+			</if>
+		</where>
+	</select>
+
+	<!-- 添加机构 -->
+	<insert id="addInstitution" parameterType="Institution">
+		INSERT INTO edu_institution (
+		<include refid="edu_institution_columns" />
+		) VALUES (
+		<include refid="edu_institution_properties" />
+		);
+	</insert>
+
+	<!-- 批量删除机构 -->
+	<delete id="delInstitutionBatch">
+		DELETE FROM
+			edu_institution
+		WHERE edu_institution.id in
+		<foreach collection="array" item="item" separator="," open="("
+			close=")">
+			#{item}
+		</foreach>
+	</delete>
+
+	<!-- 更新机构信息 -->
+	<update id="updateInstitution" parameterType="Institution">
+		UPDATE
+			edu_institution
+		SET
+			edu_institution.name = #{name},
+			edu_institution.status = #{status},
+			edu_institution.sort = #{sort},
+			edu_institution.inst_pic_url = #{instPictureUrl},
+			edu_institution.description = #{description},
+			edu_institution.create_time = #{createTime},
+			edu_institution.ID_pic_url = #{idPictureUrl},
+			edu_institution.license_pic_url = #{licensePictureUrl},
+			edu_institution.applicant = #{applicant},
+			edu_institution.mobile =	#{mobile},
+			edu_institution.email = #{email},
+			edu_institution.user_id = #{userId}
+		WHERE
+			edu_institution.id = #{id}
+	</update>
+
+	<!-- 更新机构审核状态 -->
+	<update id="updateInstitutionStatus" parameterType="Institution">
+		UPDATE
+			edu_institution
+		SET
+			edu_institution.status = #{status}
+		WHERE
+			edu_institution.id=#{id}
+	</update>
+	<!-- 查询审核通过未推荐的机构 -->
+	<select id="getInstitutionByStatusAndRec" parameterType="Map"   resultMap="InstitutionResult">
+		select <include refid="edu_institution_columns" /> from edu_institution where edu_institution.status = 1 and edu_institution.id not in(select edu_website_institution.institution_id from edu_website_institution)
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getInstitutionByStatusAndRecCount" parameterType="Map"  resultType="int">
+		select count(1) from edu_institution where edu_institution.status = 1 and edu_institution.id not in(select edu_website_institution.institution_id from edu_website_institution)
+	</select>
+	
+	<!-- 查询审核通过机构列表 -->
+	<select id="getInstitutionList" parameterType="Map"   resultMap="InstitutionResult">
+		select <include refid="edu_institution_columns" /> from edu_institution where edu_institution.status = 1
+		<include refid="publicMapper.pageEnd" />
+	</select>
+	<select id="getInstitutionListCount" parameterType="Map"  resultType="int">
+		select count(1) from edu_institution where edu_institution.status = 1
+	</select>
+</mapper>

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="CouponLimitMapper">
+
+        <resultMap id="CouponLimitResult" type="CouponLimit">
+            <result property="id" column="id"/>
+            <result property="couponId" column="coupon_id"/>
+            <result property="courseId" column="course_id"/>
+        </resultMap>
+
+        <sql id="edu_coupon_limit_columns">
+            edu_coupon_limit.id,
+            edu_coupon_limit.coupon_id,
+            edu_coupon_limit.course_id
+        </sql>
+
+        <sql id="edu_coupon_limit_properties">
+            #{id},
+            #{couponId},
+            #{courseId}
+        </sql>
+
+        <insert id="createCouponLimit" parameterType="CouponLimit" keyColumn="id" keyProperty="id" useGeneratedKeys="true" >
+            insert INTO edu_coupon_limit (<include refid="edu_coupon_limit_columns"/>) VALUES (<include refid="edu_coupon_limit_properties"/>)
+        </insert>
+
+        <delete id="deleteCouponLimitById" parameterType="Long">
+            delete from edu_coupon_limit
+            where
+                id = #{value}
+
+
+        </delete>
+
+        <update id="updateCouponLimit" parameterType="CouponLimit">
+            update edu_coupon_limit SET
+                id = #{id},
+                coupon_id = #{couponId},
+                course_id = #{courseId}
+            where
+                id = #{id}
+
+
+        </update>
+
+        <select id="getCouponLimitById" resultMap="CouponLimitResult" parameterType="Long">
+            select
+            <include refid="edu_coupon_limit_columns"/>
+            from edu_coupon_limit
+            where
+                id = #{value}
+
+
+        </select>
+		
+        <select id="getCouponLimitList" resultMap="CouponLimitResult" parameterType="CouponLimit">
+            select
+            <include refid="edu_coupon_limit_columns"/>
+            from edu_coupon_limit
+        </select>
+        
+</mapper>
